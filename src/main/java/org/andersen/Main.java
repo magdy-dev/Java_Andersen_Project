@@ -7,9 +7,9 @@ import org.andersen.entity.users.Admin;
 import org.andersen.entity.users.Customer;
 import org.andersen.entity.workspace.Availability;
 import org.andersen.entity.workspace.Workspace;
-import org.andersen.service.AuthService;
-import org.andersen.service.BookingService;
-import org.andersen.service.WorkspaceService;
+import org.andersen.service.auth.AuthServiceImp;
+import org.andersen.service.booking.BookingServiceImpl;
+import org.andersen.service.workspace.WorkspaceServiceImpl;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,9 +22,9 @@ public class Main {
     private static final List<Workspace> workspaces = new ArrayList<>();
     private static final List<Booking> bookings = new ArrayList<>();
 
-    private static final AuthService authService = new AuthService(users);
-    private static final WorkspaceService workspaceService = new WorkspaceService(workspaces);
-    private static final BookingService bookingService = new BookingService(bookings, workspaceService);
+    private static final AuthServiceImp AUTH_SERVICE_IMP = new AuthServiceImp(users);
+    private static final WorkspaceServiceImpl WORKSPACE_SERVICE_IMPL = new WorkspaceServiceImpl(workspaces);
+    private static final BookingServiceImpl BOOKING_SERVICE_IMPL = new BookingServiceImpl(bookings, WORKSPACE_SERVICE_IMPL);
     private static final Scanner scanner = new Scanner(System.in);
 
     private static final int SLOT_DURATION_HOURS = 2;
@@ -79,7 +79,7 @@ public class Main {
         String password = scanner.nextLine();
 
         try {
-            authService.registerUser(username, password);
+            AUTH_SERVICE_IMP.registerUser(username, password);
             System.out.println("Registration successful!");
         } catch (IllegalArgumentException e) {
             System.out.println("Registration error: " + e.getMessage());
@@ -93,7 +93,7 @@ public class Main {
         String password = scanner.nextLine();
 
         try {
-            Customer customer = authService.loginCustomer(username, password);
+            Customer customer = AUTH_SERVICE_IMP.loginCustomer(username, password);
             if (customer != null) {
                 customerMenu(customer);
             } else {
@@ -111,7 +111,7 @@ public class Main {
         String password = scanner.nextLine();
 
         try {
-            Admin admin = authService.loginAdmin(username, password);
+            Admin admin = AUTH_SERVICE_IMP.loginAdmin(username, password);
             if (admin != null) {
                 adminMenu();
             } else {
@@ -134,11 +134,12 @@ public class Main {
 
             try {
                 int choice = Integer.parseInt(scanner.nextLine());
+                int bookingIndex=Integer.parseInt(scanner.nextLine());
 
                 switch (choice) {
                     case 1 -> browseWorkspaces();
                     case 2 -> makeReservation(customer);
-                    case 3 -> cancelReservation(customer);
+                    case 3 -> BOOKING_SERVICE_IMPL.cancelReservation(customer,bookingIndex);
                     case 4 -> viewMyBookings(customer);
                     case 5 -> { return; }
                     default -> System.out.println("Invalid choice!");
@@ -212,8 +213,8 @@ public class Main {
             System.out.print("Enter description: ");
             String description = scanner.nextLine();
 
-            workspaceService.addWorkspace(name, description);
-            int wsIndex = workspaceService.getAllWorkspaces().size() - 1;
+            WORKSPACE_SERVICE_IMPL.addWorkspace(name, description);
+            int wsIndex = WORKSPACE_SERVICE_IMPL.getAllWorkspaces().size() - 1;
 
             while (true) {
                 System.out.print("Enter availability date (YYYY-MM-DD) or 'done': ");
@@ -226,7 +227,7 @@ public class Main {
                 System.out.print("Enter capacity: ");
                 int capacity = Integer.parseInt(scanner.nextLine());
 
-                workspaceService.addAvailabilityToWorkspace(
+                WORKSPACE_SERVICE_IMPL.addAvailabilityToWorkspace(
                         wsIndex,
                         new Availability(date, time, capacity)
                 );
@@ -243,7 +244,7 @@ public class Main {
             System.out.print("Enter workspace number to remove: ");
             int index = Integer.parseInt(scanner.nextLine()) - 1;
 
-            workspaceService.removeWorkspace(index);
+            WORKSPACE_SERVICE_IMPL.removeWorkspace(index);
             System.out.println("Workspace removed successfully!");
         } catch (Exception e) {
             System.out.println("Error removing workspace: " + e.getMessage());
@@ -261,7 +262,7 @@ public class Main {
             System.out.print("Enter new description: ");
             String newDesc = scanner.nextLine();
 
-            workspaceService.updateWorkspace(index, newName, newDesc);
+            WORKSPACE_SERVICE_IMPL.updateWorkspace(index, newName, newDesc);
             System.out.println("Workspace updated successfully!");
         } catch (Exception e) {
             System.out.println("Error updating workspace: " + e.getMessage());
@@ -270,7 +271,7 @@ public class Main {
 
     private static void viewWorkspaces() {
         System.out.println("\n=== All Workspaces ===");
-        workspaceService.getAllWorkspaces().forEach(ws -> {
+        WORKSPACE_SERVICE_IMPL.getAllWorkspaces().forEach(ws -> {
             System.out.println("• " + ws.getName());
             System.out.println("  Description: " + ws.getDescription());
             System.out.println("  Available Slots: " + ws.getAvailabilities().size());
@@ -279,7 +280,7 @@ public class Main {
 
     private static void viewAllBookings() {
         System.out.println("\n=== All Bookings ===");
-        bookingService.getAllBookings().forEach(booking -> {
+        BOOKING_SERVICE_IMPL.getAllBookings().forEach(booking -> {
             String workspaceName = booking.getWorkspace() != null
                     ? booking.getWorkspace().getName()
                     : "Deleted Workspace";
@@ -294,7 +295,7 @@ public class Main {
 
     private static void browseWorkspaces() {
         System.out.println("\n=== Available Workspaces ===");
-        workspaceService.getAllWorkspaces().forEach(ws -> {
+        WORKSPACE_SERVICE_IMPL.getAllWorkspaces().forEach(ws -> {
             System.out.println("• " + ws.getName() + " - " + ws.getDescription());
             ws.getAvailabilities().stream()
                     .filter(avail -> avail.getRemaining() > 0)
@@ -312,7 +313,7 @@ public class Main {
             System.out.print("Select workspace number: ");
             int wsIdx = Integer.parseInt(scanner.nextLine()) - 1;
 
-            Workspace ws = workspaceService.getAllWorkspaces().get(wsIdx);
+            Workspace ws = WORKSPACE_SERVICE_IMPL.getAllWorkspaces().get(wsIdx);
             List<Availability> availabilities = ws.getAvailabilities();
 
             System.out.println("Available slots:");
@@ -327,7 +328,7 @@ public class Main {
             System.out.print("Select slot number: ");
             int slotIdx = Integer.parseInt(scanner.nextLine()) - 1;
 
-            bookingService.makeReservation(customer, wsIdx, slotIdx);
+            BOOKING_SERVICE_IMPL.makeReservation(customer, wsIdx, slotIdx);
             System.out.println("Reservation successful!");
         } catch (Exception e) {
             System.out.println("Reservation failed: " + e.getMessage());
@@ -336,22 +337,11 @@ public class Main {
 
 
 
-    private static void cancelReservation(Customer customer) {
-        try {
-            List<Booking> customerBookings = bookingService.getCustomerBookings(customer);
-            if (customerBookings.isEmpty()) {
-                System.out.println("No bookings to cancel!");
-                return;
-            }
-            System.out.println("\nYour Bookings:");
-        } finally {
 
-        }
-    }
 
     private static void viewMyBookings(Customer customer) {
         try {
-            List<Booking> bookings = bookingService.getCustomerBookings(customer);
+            List<Booking> bookings = BOOKING_SERVICE_IMPL.getCustomerBookings(customer);
 
             if (bookings.isEmpty()) {
                 System.out.println("\nYou have no bookings yet.");

@@ -1,4 +1,4 @@
-package org.andersen.service;
+package org.andersen.service.workspace;
 
 
 
@@ -6,10 +6,10 @@ import org.andersen.entity.workspace.Availability;
 import org.andersen.entity.workspace.Workspace;
 import java.util.List;
 
-public class WorkspaceService {
+public class WorkspaceServiceImpl implements WorkspaceService {
     private final List<Workspace> workspaces;
 
-    public WorkspaceService(List<Workspace> workspaces) {
+    public WorkspaceServiceImpl(List<Workspace> workspaces) {
         this.workspaces = workspaces;
     }
 

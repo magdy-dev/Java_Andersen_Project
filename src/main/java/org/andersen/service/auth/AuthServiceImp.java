@@ -1,4 +1,4 @@
-package org.andersen.service;
+package org.andersen.service.auth;
 
 
 import org.andersen.entity.role.User;
@@ -7,10 +7,10 @@ import org.andersen.entity.users.Customer;
 
 import java.util.List;
 
-public class AuthService {
+public class AuthServiceImp implements AuthService {
     private final List<User> users;
 
-    public AuthService(List<User> users) {
+    public AuthServiceImp(List<User> users) {
         this.users = users;
     }
 

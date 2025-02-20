@@ -1,29 +1,30 @@
-package org.andersen.service;
+package org.andersen.service.booking;
 
 
 import org.andersen.entity.booking.Booking;
 import org.andersen.entity.users.Customer;
 import org.andersen.entity.workspace.Availability;
 import org.andersen.entity.workspace.Workspace;
+import org.andersen.service.workspace.WorkspaceServiceImpl;
 
 import java.util.Collections;
 import java.util.List;
 
-public class BookingService {
+public class BookingServiceImpl implements BookingService{
     private final List<Booking> bookings;
-    private final WorkspaceService workspaceService;
+    private final WorkspaceServiceImpl workspaceServiceImpl;
 
     public List<Booking> getAllBookings() {
         return Collections.unmodifiableList(bookings);
     }
 
-    public BookingService(List<Booking> bookings, WorkspaceService workspaceService) {
+    public BookingServiceImpl(List<Booking> bookings, WorkspaceServiceImpl workspaceServiceImpl) {
         this.bookings = bookings;
-        this.workspaceService = workspaceService;
+        this.workspaceServiceImpl = workspaceServiceImpl;
     }
 
     public void makeReservation(Customer customer, int workspaceIndex, int availabilityIndex) {
-        Workspace workspace = workspaceService.getAllWorkspaces().get(workspaceIndex);
+        Workspace workspace = workspaceServiceImpl.getAllWorkspaces().get(workspaceIndex);
         Availability availability = workspace.getAvailabilities().get(availabilityIndex);
 
         if (availability.getRemaining() > 0) {
