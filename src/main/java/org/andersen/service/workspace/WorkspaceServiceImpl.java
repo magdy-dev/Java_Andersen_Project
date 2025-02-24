@@ -1,37 +1,39 @@
 package org.andersen.service.workspace;
 
-
-
-import org.andersen.entity.workspace.Availability;
 import org.andersen.entity.workspace.Workspace;
+import org.andersen.exception.WorkspaceNotFoundException;
+import org.andersen.repository.workspace.WorkspaceRepositoryImpl;
 import java.util.List;
 
 public class WorkspaceServiceImpl implements WorkspaceService {
-    private final List<Workspace> workspaces;
+    private final WorkspaceRepositoryImpl workspaceRepository;
 
-    public WorkspaceServiceImpl(List<Workspace> workspaces) {
-        this.workspaces = workspaces;
+    public WorkspaceServiceImpl(WorkspaceRepositoryImpl workspaceRepository) throws WorkspaceNotFoundException {
+        this.workspaceRepository = workspaceRepository;
+        this.workspaceRepository.loadWorkspacesFromFile(); // Load workspaces during initialization
     }
 
-    public void addWorkspace(String name, String description) {
-        workspaces.add(new Workspace(name, description));
+    @Override
+    public void addWorkspace(Workspace workspace) throws WorkspaceNotFoundException {
+        if (workspace == null) {
+            throw new IllegalArgumentException("Workspace cannot be null.");
+        }
+        workspaceRepository.addWorkspace(workspace);
+        workspaceRepository.saveWorkspacesToFile(); // Save after adding
     }
 
-    public void removeWorkspace(int index) {
-        workspaces.remove(index);
+    @Override
+    public void removeWorkspace(int index) throws WorkspaceNotFoundException {
+        List<Workspace> workspaces = workspaceRepository.getAllWorkspaces();
+        if (index < 0 || index >= workspaces.size()) {
+            throw new WorkspaceNotFoundException("Workspace not found.");
+        }
+        workspaceRepository.removeWorkspace(workspaces.get(index));
+        workspaceRepository.saveWorkspacesToFile(); // Save after removing
     }
 
-    public void updateWorkspace(int index, String newName, String newDescription) {
-        Workspace ws = workspaces.get(index);
-        if (!newName.isEmpty()) ws.setName(newName);
-        if (!newDescription.isEmpty()) ws.setDescription(newDescription);
-    }
-
-    public void addAvailabilityToWorkspace(int workspaceIndex, Availability availability) {
-        workspaces.get(workspaceIndex).getAvailabilities().add(availability);
-    }
-
+    @Override
     public List<Workspace> getAllWorkspaces() {
-        return workspaces;
+        return workspaceRepository.getAllWorkspaces();
     }
 }

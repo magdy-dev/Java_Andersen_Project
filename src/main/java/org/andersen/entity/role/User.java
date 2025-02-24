@@ -9,7 +9,6 @@ public class User {
 
     public User() {
     }
-
     public User(String userName, String password, UserRole role) {
         this.userName = userName;
         this.password = password;

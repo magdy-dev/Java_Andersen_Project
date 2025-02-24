@@ -1,51 +1,44 @@
 package org.andersen.service.booking;
 
-
 import org.andersen.entity.booking.Booking;
 import org.andersen.entity.users.Customer;
-import org.andersen.entity.workspace.Availability;
-import org.andersen.entity.workspace.Workspace;
-import org.andersen.service.workspace.WorkspaceServiceImpl;
-
-import java.util.Collections;
+import org.andersen.repository.booking.BookingRepositoryImpl;
 import java.util.List;
 
-public class BookingServiceImpl implements BookingService{
-    private final List<Booking> bookings;
-    private final WorkspaceServiceImpl workspaceServiceImpl;
+public class BookingServiceImpl implements BookingService {
+    private final BookingRepositoryImpl bookingRepository;
 
-    public List<Booking> getAllBookings() {
-        return Collections.unmodifiableList(bookings);
+    public BookingServiceImpl(BookingRepositoryImpl bookingRepository) {
+        this.bookingRepository = bookingRepository;
     }
 
-    public BookingServiceImpl(List<Booking> bookings, WorkspaceServiceImpl workspaceServiceImpl) {
-        this.bookings = bookings;
-        this.workspaceServiceImpl = workspaceServiceImpl;
+    @Override
+    public void makeReservation(Customer customer, Booking booking) {
+        bookingRepository.addBooking(booking);
+        customer.getBookings().add(booking);
     }
 
-    public void makeReservation(Customer customer, int workspaceIndex, int availabilityIndex) {
-        Workspace workspace = workspaceServiceImpl.getAllWorkspaces().get(workspaceIndex);
-        Availability availability = workspace.getAvailabilities().get(availabilityIndex);
+    @Override
+    public void cancelReservation(Customer customer, long bookingId) {
+        List<Booking> bookings = customer.getBookings();
+        Booking bookingToRemove = null;
 
-        if (availability.getRemaining() > 0) {
-            availability.decrement();
-            Booking booking = new Booking(customer, workspace, availability.getDate(), availability.getTime());
-            bookings.add(booking);
-            customer.getBookings().add(booking);
+        for (Booking booking : bookings) {
+            if (booking.getId() == bookingId) {
+                bookingToRemove = booking;
+                break;
+            }
+        }
+
+        if (bookingToRemove != null) {
+            bookings.remove(bookingToRemove);
+            bookingRepository.removeBooking(bookingToRemove);
+        } else {
+            System.out.println("No reservation found with the provided ID.");
         }
     }
 
-    public void cancelReservation(Customer customer, int bookingIndex) {
-        Booking booking = customer.getBookings().remove(bookingIndex);
-        bookings.remove(booking);
-
-        booking.getWorkspace().getAvailabilities().stream()
-                .filter(avail -> avail.getDate().equals(booking.getDate()) &&
-                        avail.getTime().equals(booking.getTime()))
-                .findFirst()
-                .ifPresent(Availability::increment);
-    }
-
+    @Override
     public List<Booking> getCustomerBookings(Customer customer) {
         return customer.getBookings();
     }

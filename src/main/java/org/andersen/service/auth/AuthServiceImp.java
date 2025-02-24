@@ -4,6 +4,7 @@ package org.andersen.service.auth;
 import org.andersen.entity.role.User;
 import org.andersen.entity.users.Admin;
 import org.andersen.entity.users.Customer;
+import org.andersen.exception.UserAuthenticationException;
 
 import java.util.List;
 
@@ -14,27 +15,36 @@ public class AuthServiceImp implements AuthService {
         this.users = users;
     }
 
-    public Customer loginCustomer(String username, String password) {
+    public Customer loginCustomer(String username, String password) throws UserAuthenticationException {
         return users.stream()
                 .filter(user -> user instanceof Customer &&
                         user.getUserName().equals(username) &&
                         user.getPassword().equals(password))
                 .map(user -> (Customer) user)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new UserAuthenticationException("Customer not found or invalid credentials."));
     }
 
-    public Admin loginAdmin(String username, String password) {
+    public Admin loginAdmin(String username, String password) throws UserAuthenticationException {
         return users.stream()
                 .filter(user -> user instanceof Admin &&
-                        user.getUserName().equals(username) &&
-                        user.getPassword().equals(password))
+                        user.getUserName().equals("admin") &&
+                        user.getPassword().equals("admin"))
                 .map(user -> (Admin) user)
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new UserAuthenticationException("Admin not found or invalid credentials."));
     }
 
-    public void registerUser(String username, String password) {
+    public void registerUser(String username, String password) throws UserAuthenticationException {
+
+        if (users.stream().anyMatch(user -> user.getUserName().equals(username))) {
+            throw new UserAuthenticationException("Username already exists.");
+        }
+
         users.add(new Customer(username, password));
     }
+
+
+
+
 }

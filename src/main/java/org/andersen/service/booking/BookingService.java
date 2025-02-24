@@ -6,8 +6,7 @@ import org.andersen.entity.users.Customer;
 import java.util.List;
 
 public interface BookingService {
-    List<Booking> getAllBookings();
-    void makeReservation(Customer customer, int workspaceIndex, int availabilityIndex);
-    void cancelReservation(Customer customer, int bookingIndex);
+    void makeReservation(Customer customer, Booking booking);
+    void cancelReservation(Customer customer, long bookingIndex);
     List<Booking> getCustomerBookings(Customer customer);
 }
