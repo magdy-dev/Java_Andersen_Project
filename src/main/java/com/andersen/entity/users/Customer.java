@@ -1,9 +1,8 @@
-package org.andersen.entity.users;
+package com.andersen.entity.users;
 
-import org.andersen.entity.booking.Booking;
-import org.andersen.entity.role.UserRole;
-import org.andersen.entity.role.User;
-
+import com.andersen.entity.booking.Booking;
+import com.andersen.entity.role.UserRole;
+import com.andersen.entity.role.User;
 import java.util.ArrayList;
 import java.util.List;
 

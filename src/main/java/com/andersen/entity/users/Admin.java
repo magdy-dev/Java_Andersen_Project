@@ -1,8 +1,7 @@
-package org.andersen.entity.users;
+package com.andersen.entity.users;
 
-import org.andersen.entity.role.User;
-import org.andersen.entity.role.UserRole;
-
+import com.andersen.entity.role.User;
+import com.andersen.entity.role.UserRole;
 
 public class Admin extends User {
     public Admin(String username, String password) {

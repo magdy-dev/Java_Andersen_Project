@@ -1,4 +1,4 @@
-package org.andersen.entity.role;
+package com.andersen.entity.role;
 
 import java.util.Objects;
 
@@ -9,7 +9,6 @@ public class User {
 
     public User() {
     }
-
     public User(String userName, String password, UserRole role) {
         this.userName = userName;
         this.password = password;
