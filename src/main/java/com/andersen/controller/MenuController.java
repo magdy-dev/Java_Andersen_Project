@@ -80,7 +80,7 @@ public class MenuController {
                 case 2 -> removeWorkspace();
                 case 3 -> viewAllReservations();
                 case 4 -> {
-                    return; // Back to the main menu
+                    return; 
                 }
                 default -> System.out.println("Invalid choice! Please try again.");
             }
@@ -105,7 +105,7 @@ public class MenuController {
         if ("magdy".equals(username) && "magdy".equals(password)) {
             return new Customer(username, password);
         }
-        return null; // Failed
+        return null;
     }
 
     private void customerMenu(Customer customer) {
@@ -225,17 +225,14 @@ public class MenuController {
             }
         }
 
-        // Create booking and associate it with the customer and workspace
         Booking booking = new Booking(customer, selectedWorkspace, startTimeStr, endTimeStr);
 
-        // Assuming the BookingService handles adding the booking to the workspace
         bookingService.makeReservation(customer, booking);
         selectedWorkspace.addBooking(booking);
 
         System.out.println("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTimeStr + " to " + endTimeStr);
     }
 
-    // Method to validate time format
     private boolean isValidTimeFormat(String time) {
         try {
             LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
@@ -279,7 +276,6 @@ public class MenuController {
         System.out.print("Enter reservation ID to cancel: ");
         String reservationId = scanner.nextLine();
 
-        // Find the booking by ID
         Booking bookingToCancel = null;
         for (Booking booking : bookings) {
             if (String.valueOf(booking.getId()).equals(reservationId)) {
@@ -293,7 +289,7 @@ public class MenuController {
             return;
         }
 
-        // Cancel the booking
+        
         customer.getBookings().remove(bookingToCancel);
         bookingService.cancelReservation(customer, bookingToCancel.getId());
         System.out.println("Reservation canceled successfully!");

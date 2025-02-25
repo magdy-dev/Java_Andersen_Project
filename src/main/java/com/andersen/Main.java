@@ -2,7 +2,7 @@ package com.andersen;
 
 import com.andersen.controller.MenuController;
 import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.repository.booking.BookingRepositoryImpl; // Ensure you have the correct import
+import com.andersen.repository.booking.BookingRepositoryImpl; 
 import com.andersen.repository.workspace.WorkspaceRepositoryImpl;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
@@ -14,19 +14,18 @@ public class Main {
     public static void main(String[] args) throws WorkspaceNotFoundException {
         Scanner scanner = new Scanner(System.in);
 
-        // instances of the repositories
+       
         WorkspaceRepositoryImpl workspaceRepository = new WorkspaceRepositoryImpl();
-        WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceRepository); // Pass repository to service
+        WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceRepository); 
 
-        // instance of BookingRepository
-        BookingRepositoryImpl bookingRepository = new BookingRepositoryImpl(); // Replace with actual implementation
-        BookingService bookingService = new BookingServiceImpl(bookingRepository); // Pass the repository to the service
 
-        // menu controller
+        BookingRepositoryImpl bookingRepository = new BookingRepositoryImpl(); 
+        BookingService bookingService = new BookingServiceImpl(bookingRepository); 
+
         MenuController menuController = new MenuController(workspaceService, bookingService, scanner);
         menuController.mainMenu();
 
-        // scanner when done
+
         scanner.close();
     }
 }
