@@ -11,6 +11,7 @@ public interface BookingRepository {
     public void removeBooking(Booking booking);
 
     public List<Booking> getAllBookings() ;
+    long generateId();
 
 
 }

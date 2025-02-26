@@ -2,7 +2,11 @@ package com.andersen.service.booking;
 
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
+import com.andersen.entity.workspace.Workspace;
+import com.andersen.repository.booking.BookingRepository;
 import com.andersen.repository.booking.BookingRepositoryImpl;
+
+import java.time.LocalTime;
 import java.util.List;
 
 public class BookingServiceImpl implements BookingService {
@@ -10,6 +14,11 @@ public class BookingServiceImpl implements BookingService {
 
     public BookingServiceImpl(BookingRepositoryImpl bookingRepository) {
         this.bookingRepository = bookingRepository;
+    }
+
+        public Booking createBooking(Customer customer, Workspace workspace, LocalTime startTime, LocalTime endTime) {
+        long id = bookingRepository.generateId();
+        return new Booking(id, customer, workspace, startTime, endTime);
     }
 
     @Override

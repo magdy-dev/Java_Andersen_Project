@@ -11,4 +11,6 @@ public interface WorkspaceRepository {
     void removeWorkspace(Workspace workspace);
 
     List<Workspace> getAllWorkspaces();
+
+
 }

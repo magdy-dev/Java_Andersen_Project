@@ -4,6 +4,8 @@ import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
+import com.andersen.repository.booking.BookingRepository;
+import com.andersen.repository.booking.BookingRepositoryImpl;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
@@ -194,48 +196,47 @@ public class MenuController {
 
     private void makeReservation(Customer customer) {
         System.out.print("Enter workspace index to reserve: ");
-        int index = getIntInput() - 1; // Adjust for zero-based indexing
-
-        // Validate workspace index
+        int index = getIntInput() - 1;
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (index < 0 || index >= workspaces.size()) {
             System.out.println("Invalid workspace index. Please try again.");
             return;
         }
+
         Workspace selectedWorkspace = workspaces.get(index);
-        String startTimeStr, endTimeStr;
+        LocalTime startTime = getValidTime("Enter reservation start time (HH:mm): ");
+        LocalTime endTime = getValidTime("Enter reservation end time (HH:mm): ");
 
-        while (true) {
-            System.out.print("Enter reservation start time (HH:mm): ");
-            startTimeStr = scanner.nextLine();
-            if (isValidTimeFormat(startTimeStr)) {
-                break;
-            } else {
-                System.out.println("Invalid time format. Please use HH:mm.");
-            }
+        // Check if the end time is after the start time
+        if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
+            System.out.println("End time must be after start time. Please try again.");
+            return;
         }
 
-        while (true) {
-            System.out.print("Enter reservation end time (HH:mm): ");
-            endTimeStr = scanner.nextLine();
-            if (isValidTimeFormat(endTimeStr)) {
-                break;
-            } else {
-                System.out.println("Invalid time format. Please use HH:mm.");
-            }
-        }
+        // Create the booking using the service method
+        Booking booking = bookingService.createBooking(customer, selectedWorkspace, startTime, endTime);
 
-        // Create booking and associate it with the customer and workspace
-        Booking booking = new Booking(customer, selectedWorkspace, startTimeStr, endTimeStr);
-
-        // Assuming the BookingService handles adding the booking to the workspace
+        // Make the reservation
         bookingService.makeReservation(customer, booking);
         selectedWorkspace.addBooking(booking);
 
-        System.out.println("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTimeStr + " to " + endTimeStr);
+        System.out.println("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTime + " to " + endTime);
     }
 
-    // Method to validate time format
+    private LocalTime getValidTime(String prompt) {
+        while (true) {
+            System.out.print(prompt);
+            String timeStr = scanner.nextLine();
+            if (isValidTimeFormat(timeStr)) {
+                return LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
+            } else {
+                System.out.println("Invalid time format. Please use HH:mm.");
+            }
+        }
+    }
+
+
+
     private boolean isValidTimeFormat(String time) {
         try {
             LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));

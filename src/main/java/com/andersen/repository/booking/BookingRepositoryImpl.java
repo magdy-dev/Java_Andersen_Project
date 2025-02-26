@@ -21,4 +21,11 @@ public class BookingRepositoryImpl implements BookingRepository {
     public List<Booking> getAllBookings() {
         return new ArrayList<>(bookings);
     }
+
+    @Override
+    public long generateId() {
+
+        return System.currentTimeMillis();
+    }
+
 }
