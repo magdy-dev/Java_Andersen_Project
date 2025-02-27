@@ -8,7 +8,7 @@ import java.util.List;
 public interface WorkspaceRepository {
     void addWorkspace(Workspace workspace) throws WorkspaceNotFoundException;
 
-    void removeWorkspace(Workspace workspace);
+    void removeWorkspace(Workspace workspace) throws WorkspaceNotFoundException;
 
     List<Workspace> getAllWorkspaces();
 
