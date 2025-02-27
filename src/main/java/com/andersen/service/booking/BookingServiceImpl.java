@@ -3,9 +3,7 @@ package com.andersen.service.booking;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.repository.booking.BookingRepository;
 import com.andersen.repository.booking.BookingRepositoryImpl;
-
 import java.time.LocalTime;
 import java.util.List;
 
@@ -31,14 +29,12 @@ public class BookingServiceImpl implements BookingService {
     public void cancelReservation(Customer customer, long bookingId) {
         List<Booking> bookings = customer.getBookings();
         Booking bookingToRemove = null;
-
         for (Booking booking : bookings) {
             if (booking.getId() == bookingId) {
                 bookingToRemove = booking;
                 break;
             }
         }
-
         if (bookingToRemove != null) {
             bookings.remove(bookingToRemove);
             bookingRepository.removeBooking(bookingToRemove);

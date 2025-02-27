@@ -213,10 +213,10 @@ public class MenuController {
             return;
         }
 
-        // Create the booking using the service method
+
         Booking booking = bookingService.createBooking(customer, selectedWorkspace, startTime, endTime);
 
-        // Make the reservation
+
         bookingService.makeReservation(customer, booking);
         selectedWorkspace.addBooking(booking);
 

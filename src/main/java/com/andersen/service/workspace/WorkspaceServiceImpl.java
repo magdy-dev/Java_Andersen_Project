@@ -10,7 +10,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     public WorkspaceServiceImpl(WorkspaceRepositoryImpl workspaceRepository) throws WorkspaceNotFoundException {
         this.workspaceRepository = workspaceRepository;
-        this.workspaceRepository.loadWorkspacesFromFile(); // Load workspaces during initialization
+        this.workspaceRepository.loadWorkspacesFromFile();
     }
 
     @Override
@@ -19,7 +19,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new IllegalArgumentException("Workspace cannot be null.");
         }
         workspaceRepository.addWorkspace(workspace);
-        workspaceRepository.saveWorkspacesToFile(); // Save after adding
+
     }
 
     @Override
@@ -29,7 +29,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceNotFoundException("Workspace not found.");
         }
         workspaceRepository.removeWorkspace(workspaces.get(index));
-        workspaceRepository.saveWorkspacesToFile(); // Save after removing
+        // No need to call saveWorkspacesToFile() here since it's private
     }
 
     @Override
