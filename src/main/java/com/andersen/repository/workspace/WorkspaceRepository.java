@@ -5,12 +5,11 @@ import com.andersen.exception.WorkspaceNotFoundException;
 
 import java.util.List;
 
-public interface WorkspaceRepository {
-    void addWorkspace(Workspace workspace) throws WorkspaceNotFoundException;
+public interface WorkspaceRepository<T extends Workspace> {
+    void addWorkspace(T workspace) throws WorkspaceNotFoundException;
 
-    void removeWorkspace(Workspace workspace) throws WorkspaceNotFoundException;
+    void removeWorkspace(T workspace) throws WorkspaceNotFoundException;
 
-    List<Workspace> getAllWorkspaces();
-
+    List<T> getAllWorkspaces();
 
 }
