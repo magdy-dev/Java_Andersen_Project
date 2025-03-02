@@ -10,6 +10,7 @@ import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
+
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -27,7 +28,7 @@ public class MenuController {
         this.scanner = scanner;
     }
 
-    public void mainMenu() throws WorkspaceNotFoundException {
+    public void mainMenu() {
         while (true) {
             System.out.println("\n=== Welcome to the Coworking Space Reservation ===");
             System.out.println("1. Admin Login");
@@ -39,16 +40,18 @@ public class MenuController {
             switch (choice) {
                 case 1 -> adminLogin();
                 case 2 -> userLogin();
-                case 3 -> {
-                    System.out.println("Exiting the application...");
-                    System.exit(0);
-                }
+                case 3 -> exitApplication();
                 default -> System.out.println("Invalid choice! Please try again.");
             }
         }
     }
 
-    private void adminLogin() throws WorkspaceNotFoundException {
+    private void exitApplication() {
+        System.out.println("Exiting the application...");
+        System.exit(0);
+    }
+
+    private void adminLogin() {
         System.out.print("Admin Username: ");
         String username = scanner.nextLine();
         System.out.print("Admin Password: ");
@@ -65,7 +68,7 @@ public class MenuController {
         return "admin".equals(username) && "admin".equals(password);
     }
 
-    private void adminMenu() throws WorkspaceNotFoundException {
+    private void adminMenu() {
         System.out.println("Admin Logged In");
 
         while (true) {
@@ -135,14 +138,18 @@ public class MenuController {
         }
     }
 
-    private void addWorkspace() throws WorkspaceNotFoundException {
+    private void addWorkspace() {
         System.out.print("Enter workspace name: ");
         String name = scanner.nextLine();
         System.out.print("Enter workspace description: ");
         String description = scanner.nextLine();
 
-        workspaceService.addWorkspace(new Workspace(name, description));
-        System.out.println("Workspace added successfully!");
+        try {
+            workspaceService.addWorkspace(new Workspace(name, description));
+            System.out.println("Workspace added successfully!");
+        } catch (WorkspaceNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
     private void removeWorkspace() {
@@ -213,10 +220,7 @@ public class MenuController {
             return;
         }
 
-
         Booking booking = bookingService.createBooking(customer, selectedWorkspace, startTime, endTime);
-
-
         bookingService.makeReservation(customer, booking);
         selectedWorkspace.addBooking(booking);
 
@@ -234,8 +238,6 @@ public class MenuController {
             }
         }
     }
-
-
 
     private boolean isValidTimeFormat(String time) {
         try {
@@ -281,13 +283,10 @@ public class MenuController {
         String reservationId = scanner.nextLine();
 
         // Find the booking by ID
-        Booking bookingToCancel = null;
-        for (Booking booking : bookings) {
-            if (String.valueOf(booking.getId()).equals(reservationId)) {
-                bookingToCancel = booking;
-                break;
-            }
-        }
+        Booking bookingToCancel = bookings.stream()
+                .filter(booking -> String.valueOf(booking.getId()).equals(reservationId))
+                .findFirst()
+                .orElse(null);
 
         if (bookingToCancel == null) {
             System.out.println("No reservation found with that ID. Please try again.");
