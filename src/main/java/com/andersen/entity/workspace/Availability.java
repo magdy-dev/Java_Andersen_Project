@@ -1,6 +1,5 @@
 package com.andersen.entity.workspace;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

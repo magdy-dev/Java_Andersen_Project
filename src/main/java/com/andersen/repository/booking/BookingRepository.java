@@ -4,13 +4,14 @@ import com.andersen.entity.booking.Booking;
 
 import java.util.List;
 
-public interface BookingRepository {
+public interface BookingRepository<T extends Booking> {
 
-    public void addBooking(Booking booking);
+    void addBooking(T booking);
 
-    public void removeBooking(Booking booking);
+    void removeBooking(T booking);
 
-    public List<Booking> getAllBookings() ;
+    List<Booking> getAllBookings();
+
     long generateId();
 
 

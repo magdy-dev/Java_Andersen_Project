@@ -8,9 +8,9 @@ import java.util.List;
 public class WorkspaceServiceImpl implements WorkspaceService {
     private final WorkspaceRepositoryImpl workspaceRepository;
 
-    public WorkspaceServiceImpl(WorkspaceRepositoryImpl workspaceRepository) throws WorkspaceNotFoundException {
+    // Constructor initializes the repository, and loading is handled in the repository's constructor
+    public WorkspaceServiceImpl(WorkspaceRepositoryImpl workspaceRepository) {
         this.workspaceRepository = workspaceRepository;
-        this.workspaceRepository.loadWorkspacesFromFile(); // Load workspaces during initialization
     }
 
     @Override
@@ -19,7 +19,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new IllegalArgumentException("Workspace cannot be null.");
         }
         workspaceRepository.addWorkspace(workspace);
-        workspaceRepository.saveWorkspacesToFile(); // Save after adding
     }
 
     @Override
@@ -29,7 +28,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceNotFoundException("Workspace not found.");
         }
         workspaceRepository.removeWorkspace(workspaces.get(index));
-        workspaceRepository.saveWorkspacesToFile(); // Save after removing
     }
 
     @Override
