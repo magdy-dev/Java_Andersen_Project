@@ -4,8 +4,6 @@ import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.repository.booking.BookingRepository;
-import com.andersen.repository.booking.BookingRepositoryImpl;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
@@ -82,7 +80,7 @@ public class MenuController {
                 case 2 -> removeWorkspace();
                 case 3 -> viewAllReservations();
                 case 4 -> {
-                    return; // Back to the main menu
+                    return; 
                 }
                 default -> System.out.println("Invalid choice! Please try again.");
             }
@@ -107,7 +105,7 @@ public class MenuController {
         if ("magdy".equals(username) && "magdy".equals(password)) {
             return new Customer(username, password);
         }
-        return null; // Failed
+        return null;
     }
 
     private void customerMenu(Customer customer) {
@@ -196,46 +194,44 @@ public class MenuController {
 
     private void makeReservation(Customer customer) {
         System.out.print("Enter workspace index to reserve: ");
-        int index = getIntInput() - 1;
+        int index = getIntInput() - 1; // Adjust for zero-based indexing
+
+        // Validate workspace index
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (index < 0 || index >= workspaces.size()) {
             System.out.println("Invalid workspace index. Please try again.");
             return;
         }
-
         Workspace selectedWorkspace = workspaces.get(index);
-        LocalTime startTime = getValidTime("Enter reservation start time (HH:mm): ");
-        LocalTime endTime = getValidTime("Enter reservation end time (HH:mm): ");
+        String startTimeStr, endTimeStr;
 
-        // Check if the end time is after the start time
-        if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
-            System.out.println("End time must be after start time. Please try again.");
-            return;
-        }
-
-
-        Booking booking = bookingService.createBooking(customer, selectedWorkspace, startTime, endTime);
-
-
-        bookingService.makeReservation(customer, booking);
-        selectedWorkspace.addBooking(booking);
-
-        System.out.println("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTime + " to " + endTime);
-    }
-
-    private LocalTime getValidTime(String prompt) {
         while (true) {
-            System.out.print(prompt);
-            String timeStr = scanner.nextLine();
-            if (isValidTimeFormat(timeStr)) {
-                return LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
+            System.out.print("Enter reservation start time (HH:mm): ");
+            startTimeStr = scanner.nextLine();
+            if (isValidTimeFormat(startTimeStr)) {
+                break;
             } else {
                 System.out.println("Invalid time format. Please use HH:mm.");
             }
         }
+
+        while (true) {
+            System.out.print("Enter reservation end time (HH:mm): ");
+            endTimeStr = scanner.nextLine();
+            if (isValidTimeFormat(endTimeStr)) {
+                break;
+            } else {
+                System.out.println("Invalid time format. Please use HH:mm.");
+            }
+        }
+
+        Booking booking = new Booking(customer, selectedWorkspace, startTimeStr, endTimeStr);
+
+        bookingService.makeReservation(customer, booking);
+        selectedWorkspace.addBooking(booking);
+
+        System.out.println("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTimeStr + " to " + endTimeStr);
     }
-
-
 
     private boolean isValidTimeFormat(String time) {
         try {
@@ -280,7 +276,6 @@ public class MenuController {
         System.out.print("Enter reservation ID to cancel: ");
         String reservationId = scanner.nextLine();
 
-        // Find the booking by ID
         Booking bookingToCancel = null;
         for (Booking booking : bookings) {
             if (String.valueOf(booking.getId()).equals(reservationId)) {
@@ -294,7 +289,7 @@ public class MenuController {
             return;
         }
 
-        // Cancel the booking
+        
         customer.getBookings().remove(bookingToCancel);
         bookingService.cancelReservation(customer, bookingToCancel.getId());
         System.out.println("Reservation canceled successfully!");
