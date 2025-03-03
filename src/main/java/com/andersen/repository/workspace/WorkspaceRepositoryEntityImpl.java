@@ -9,12 +9,12 @@ import java.util.Set;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
-public class WorkspaceRepositoryImpl implements WorkspaceRepository<Workspace> {
+public class WorkspaceRepositoryEntityImpl implements WorkspaceRepository {
     private final Set<Workspace> workspaces = new TreeSet<>((w1, w2) -> w1.getName().compareTo(w2.getName())); // Auto-sort by name
     private final String filePath = "workspaces.txt"; // File to store workspaces
 
     // Constructor that loads workspaces from file
-    public WorkspaceRepositoryImpl() throws WorkspaceNotFoundException {
+    public WorkspaceRepositoryEntityImpl() throws WorkspaceNotFoundException {
         loadWorkspacesFromFile(); // Load workspaces from file upon initialization
     }
 

@@ -5,7 +5,7 @@ import com.andersen.entity.booking.Booking;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BookingRepositoryImpl implements BookingRepository {
+public class BookingRepositoryEntityImpl implements BookingRepository {
     private final List<Booking> bookings = new ArrayList<>();
 
     @Override
