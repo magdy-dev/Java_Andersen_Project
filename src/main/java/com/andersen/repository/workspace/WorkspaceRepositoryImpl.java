@@ -8,20 +8,23 @@ import java.util.List;
 
 public class WorkspaceRepositoryImpl implements WorkspaceRepository {
     private final List<Workspace> workspaces = new ArrayList<>();
-    private final String filePath = "workspaces.txt"; // File to store
+    private final String filePath = "workspaces.txt"; // File to store workspaces
 
     @Override
     public void addWorkspace(Workspace workspace) throws WorkspaceNotFoundException {
         if (workspace != null) {
             workspaces.add(workspace);
+            saveWorkspacesToFile(); // Save to file after adding
         } else {
             throw new WorkspaceNotFoundException("Workspace cannot be null.");
         }
     }
 
     @Override
-    public void removeWorkspace(Workspace workspace) {
-        if (!workspaces.remove(workspace)) {
+    public void removeWorkspace(Workspace workspace) throws WorkspaceNotFoundException {
+        if (workspaces.remove(workspace)) {
+            saveWorkspacesToFile(); // Save to file after removal
+        } else {
             System.out.println("Workspace not found for removal.");
         }
     }
@@ -46,8 +49,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             throw new WorkspaceNotFoundException("Error loading workspaces: " + e.getMessage());
         }
     }
-
-    public void saveWorkspacesToFile() throws WorkspaceNotFoundException {
+    private void saveWorkspacesToFile() throws WorkspaceNotFoundException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Workspace workspace : workspaces) {
                 writer.write(workspace.getName() + "," + workspace.getDescription());
