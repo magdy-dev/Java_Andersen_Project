@@ -12,12 +12,21 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepositoryEntityImpl workspaceRepository;
 
+
+    private void initialize() {
+        try {
+            workspaceRepository.loadWorkspaces(); // Load workspaces when the service is initialized
+        } catch (WorkspaceNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+    }
     public WorkspaceServiceImpl(WorkspaceRepositoryEntityImpl workspaceRepository) {
         if (workspaceRepository == null) {
             throw new IllegalArgumentException("WorkspaceRepository cannot be null.");
         }
         this.workspaceRepository = workspaceRepository;
         logger.info("WorkspaceServiceImpl initialized with repository: {}", workspaceRepository.getClass().getSimpleName());
+        initialize();
     }
 
     @Override

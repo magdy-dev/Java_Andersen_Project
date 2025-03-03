@@ -34,9 +34,6 @@ public class Main {
 
             MenuController menuController = new MenuController(workspaceService, bookingService, authService, scanner);
             menuController.mainMenu();
-        } catch (WorkspaceNotFoundException e) {
-            logger.error("Workspace error: {}", e.getMessage());
-            System.out.println("Error initializing workspace: " + e.getMessage());
         } catch (Exception e) {
             logger.error("An unexpected error occurred: {}", e.getMessage());
             System.out.println("An unexpected error occurred: " + e.getMessage());

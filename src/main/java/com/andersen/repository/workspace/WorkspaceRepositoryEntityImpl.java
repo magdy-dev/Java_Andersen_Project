@@ -13,9 +13,27 @@ public class WorkspaceRepositoryEntityImpl implements WorkspaceRepository {
     private final Set<Workspace> workspaces = new TreeSet<>((w1, w2) -> w1.getName().compareTo(w2.getName())); // Auto-sort by name
     private final String filePath = "workspaces.txt"; // File to store workspaces
 
-    // Constructor that loads workspaces from file
-    public WorkspaceRepositoryEntityImpl() throws WorkspaceNotFoundException {
-        loadWorkspacesFromFile(); // Load workspaces from file upon initialization
+    public WorkspaceRepositoryEntityImpl() {
+
+    }
+
+    public void loadWorkspaces() throws WorkspaceNotFoundException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",", 2); // Limit to 2 parts
+                if (parts.length == 2) {
+                    String name = parts[0].trim();
+                    String description = parts[1].trim();
+                    workspaces.add(new Workspace(name, description)); // Add to TreeSet
+                }
+            }
+        } catch (FileNotFoundException e) {
+            // If the file doesn't exist, it's okay; we just start with an empty workspace list
+            System.out.println("Workspaces file not found, starting with an empty list.");
+        } catch (IOException e) {
+            throw new WorkspaceNotFoundException("Error loading workspaces: " + e.getMessage());
+        }
     }
 
     @Override
@@ -39,26 +57,6 @@ public class WorkspaceRepositoryEntityImpl implements WorkspaceRepository {
     @Override
     public List<Workspace> getAllWorkspaces() {
         return new ArrayList<>(workspaces); // Return a copy of the workspaces as a list
-    }
-
-    // Private method to load workspaces from a file
-    private void loadWorkspacesFromFile() throws WorkspaceNotFoundException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", 2); // Limit to 2 parts
-                if (parts.length == 2) {
-                    String name = parts[0].trim();
-                    String description = parts[1].trim();
-                    workspaces.add(new Workspace(name, description)); // Add to TreeSet
-                }
-            }
-        } catch (FileNotFoundException e) {
-            // If the file doesn't exist, it's okay; we just start with an empty workspace list
-            System.out.println("Workspaces file not found, starting with an empty list.");
-        } catch (IOException e) {
-            throw new WorkspaceNotFoundException("Error loading workspaces: " + e.getMessage());
-        }
     }
 
     // Private method to save workspaces to a file
