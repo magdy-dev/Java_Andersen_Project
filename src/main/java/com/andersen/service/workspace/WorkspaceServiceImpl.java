@@ -2,24 +2,23 @@ package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.logger.LoggerUtil;
+import com.andersen.logger.UserOutputLogger;
 import com.andersen.repository.workspace.WorkspaceRepositoryEntityImpl;
 import org.slf4j.Logger;
 import java.util.List;
 
 public class WorkspaceServiceImpl implements WorkspaceService {
-    private static final Logger logger = LoggerUtil.getLogger(WorkspaceServiceImpl.class);
-
+    private static final Logger logger = UserOutputLogger.getLogger(WorkspaceServiceImpl.class);
     private final WorkspaceRepositoryEntityImpl workspaceRepository;
-
 
     private void initialize() {
         try {
             workspaceRepository.loadWorkspaces(); // Load workspaces when the service is initialized
         } catch (WorkspaceNotFoundException e) {
-            System.out.println(e.getMessage());
+            UserOutputLogger.log(e.getMessage());
         }
     }
+
     public WorkspaceServiceImpl(WorkspaceRepositoryEntityImpl workspaceRepository) {
         if (workspaceRepository == null) {
             throw new IllegalArgumentException("WorkspaceRepository cannot be null.");

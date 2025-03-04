@@ -3,7 +3,7 @@ package com.andersen.service.booking;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.logger.LoggerUtil;
+import com.andersen.logger.UserOutputLogger;
 import com.andersen.repository.booking.BookingRepositoryEntityImpl;
 import org.slf4j.Logger;
 
@@ -11,7 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 public class BookingServiceImpl implements BookingService {
-    private static final Logger logger = LoggerUtil.getLogger(BookingServiceImpl.class);
+    private static final Logger logger = UserOutputLogger.getLogger(BookingServiceImpl.class);
     private final BookingRepositoryEntityImpl bookingRepository;
 
     public BookingServiceImpl(BookingRepositoryEntityImpl bookingRepository) {
