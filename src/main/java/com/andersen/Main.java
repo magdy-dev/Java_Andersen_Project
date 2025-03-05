@@ -10,13 +10,11 @@ import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
 import com.andersen.logger.UserOutputLogger;
-import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    private static final Logger logger = UserOutputLogger.getLogger(Main.class);
 
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
@@ -34,11 +32,9 @@ public class Main {
             MenuController menuController = new MenuController(workspaceService, bookingService, authService, scanner);
             menuController.mainMenu();
         } catch (Exception e) {
-            logger.error("An unexpected error occurred: {}", e.getMessage());
             UserOutputLogger.log("An unexpected error occurred: " + e.getMessage());
         } finally {
             scanner.close();
-            logger.info("Scanner closed and application terminated.");
         }
     }
 }

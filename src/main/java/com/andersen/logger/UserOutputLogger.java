@@ -10,12 +10,8 @@ public class UserOutputLogger {
         logger.info(message);
     }
 
-    public static void logWarning(String message) {
-        logger.warn(message);
-    }
-
-    public static void logError(String message) {
-        logger.error(message);
+    public static void output(String input) {
+        System.out.println(input);
     }
 
     public static Logger getLogger(Class<?> clazz) {
