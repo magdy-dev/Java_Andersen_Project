@@ -31,8 +31,8 @@ public class Booking {
     }
 
     private long generateId() {
-        
-        return System.currentTimeMillis(); 
+        // This could be replaced with a real ID generation logic
+        return System.currentTimeMillis(); // For example, using current time as a unique ID
     }
 
     private static LocalTime parseTime(String time) {

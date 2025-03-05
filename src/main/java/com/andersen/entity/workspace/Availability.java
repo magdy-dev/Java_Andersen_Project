@@ -1,19 +1,12 @@
 package com.andersen.entity.workspace;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 public class Availability {
-    @JsonProperty("id")
-    private long id;
-    @JsonProperty("date")
     private LocalDate date;
-    @JsonProperty("time")
     private LocalTime time;
-    @JsonProperty("capacity")
     private int capacity;
-    @JsonProperty("remaining")
     private int remaining;
 
     public Availability() {

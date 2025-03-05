@@ -1,31 +1,40 @@
 package com.andersen;
 
 import com.andersen.controller.MenuController;
-import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.repository.booking.BookingRepositoryImpl; 
-import com.andersen.repository.workspace.WorkspaceRepositoryImpl;
+import com.andersen.entity.role.User;
+import com.andersen.repository.booking.BookingRepositoryEntityImpl;
+import com.andersen.repository.workspace.WorkspaceRepositoryEntityImpl;
+import com.andersen.service.auth.AuthServiceImp;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
+import com.andersen.logger.UserOutputLogger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws WorkspaceNotFoundException {
+
+    public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-       
-        WorkspaceRepositoryImpl workspaceRepository = new WorkspaceRepositoryImpl();
-        WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceRepository); 
+        try {
+            WorkspaceRepositoryEntityImpl workspaceRepository = new WorkspaceRepositoryEntityImpl();
+            WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceRepository);
 
+            BookingRepositoryEntityImpl bookingRepository = new BookingRepositoryEntityImpl();
+            BookingService bookingService = new BookingServiceImpl(bookingRepository);
 
-        BookingRepositoryImpl bookingRepository = new BookingRepositoryImpl(); 
-        BookingService bookingService = new BookingServiceImpl(bookingRepository); 
+            List<User> users = new ArrayList<>();
+            AuthServiceImp authService = new AuthServiceImp(users);
 
-        MenuController menuController = new MenuController(workspaceService, bookingService, scanner);
-        menuController.mainMenu();
-
-
-        scanner.close();
+            MenuController menuController = new MenuController(workspaceService, bookingService, authService, scanner);
+            menuController.mainMenu();
+        } catch (Exception e) {
+            UserOutputLogger.log("An unexpected error occurred: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
     }
 }
