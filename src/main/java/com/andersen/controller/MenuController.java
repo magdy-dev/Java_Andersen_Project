@@ -1,13 +1,19 @@
 package com.andersen.controller;
 
 import com.andersen.entity.booking.Booking;
+import com.andersen.entity.users.Admin;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
+import com.andersen.exception.UserAuthenticationException;
 import com.andersen.exception.WorkspaceNotFoundException;
+import com.andersen.service.auth.AuthServiceImp;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
+import com.andersen.logger.UserOutputLogger;
+import org.slf4j.Logger;
+
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -15,64 +21,112 @@ import java.util.List;
 import java.util.Scanner;
 
 public class MenuController {
+    private static final Logger logger = UserOutputLogger.getLogger(MenuController.class);
     private final WorkspaceServiceImpl workspaceService;
     private final BookingServiceImpl bookingService;
+    private final AuthServiceImp authService;
     private final Scanner scanner;
 
-    public MenuController(WorkspaceService workspaceService, BookingService bookingService, Scanner scanner) {
+    public MenuController(WorkspaceService workspaceService, BookingService bookingService, AuthServiceImp authService, Scanner scanner) {
         this.workspaceService = (WorkspaceServiceImpl) workspaceService;
         this.bookingService = (BookingServiceImpl) bookingService;
+        this.authService = authService;
         this.scanner = scanner;
     }
 
-    public void mainMenu() throws WorkspaceNotFoundException {
+    public void mainMenu() {
         while (true) {
-            System.out.println("\n=== Welcome to the Coworking Space Reservation ===");
-            System.out.println("1. Admin Login");
-            System.out.println("2. User Login");
-            System.out.println("3. Exit");
-            System.out.print("Choose an option: ");
+            UserOutputLogger.output("\n=== Welcome to the Coworking Space Reservation ===");
+            UserOutputLogger.output("1. Admin Login");
+            UserOutputLogger.output("2. User Login");
+            UserOutputLogger.output("3. Register User");
+            UserOutputLogger.output("4. Exit");
+            UserOutputLogger.output("Choose an option: ");
 
             int choice = getIntInput();
             switch (choice) {
                 case 1 -> adminLogin();
                 case 2 -> userLogin();
-                case 3 -> {
-                    System.out.println("Exiting the application...");
-                    System.exit(0);
+                case 3 -> registerUser();
+                case 4 -> exitApplication();
+                default -> {
+                    logger.warn("Invalid choice made in main menu: {}", choice);
+                    UserOutputLogger.output("Invalid choice! Please try again.");
                 }
-                default -> System.out.println("Invalid choice! Please try again.");
             }
         }
     }
 
-    private void adminLogin() throws WorkspaceNotFoundException {
-        System.out.print("Admin Username: ");
+    private void exitApplication() {
+        logger.info("Exiting the application...");
+        UserOutputLogger.output("Exiting the application...");
+        System.exit(0);
+    }
+
+    private void registerUser() {
+        UserOutputLogger.output("Enter username: ");
         String username = scanner.nextLine();
-        System.out.print("Admin Password: ");
+        UserOutputLogger.output("Enter password: ");
         String password = scanner.nextLine();
 
-        if (authenticateAdmin(username, password)) {
-            adminMenu();
-        } else {
-            System.out.println("Invalid admin credentials. Please try again.");
+        try {
+            authService.registerUser(username, password);
+            logger.info("User registered successfully: {}", username);
+            UserOutputLogger.output("User registered successfully!");
+        } catch (UserAuthenticationException e) {
+            logger.error("Registration failed for username: {}", username);
+            UserOutputLogger.output("Registration failed: " + e.getMessage());
+        } catch (IllegalArgumentException e) {
+            logger.warn("Invalid input during registration for username: {}", username);
+            UserOutputLogger.output("Invalid input: " + e.getMessage());
         }
     }
 
-    private boolean authenticateAdmin(String username, String password) {
-        return "admin".equals(username) && "admin".equals(password);
+    private void userLogin() {
+        UserOutputLogger.output("Username: ");
+        String username = scanner.nextLine();
+        UserOutputLogger.output("Password: ");
+        String password = scanner.nextLine();
+
+        try {
+            Customer authenticatedCustomer = authService.loginCustomer(username, password);
+            if (authenticatedCustomer != null) {
+                logger.info("User {} logged in successfully.", username);
+                customerMenu(authenticatedCustomer);
+            }
+        } catch (UserAuthenticationException e) {
+            logger.error("User login failed for username: {}", username);
+            UserOutputLogger.output("Invalid username or password. Please try again.");
+        }
     }
 
-    private void adminMenu() throws WorkspaceNotFoundException {
-        System.out.println("Admin Logged In");
+    private void adminLogin() {
+        UserOutputLogger.output("Admin Username: ");
+        String username = scanner.nextLine();
+        UserOutputLogger.output("Admin Password: ");
+        String password = scanner.nextLine();
+
+        try {
+            Admin admin = authService.loginAdmin(username, password);
+            logger.info("Admin {} logged in successfully.", username);
+            adminMenu();
+        } catch (UserAuthenticationException e) {
+            logger.error("Admin login failed for username: {}", username);
+            UserOutputLogger.output("Invalid admin credentials. Please try again.");
+        }
+    }
+
+    private void adminMenu() {
+        logger.info("Admin menu accessed.");
+        UserOutputLogger.output("Admin Logged In");
 
         while (true) {
-            System.out.println("\n=== Admin Menu ===");
-            System.out.println("1. Add a new coworking space");
-            System.out.println("2. Remove a coworking space");
-            System.out.println("3. View all reservations");
-            System.out.println("4. Back");
-            System.out.print("Choose an option: ");
+            UserOutputLogger.output("\n=== Admin Menu ===");
+            UserOutputLogger.output("1. Add a new coworking space");
+            UserOutputLogger.output("2. Remove a coworking space");
+            UserOutputLogger.output("3. View all reservations");
+            UserOutputLogger.output("4. Back");
+            UserOutputLogger.output("Choose an option: ");
 
             int choice = getIntInput();
             switch (choice) {
@@ -80,43 +134,27 @@ public class MenuController {
                 case 2 -> removeWorkspace();
                 case 3 -> viewAllReservations();
                 case 4 -> {
-                    return; 
+                    logger.info("Returning to main menu from admin menu.");
+                    return; // Back to the main menu
                 }
-                default -> System.out.println("Invalid choice! Please try again.");
+                default -> {
+                    logger.warn("Invalid choice made in admin menu: {}", choice);
+                    UserOutputLogger.output("Invalid choice! Please try again.");
+                }
             }
         }
     }
 
-    private void userLogin() {
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-
-        Customer authenticatedCustomer = authenticateCustomer(username, password);
-        if (authenticatedCustomer != null) {
-            customerMenu(authenticatedCustomer);
-        } else {
-            System.out.println("Invalid username or password. Please try again.");
-        }
-    }
-
-    private Customer authenticateCustomer(String username, String password) {
-        if ("magdy".equals(username) && "magdy".equals(password)) {
-            return new Customer(username, password);
-        }
-        return null;
-    }
-
     private void customerMenu(Customer customer) {
+        logger.info("Customer menu accessed for user: {}", customer.getUserName());
         while (true) {
-            System.out.println("\n=== Customer Menu ===");
-            System.out.println("1. Browse available spaces");
-            System.out.println("2. Make a reservation");
-            System.out.println("3. View my reservations");
-            System.out.println("4. Cancel a reservation");
-            System.out.println("5. Logout");
-            System.out.print("Choose an option: ");
+            UserOutputLogger.output("\n=== Customer Menu ===");
+            UserOutputLogger.output("1. Browse available spaces");
+            UserOutputLogger.output("2. Make a reservation");
+            UserOutputLogger.output("3. View my reservations");
+            UserOutputLogger.output("4. Cancel a reservation");
+            UserOutputLogger.output("5. Logout");
+            UserOutputLogger.output("Choose an option: ");
 
             int choice = getIntInput();
             switch (choice) {
@@ -125,54 +163,69 @@ public class MenuController {
                 case 3 -> viewMyReservations(customer);
                 case 4 -> cancelReservation(customer);
                 case 5 -> {
-                    System.out.println("Logging out...");
+                    logger.info("Customer {} logging out.", customer.getUserName());
+                    UserOutputLogger.output("Logging out...");
                     return;
                 }
-                default -> System.out.println("Invalid choice! Please try again.");
+                default -> {
+                    logger.warn("Invalid choice made in customer menu: {}", choice);
+                    UserOutputLogger.output("Invalid choice! Please try again.");
+                }
             }
         }
     }
 
-    private void addWorkspace() throws WorkspaceNotFoundException {
-        System.out.print("Enter workspace name: ");
+    private void addWorkspace() {
+        UserOutputLogger.output("Enter workspace name: ");
         String name = scanner.nextLine();
-        System.out.print("Enter workspace description: ");
+        UserOutputLogger.output("Enter workspace description: ");
         String description = scanner.nextLine();
 
-        workspaceService.addWorkspace(new Workspace(name, description));
-        System.out.println("Workspace added successfully!");
+        try {
+            workspaceService.addWorkspace(new Workspace(name, description));
+            logger.info("Workspace added successfully: {}", name);
+            UserOutputLogger.output("Workspace added successfully!");
+        } catch (WorkspaceNotFoundException e) {
+            logger.error("Error adding workspace: {}", e.getMessage());
+            UserOutputLogger.output(e.getMessage());
+        }
     }
 
     private void removeWorkspace() {
-        System.out.print("Enter workspace index to remove: ");
+        UserOutputLogger.output("Enter workspace index to remove: ");
         int index = getIntInput();
         try {
             workspaceService.removeWorkspace(index);
-            System.out.println("Workspace removed successfully!");
+            logger.info("Workspace removed successfully at index: {}", index);
+            UserOutputLogger.output("Workspace removed successfully!");
         } catch (WorkspaceNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Error removing workspace: {}", e.getMessage());
+            UserOutputLogger.output(e.getMessage());
         }
     }
 
     private void viewAllReservations() {
-        System.out.println("\n=== All Reservations ===");
+        logger.info("Viewing all reservations.");
+        UserOutputLogger.output("\n=== All Reservations ===");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
 
         if (workspaces.isEmpty()) {
-            System.out.println("No workspaces available.");
+            logger.info("No workspaces available.");
+            UserOutputLogger.output("No workspaces available.");
             return;
         }
 
         for (Workspace workspace : workspaces) {
             List<Booking> bookings = workspace.getBookings();
             if (bookings.isEmpty()) {
-                System.out.println("Workspace: " + workspace.getName() + " has no reservations.");
+                logger.info("Workspace: {} has no reservations.", workspace.getName());
+                UserOutputLogger.output("Workspace: " + workspace.getName() + " has no reservations.");
                 continue;
             }
 
-            System.out.println("Workspace: " + workspace.getName());
+            UserOutputLogger.output("Workspace: " + workspace.getName());
             for (Booking booking : bookings) {
-                System.out.println(" - Customer: " + booking.getCustomer().getUserName() +
+                UserOutputLogger.output(" - Customer: " + booking.getCustomer().getUserName() +
                         ", Start Time: " + booking.getStartTime() +
                         ", End Time: " + booking.getEndTime());
             }
@@ -180,57 +233,60 @@ public class MenuController {
     }
 
     private void browseAvailableSpaces() {
+        logger.info("Browsing available spaces.");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (workspaces.isEmpty()) {
-            System.out.println("No available spaces.");
+            logger.info("No available spaces found.");
+            UserOutputLogger.output("No available spaces.");
         } else {
-            System.out.println("Available Workspaces:");
+            UserOutputLogger.output("Available Workspaces:");
             for (int i = 0; i < workspaces.size(); i++) {
                 Workspace ws = workspaces.get(i);
-                System.out.println((i + 1) + ". " + ws.getName() + " - " + ws.getDescription());
+                UserOutputLogger.output((i + 1) + ". " + ws.getName() + " - " + ws.getDescription());
             }
         }
     }
 
     private void makeReservation(Customer customer) {
-        System.out.print("Enter workspace index to reserve: ");
-        int index = getIntInput() - 1; // Adjust for zero-based indexing
-
-        // Validate workspace index
+        UserOutputLogger.output("Enter workspace index to reserve: ");
+        int index = getIntInput() - 1;
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (index < 0 || index >= workspaces.size()) {
-            System.out.println("Invalid workspace index. Please try again.");
+            logger.warn("Invalid workspace index entered: {}", index);
+            UserOutputLogger.output("Invalid workspace index. Please try again.");
             return;
         }
+
         Workspace selectedWorkspace = workspaces.get(index);
-        String startTimeStr, endTimeStr;
+        LocalTime startTime = getValidTime("Enter reservation start time (HH:mm): ");
+        LocalTime endTime = getValidTime("Enter reservation end time (HH:mm): ");
 
-        while (true) {
-            System.out.print("Enter reservation start time (HH:mm): ");
-            startTimeStr = scanner.nextLine();
-            if (isValidTimeFormat(startTimeStr)) {
-                break;
-            } else {
-                System.out.println("Invalid time format. Please use HH:mm.");
-            }
+        // Check if the end time is after the start time
+        if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
+            logger.warn("End time must be after start time.");
+            UserOutputLogger.output("End time must be after start time. Please try again.");
+            return;
         }
 
-        while (true) {
-            System.out.print("Enter reservation end time (HH:mm): ");
-            endTimeStr = scanner.nextLine();
-            if (isValidTimeFormat(endTimeStr)) {
-                break;
-            } else {
-                System.out.println("Invalid time format. Please use HH:mm.");
-            }
-        }
-
-        Booking booking = new Booking(customer, selectedWorkspace, startTimeStr, endTimeStr);
-
+        Booking booking = bookingService.createBooking(customer, selectedWorkspace, startTime, endTime);
         bookingService.makeReservation(customer, booking);
         selectedWorkspace.addBooking(booking);
 
-        System.out.println("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTimeStr + " to " + endTimeStr);
+        logger.info("Reservation made successfully for {} from {} to {}", selectedWorkspace.getName(), startTime, endTime);
+        UserOutputLogger.output("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTime + " to " + endTime);
+    }
+
+    private LocalTime getValidTime(String prompt) {
+        while (true) {
+            UserOutputLogger.output(prompt);
+            String timeStr = scanner.nextLine();
+            if (isValidTimeFormat(timeStr)) {
+                return LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
+            } else {
+                logger.warn("Invalid time format entered: {}", timeStr);
+                UserOutputLogger.output("Invalid time format. Please use HH:mm.");
+            }
+        }
     }
 
     private boolean isValidTimeFormat(String time) {
@@ -245,13 +301,15 @@ public class MenuController {
     private void viewMyReservations(Customer customer) {
         List<Booking> bookings = bookingService.getCustomerBookings(customer);
         if (bookings.isEmpty()) {
-            System.out.println("You have no reservations.");
+            logger.info("Customer {} has no reservations.", customer.getUserName());
+            UserOutputLogger.output("You have no reservations.");
             return;
         }
 
-        System.out.println("Your Reservations:");
+        logger.info("Displaying reservations for customer: {}", customer.getUserName());
+        UserOutputLogger.output("Your Reservations:");
         for (Booking booking : bookings) {
-            System.out.println("ID: " + booking.getId() +
+            UserOutputLogger.output("ID: " + booking.getId() +
                     ", Workspace: " + booking.getWorkspace().getName() +
                     ", Start Time: " + booking.getStartTime() +
                     ", End Time: " + booking.getEndTime());
@@ -261,38 +319,39 @@ public class MenuController {
     private void cancelReservation(Customer customer) {
         List<Booking> bookings = bookingService.getCustomerBookings(customer);
         if (bookings.isEmpty()) {
-            System.out.println("You have no reservations to cancel.");
+            logger.info("Customer {} has no reservations to cancel.", customer.getUserName());
+            UserOutputLogger.output("You have no reservations to cancel.");
             return;
         }
 
-        System.out.println("Your Reservations:");
+        UserOutputLogger.output("Your Reservations:");
         for (Booking booking : bookings) {
-            System.out.println("ID: " + booking.getId() +
+            UserOutputLogger.output("ID: " + booking.getId() +
                     ", Workspace: " + booking.getWorkspace().getName() +
                     ", Start Time: " + booking.getStartTime() +
                     ", End Time: " + booking.getEndTime());
         }
 
-        System.out.print("Enter reservation ID to cancel: ");
+        UserOutputLogger.output("Enter reservation ID to cancel: ");
         String reservationId = scanner.nextLine();
 
-        Booking bookingToCancel = null;
-        for (Booking booking : bookings) {
-            if (String.valueOf(booking.getId()).equals(reservationId)) {
-                bookingToCancel = booking;
-                break;
-            }
-        }
+        // Find the booking by ID
+        Booking bookingToCancel = bookings.stream()
+                .filter(booking -> String.valueOf(booking.getId()).equals(reservationId))
+                .findFirst()
+                .orElse(null);
 
         if (bookingToCancel == null) {
-            System.out.println("No reservation found with that ID. Please try again.");
+            logger.warn("No reservation found with ID: {}", reservationId);
+            UserOutputLogger.output("No reservation found with that ID. Please try again.");
             return;
         }
 
-        
+        // Cancel the booking
         customer.getBookings().remove(bookingToCancel);
         bookingService.cancelReservation(customer, bookingToCancel.getId());
-        System.out.println("Reservation canceled successfully!");
+        logger.info("Reservation ID: {} canceled successfully.", bookingToCancel.getId());
+        UserOutputLogger.output("Reservation canceled successfully!");
     }
 
     private int getIntInput() {
@@ -300,7 +359,8 @@ public class MenuController {
             try {
                 return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number!");
+                logger.warn("Invalid number input.");
+                UserOutputLogger.output("Please enter a valid number!");
             }
         }
     }

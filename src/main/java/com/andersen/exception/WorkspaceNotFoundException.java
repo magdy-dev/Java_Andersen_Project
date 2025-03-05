@@ -7,6 +7,7 @@ public class WorkspaceNotFoundException extends Exception {
 
 
     public WorkspaceNotFoundException(String message, Throwable cause) {
+
         super(message, cause);
     }
 }
