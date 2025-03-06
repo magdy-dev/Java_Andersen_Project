@@ -2,7 +2,6 @@ package com.andersen.entity.booking;
 
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
-
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -18,21 +17,15 @@ public class Booking {
 
     private LocalTime endTime;
 
-    public Booking(Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
-        this.id = generateId();
+    public Booking(Long generateId,Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
+        this.id = generateId;
         this.customer = customer;
         this.workspace = selectedWorkspace;
         this.startTime = startTime;
         this.endTime = endTime;
     }
-
-    public Booking(Customer customer, Workspace selectedWorkspace, String startTime, String endTime) {
-        this(customer, selectedWorkspace, parseTime(startTime), parseTime(endTime));
-    }
-
-    private long generateId() {
-        // This could be replaced with a real ID generation logic
-        return System.currentTimeMillis(); // For example, using current time as a unique ID
+    public Booking(Long idGenerator, Customer customer, Workspace selectedWorkspace, String startTime, String endTime) {
+        this(idGenerator, customer, selectedWorkspace, parseTime(startTime), parseTime(endTime));
     }
 
     private static LocalTime parseTime(String time) {

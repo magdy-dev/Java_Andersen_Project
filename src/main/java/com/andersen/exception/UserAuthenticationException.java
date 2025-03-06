@@ -5,8 +5,4 @@ public class UserAuthenticationException extends Exception{
         super(message);
     }
 
-
-    public UserAuthenticationException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

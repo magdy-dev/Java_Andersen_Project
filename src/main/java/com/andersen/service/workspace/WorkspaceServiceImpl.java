@@ -5,7 +5,9 @@ import com.andersen.exception.WorkspaceNotFoundException;
 import com.andersen.logger.UserOutputLogger;
 import com.andersen.repository.workspace.WorkspaceRepositoryEntityImpl;
 import org.slf4j.Logger;
+
 import java.util.List;
+import java.util.Optional;
 
 public class WorkspaceServiceImpl implements WorkspaceService {
     private static final Logger logger = UserOutputLogger.getLogger(WorkspaceServiceImpl.class);
@@ -13,7 +15,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     private void initialize() {
         try {
-            workspaceRepository.loadWorkspaces(); // Load workspaces when the service is initialized
+            workspaceRepository.loadWorkspaces();
         } catch (WorkspaceNotFoundException e) {
             UserOutputLogger.log(e.getMessage());
         }
@@ -42,14 +44,31 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public void removeWorkspace(int index) throws WorkspaceNotFoundException {
         List<Workspace> workspaces = workspaceRepository.getAllWorkspaces();
-        if (index < 0 || index >= workspaces.size()) {
-            logger.error("Invalid index for workspace removal: {}", index);
-            throw new WorkspaceNotFoundException("Workspace not found.");
-        }
-        Workspace workspace = workspaces.get(index);
-        logger.debug("Removing workspace at index {}: {}", index, workspace);
-        workspaceRepository.removeWorkspace(workspace);
-        logger.info("Workspace removed successfully: {}", workspace);
+
+        //  Optional to handle the workspace removal more gracefully
+        Optional<Workspace> workspaceOptional = (index >= 0 && index < workspaces.size())
+                ? Optional.of(workspaces.get(index))
+                : Optional.empty();
+
+        workspaceOptional.ifPresentOrElse(
+                workspace -> {
+                    logger.debug("Removing workspace at index {}: {}", index, workspace);
+                    try {
+                        workspaceRepository.removeWorkspace(workspace);
+                    } catch (WorkspaceNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                    logger.info("Workspace removed successfully: {}", workspace);
+                },
+                () -> {
+                    logger.error("Invalid index for workspace removal: {}", index);
+                    try {
+                        throw new WorkspaceNotFoundException("Workspace not found.");
+                    } catch (WorkspaceNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+        );
     }
 
     @Override

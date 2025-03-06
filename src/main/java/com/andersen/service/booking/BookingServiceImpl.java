@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public class BookingServiceImpl implements BookingService {
     private static final Logger logger = UserOutputLogger.getLogger(BookingServiceImpl.class);
@@ -33,20 +34,22 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public void cancelReservation(Customer customer, long bookingId) {
         List<Booking> bookings = customer.getBookings();
-        Booking bookingToRemove = null;
-        for (Booking booking : bookings) {
-            if (booking.getId() == bookingId) {
-                bookingToRemove = booking;
-                break;
-            }
-        }
-        if (bookingToRemove != null) {
-            bookings.remove(bookingToRemove);
-            bookingRepository.removeBooking(bookingToRemove);
-            logger.info("Booking with ID: {} has been canceled for customer: {}", bookingId, customer.getId());
-        } else {
-            logger.warn("No reservation found with the provided ID: {}", bookingId);
-        }
+
+        // Optional to find the booking
+        Optional<Booking> bookingToRemove = bookings.stream()
+                .filter(booking -> booking.getId() == bookingId)
+                .findFirst();
+
+        bookingToRemove.ifPresentOrElse(
+                booking -> {
+                    bookings.remove(booking);
+                    bookingRepository.removeBooking(booking);
+                    logger.info("Booking with ID: {} has been canceled for customer: {}", bookingId, customer.getId());
+                },
+                () -> {
+                    logger.warn("No reservation found with the provided ID: {}", bookingId);
+                }
+        );
     }
 
     @Override
