@@ -6,7 +6,10 @@
         </Console>
     </Appenders>
     <Loggers>
-        <Logger name="UserOutputLogger" level="info" additivity="false">
+        <Logger name="UserOutPut" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+        <Logger name="Loge" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
         <Root level="error">
