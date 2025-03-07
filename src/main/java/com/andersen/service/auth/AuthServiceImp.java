@@ -44,7 +44,7 @@ public class AuthServiceImp implements AuthService {
 
         return customerOptional.orElseThrow(() -> {
             logger.error("Customer login failed for username: {}", username);
-            UserOutputLogger.output("Invalid username or password. Please try again."); // User-facing message
+            UserOutputLogger.output("Invalid username or password. Please try again."); 
             return new UserAuthenticationException("Customer not found or invalid credentials.");
         });
     }
@@ -59,12 +59,12 @@ public class AuthServiceImp implements AuthService {
         logger.debug("Attempting to log in admin with username: {}", username);
 
         if (ADMIN_USERNAME.equals(username) && ADMIN_PASSWORD.equals(password)) {
-            UserOutputLogger.output("Admin logged in successfully."); // User-facing message
+            UserOutputLogger.output("Admin logged in successfully."); 
             return new Admin(username, password);
         }
 
         logger.error("Admin login failed for username: {}", username);
-        UserOutputLogger.output("Invalid admin credentials. Please try again."); // User-facing message
+        UserOutputLogger.output("Invalid admin credentials. Please try again."); 
         throw new UserAuthenticationException("Admin not found or invalid credentials.");
     }
 
@@ -79,12 +79,12 @@ public class AuthServiceImp implements AuthService {
 
         if (users.stream().anyMatch(user -> user.getUserName().equals(username))) {
             logger.error("Username already exists: {}", username);
-            UserOutputLogger.output("Username already exists. Please choose a different username."); // User-facing message
+            UserOutputLogger.output("Username already exists. Please choose a different username."); 
             throw new UserAuthenticationException("Username already exists.");
         }
 
         users.add(new Customer(username, password));
         logger.info("User registered successfully: {}", username);
-        UserOutputLogger.output("User registered successfully: " + username); // User-facing message
+        UserOutputLogger.output("User registered successfully: " + username);
     }
 }
