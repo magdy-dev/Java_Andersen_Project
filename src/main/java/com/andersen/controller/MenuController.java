@@ -298,6 +298,10 @@ public class MenuController {
         }
     }
 
+    /**
+     *
+     * @param customer
+     */
     private void viewMyReservations(Customer customer) {
         List<Booking> bookings = bookingService.getCustomerBookings(customer);
         if (bookings.isEmpty()) {

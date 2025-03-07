@@ -4,10 +4,7 @@ import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
 
 import java.io.*;
-import java.util.List;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.TreeSet;
+import java.util.*;
 
 public class WorkspaceRepositoryEntityImpl implements WorkspaceRepository {
     private final Set<Workspace> workspaces = new TreeSet<>((w1, w2) -> w1.getName().compareTo(w2.getName())); // Auto-sort by name
@@ -69,5 +66,13 @@ public class WorkspaceRepositoryEntityImpl implements WorkspaceRepository {
         } catch (IOException e) {
             throw new WorkspaceNotFoundException("Error saving workspaces: " + e.getMessage());
         }
+    }
+
+    public Optional<Workspace> getWorkspaceById(long workspaceId) {
+        List<Workspace> workspaces = getAllWorkspaces(); // Fetch all workspaces
+        //  stream filtering to find the workspace by ID
+        return workspaces.stream()
+                .filter(workspace -> workspace.getId() == workspaceId)
+                .findFirst();
     }
 }

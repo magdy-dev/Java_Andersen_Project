@@ -42,26 +42,22 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     }
 
     @Override
-    public void removeWorkspace(int index) throws WorkspaceNotFoundException {
-        List<Workspace> workspaces = workspaceRepository.getAllWorkspaces();
-
-        //  Optional to handle the workspace removal more gracefully
-        Optional<Workspace> workspaceOptional = (index >= 0 && index < workspaces.size())
-                ? Optional.of(workspaces.get(index))
-                : Optional.empty();
+    public void removeWorkspace(long workspaceId) throws WorkspaceNotFoundException {
+        // Fetch the workspace directly by its ID
+        Optional<Workspace> workspaceOptional = workspaceRepository.getWorkspaceById(workspaceId);
 
         workspaceOptional.ifPresentOrElse(
                 workspace -> {
-                    logger.debug("Removing workspace at index {}: {}", index, workspace);
+                    logger.debug("Removing workspace: {}", workspace);
                     try {
                         workspaceRepository.removeWorkspace(workspace);
+                        logger.info("Workspace removed successfully: {}", workspace);
                     } catch (WorkspaceNotFoundException e) {
                         throw new RuntimeException(e);
                     }
-                    logger.info("Workspace removed successfully: {}", workspace);
                 },
                 () -> {
-                    logger.error("Invalid index for workspace removal: {}", index);
+                    logger.error("Invalid workspace ID for removal: {}", workspaceId);
                     try {
                         throw new WorkspaceNotFoundException("Workspace not found.");
                     } catch (WorkspaceNotFoundException e) {
@@ -70,7 +66,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                 }
         );
     }
-
     @Override
     public List<Workspace> getAllWorkspaces() {
         logger.debug("Fetching all workspaces.");

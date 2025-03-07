@@ -17,8 +17,8 @@ public class Booking {
 
     private LocalTime endTime;
 
-    public Booking(Long generateId,Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
-        this.id = generateId;
+    public Booking(Long id,Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
+        this.id = id;
         this.customer = customer;
         this.workspace = selectedWorkspace;
         this.startTime = startTime;
