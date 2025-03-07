@@ -7,6 +7,6 @@ import java.util.List;
 
 public interface WorkspaceService {
     void addWorkspace(Workspace workspace) throws WorkspaceNotFoundException;
-    void removeWorkspace(int index) throws WorkspaceNotFoundException;
+    void removeWorkspace(long index) throws WorkspaceNotFoundException;
     List<Workspace> getAllWorkspaces();
 }
