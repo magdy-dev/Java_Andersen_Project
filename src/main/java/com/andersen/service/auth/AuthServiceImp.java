@@ -4,7 +4,7 @@ import com.andersen.entity.role.User;
 import com.andersen.entity.users.Admin;
 import com.andersen.entity.users.Customer;
 import com.andersen.exception.UserAuthenticationException;
-import com.andersen.logger.Loge;
+import com.andersen.logger.ConsoleLogger;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -15,7 +15,7 @@ import java.util.Optional;
  * This service provides methods for logging in customers and admins, as well as registering new users.
  */
 public class AuthServiceImp implements AuthService {
-    private static final Logger logger = Loge.getLogger(AuthServiceImp.class); // For internal logs
+    private static final Logger logger = ConsoleLogger.getLogger(AuthServiceImp.class); // For internal logs
     private static final String ADMIN_USERNAME = "admin";
     private static final String ADMIN_PASSWORD = "admin";
     private final List<User> users;

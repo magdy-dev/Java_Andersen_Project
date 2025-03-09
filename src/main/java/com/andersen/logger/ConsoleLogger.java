@@ -3,7 +3,7 @@ package com.andersen.logger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Loge {
+public class ConsoleLogger {
     private static final Logger logger = LoggerFactory.getLogger("UserOutputLogger");
 
     public static void log(String message) {

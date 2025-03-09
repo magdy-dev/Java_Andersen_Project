@@ -6,7 +6,7 @@ import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.UserAuthenticationException;
 import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.logger.UserOutPut;
+import com.andersen.logger.OutputLogger;
 import com.andersen.service.auth.AuthServiceImp;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
@@ -37,12 +37,12 @@ public class MenuController {
 
     public void mainMenu() {
         while (true) {
-            UserOutPut.log("\n=== Welcome to the Coworking Space Reservation ===");
-            UserOutPut.log("1. Admin Login");
-            UserOutPut.log("2. User Login");
-            UserOutPut.log("3. Register User");
-            UserOutPut.log("4. Exit");
-            UserOutPut.log("Choose an option: ");
+            OutputLogger.log("\n=== Welcome to the Coworking Space Reservation ===");
+            OutputLogger.log("1. Admin Login");
+            OutputLogger.log("2. User Login");
+            OutputLogger.log("3. Register User");
+            OutputLogger.log("4. Exit");
+            OutputLogger.log("Choose an option: ");
 
             int choice = getIntInput();
             switch (choice) {
@@ -52,7 +52,7 @@ public class MenuController {
                 case 4 -> exitApplication();
                 default -> {
                     logger.warn("Invalid choice made in main menu: {}", choice);
-                    UserOutPut.log("Invalid choice! Please try again.");
+                    OutputLogger.log("Invalid choice! Please try again.");
                 }
             }
         }
@@ -60,33 +60,33 @@ public class MenuController {
 
     private void exitApplication() {
         logger.info("Exiting the application...");
-        UserOutPut.log("Exiting the application...");
+        OutputLogger.log("Exiting the application...");
         System.exit(0);
     }
 
     private void registerUser() {
-        UserOutPut.log("Enter username: ");
+        OutputLogger.log("Enter username: ");
         String username = scanner.nextLine();
-        UserOutPut.log("Enter password: ");
+        OutputLogger.log("Enter password: ");
         String password = scanner.nextLine();
 
         try {
             authService.registerUser(username, password);
             logger.info("User registered successfully: {}", username);
-            UserOutPut.log("User registered successfully!");
+            OutputLogger.log("User registered successfully!");
         } catch (UserAuthenticationException e) {
             logger.error("Registration failed for username: {}", username);
-            UserOutPut.log("Registration failed: " + e.getMessage());
+            OutputLogger.log("Registration failed: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             logger.warn("Invalid input during registration for username: {}", username);
-            UserOutPut.log("Invalid input: " + e.getMessage());
+            OutputLogger.log("Invalid input: " + e.getMessage());
         }
     }
 
     private void userLogin() {
-        UserOutPut.log("Username: ");
+        OutputLogger.log("Username: ");
         String username = scanner.nextLine();
-        UserOutPut.log("Password: ");
+        OutputLogger.log("Password: ");
         String password = scanner.nextLine();
 
         try {
@@ -97,14 +97,14 @@ public class MenuController {
             }
         } catch (UserAuthenticationException e) {
             logger.error("User login failed for username: {}", username);
-            UserOutPut.log("Invalid username or password. Please try again.");
+            OutputLogger.log("Invalid username or password. Please try again.");
         }
     }
 
     private void adminLogin() {
-        UserOutPut.log("Admin Username: ");
+        OutputLogger.log("Admin Username: ");
         String username = scanner.nextLine();
-        UserOutPut.log("Admin Password: ");
+        OutputLogger.log("Admin Password: ");
         String password = scanner.nextLine();
 
         try {
@@ -113,21 +113,21 @@ public class MenuController {
             adminMenu();
         } catch (UserAuthenticationException e) {
             logger.error("Admin login failed for username: {}", username);
-            UserOutPut.log("Invalid admin credentials. Please try again.");
+            OutputLogger.log("Invalid admin credentials. Please try again.");
         }
     }
 
     private void adminMenu() {
         logger.info("Admin menu accessed.");
-        UserOutPut.log("Admin Logged In");
+        OutputLogger.log("Admin Logged In");
 
         while (true) {
-            UserOutPut.log("\n=== Admin Menu ===");
-            UserOutPut.log("1. Add a new coworking space");
-            UserOutPut.log("2. Remove a coworking space");
-            UserOutPut.log("3. View all reservations");
-            UserOutPut.log("4. Back");
-            UserOutPut.log("Choose an option: ");
+            OutputLogger.log("\n=== Admin Menu ===");
+            OutputLogger.log("1. Add a new coworking space");
+            OutputLogger.log("2. Remove a coworking space");
+            OutputLogger.log("3. View all reservations");
+            OutputLogger.log("4. Back");
+            OutputLogger.log("Choose an option: ");
 
             int choice = getIntInput();
             switch (choice) {
@@ -140,7 +140,7 @@ public class MenuController {
                 }
                 default -> {
                     logger.warn("Invalid choice made in admin menu: {}", choice);
-                    UserOutPut.log("Invalid choice! Please try again.");
+                    OutputLogger.log("Invalid choice! Please try again.");
                 }
             }
         }
@@ -149,13 +149,13 @@ public class MenuController {
     private void customerMenu(Customer customer) {
         logger.info("Customer menu accessed for user: {}", customer.getUserName());
         while (true) {
-            UserOutPut.log("\n=== Customer Menu ===");
-            UserOutPut.log("1. Browse available spaces");
-            UserOutPut.log("2. Make a reservation");
-            UserOutPut.log("3. View my reservations");
-            UserOutPut.log("4. Cancel a reservation");
-            UserOutPut.log("5. Logout");
-            UserOutPut.log("Choose an option: ");
+            OutputLogger.log("\n=== Customer Menu ===");
+            OutputLogger.log("1. Browse available spaces");
+            OutputLogger.log("2. Make a reservation");
+            OutputLogger.log("3. View my reservations");
+            OutputLogger.log("4. Cancel a reservation");
+            OutputLogger.log("5. Logout");
+            OutputLogger.log("Choose an option: ");
 
             int choice = getIntInput();
             switch (choice) {
@@ -165,54 +165,54 @@ public class MenuController {
                 case 4 -> cancelReservation(customer);
                 case 5 -> {
                     logger.info("Customer {} logging out.", customer.getUserName());
-                    UserOutPut.log("Logging out...");
+                    OutputLogger.log("Logging out...");
                     return;
                 }
                 default -> {
                     logger.warn("Invalid choice made in customer menu: {}", choice);
-                    UserOutPut.log("Invalid choice! Please try again.");
+                    OutputLogger.log("Invalid choice! Please try again.");
                 }
             }
         }
     }
 
     private void addWorkspace() {
-        UserOutPut.log("Enter workspace name: ");
+        OutputLogger.log("Enter workspace name: ");
         String name = scanner.nextLine();
-        UserOutPut.log("Enter workspace description: ");
+        OutputLogger.log("Enter workspace description: ");
         String description = scanner.nextLine();
 
         try {
             workspaceService.addWorkspace(new Workspace(name, description));
             logger.info("Workspace added successfully: {}", name);
-            UserOutPut.log("Workspace added successfully!");
+            OutputLogger.log("Workspace added successfully!");
         } catch (WorkspaceNotFoundException e) {
             logger.error("Error adding workspace: {}", e.getMessage());
-            UserOutPut.log(e.getMessage());
+            OutputLogger.log(e.getMessage());
         }
     }
 
     private void removeWorkspace() {
-        UserOutPut.log("Enter workspace index to remove: ");
+        OutputLogger.log("Enter workspace index to remove: ");
         int index = getIntInput();
         try {
             workspaceService.removeWorkspace(index);
             logger.info("Workspace removed successfully at index: {}", index);
-            UserOutPut.log("Workspace removed successfully!");
+            OutputLogger.log("Workspace removed successfully!");
         } catch (WorkspaceNotFoundException e) {
             logger.error("Error removing workspace: {}", e.getMessage());
-            UserOutPut.log(e.getMessage());
+            OutputLogger.log(e.getMessage());
         }
     }
 
     private void viewAllReservations() {
         logger.info("Viewing all reservations.");
-        UserOutPut.log("\n=== All Reservations ===");
+        OutputLogger.log("\n=== All Reservations ===");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
 
         if (workspaces.isEmpty()) {
             logger.info("No workspaces available.");
-            UserOutPut.log("No workspaces available.");
+            OutputLogger.log("No workspaces available.");
             return;
         }
 
@@ -220,13 +220,13 @@ public class MenuController {
             List<Booking> bookings = workspace.getBookings();
             if (bookings.isEmpty()) {
                 logger.info("Workspace: {} has no reservations.", workspace.getName());
-                UserOutPut.log("Workspace: " + workspace.getName() + " has no reservations.");
+                OutputLogger.log("Workspace: " + workspace.getName() + " has no reservations.");
                 continue;
             }
 
-            UserOutPut.log("Workspace: " + workspace.getName());
+            OutputLogger.log("Workspace: " + workspace.getName());
             for (Booking booking : bookings) {
-                UserOutPut.log(" - Customer: " + booking.getCustomer().getUserName() +
+                OutputLogger.log(" - Customer: " + booking.getCustomer().getUserName() +
                         ", Start Time: " + booking.getStartTime() +
                         ", End Time: " + booking.getEndTime());
             }
@@ -238,23 +238,23 @@ public class MenuController {
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (workspaces.isEmpty()) {
             logger.info("No available spaces found.");
-            UserOutPut.log("No available spaces.");
+            OutputLogger.log("No available spaces.");
         } else {
-            UserOutPut.log("Available Workspaces:");
+            OutputLogger.log("Available Workspaces:");
             for (int i = 0; i < workspaces.size(); i++) {
                 Workspace ws = workspaces.get(i);
-                UserOutPut.log((i + 1) + ". " + ws.getName() + " - " + ws.getDescription());
+                OutputLogger.log((i + 1) + ". " + ws.getName() + " - " + ws.getDescription());
             }
         }
     }
 
     private void makeReservation(Customer customer) {
-        UserOutPut.log("Enter workspace index to reserve: ");
+        OutputLogger.log("Enter workspace index to reserve: ");
         int index = getIntInput() - 1;
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (index < 0 || index >= workspaces.size()) {
             logger.warn("Invalid workspace index entered: {}", index);
-            UserOutPut.log("Invalid workspace index. Please try again.");
+            OutputLogger.log("Invalid workspace index. Please try again.");
             return;
         }
 
@@ -265,7 +265,7 @@ public class MenuController {
         // Check if the end time is after the start time
         if (endTime.isBefore(startTime) || endTime.equals(startTime)) {
             logger.warn("End time must be after start time.");
-            UserOutPut.log("End time must be after start time. Please try again.");
+            OutputLogger.log("End time must be after start time. Please try again.");
             return;
         }
 
@@ -274,18 +274,18 @@ public class MenuController {
         selectedWorkspace.addBooking(booking);
 
         logger.info("Reservation made successfully for {} from {} to {}", selectedWorkspace.getName(), startTime, endTime);
-        UserOutPut.log("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTime + " to " + endTime);
+        OutputLogger.log("Reservation made successfully for " + selectedWorkspace.getName() + " from " + startTime + " to " + endTime);
     }
 
     private LocalTime getValidTime(String prompt) {
         while (true) {
-            UserOutPut.log(prompt);
+            OutputLogger.log(prompt);
             String timeStr = scanner.nextLine();
             if (isValidTimeFormat(timeStr)) {
                 return LocalTime.parse(timeStr, DateTimeFormatter.ofPattern("HH:mm"));
             } else {
                 logger.warn("Invalid time format entered: {}", timeStr);
-                UserOutPut.log("Invalid time format. Please use HH:mm.");
+                OutputLogger.log("Invalid time format. Please use HH:mm.");
             }
         }
     }
@@ -303,14 +303,14 @@ public class MenuController {
         List<Booking> bookings = bookingService.getCustomerBookings(customer);
         if (bookings.isEmpty()) {
             logger.info("Customer {} has no reservations.", customer.getUserName());
-            UserOutPut.log("You have no reservations.");
+            OutputLogger.log("You have no reservations.");
             return;
         }
 
         logger.info("Displaying reservations for customer: {}", customer.getUserName());
-        UserOutPut.log("Your Reservations:");
+        OutputLogger.log("Your Reservations:");
         for (Booking booking : bookings) {
-            UserOutPut.log("ID: " + booking.getId() +
+            OutputLogger.log("ID: " + booking.getId() +
                     ", Workspace: " + booking.getWorkspace().getName() +
                     ", Start Time: " + booking.getStartTime() +
                     ", End Time: " + booking.getEndTime());
@@ -321,19 +321,19 @@ public class MenuController {
         List<Booking> bookings = bookingService.getCustomerBookings(customer);
         if (bookings.isEmpty()) {
             logger.info("Customer {} has no reservations to cancel.", customer.getUserName());
-            UserOutPut.log("You have no reservations to cancel.");
+            OutputLogger.log("You have no reservations to cancel.");
             return;
         }
 
-        UserOutPut.log("Your Reservations:");
+        OutputLogger.log("Your Reservations:");
         for (Booking booking : bookings) {
-            UserOutPut.log("ID: " + booking.getId() +
+            OutputLogger.log("ID: " + booking.getId() +
                     ", Workspace: " + booking.getWorkspace().getName() +
                     ", Start Time: " + booking.getStartTime() +
                     ", End Time: " + booking.getEndTime());
         }
 
-        UserOutPut.log("Enter reservation ID to cancel: ");
+        OutputLogger.log("Enter reservation ID to cancel: ");
         String reservationId = scanner.nextLine();
 
         // Find the booking by ID
@@ -344,7 +344,7 @@ public class MenuController {
 
         if (bookingToCancel == null) {
             logger.warn("No reservation found with ID: {}", reservationId);
-            UserOutPut.log("No reservation found with that ID. Please try again.");
+            OutputLogger.log("No reservation found with that ID. Please try again.");
             return;
         }
 
@@ -352,7 +352,7 @@ public class MenuController {
         customer.getBookings().remove(bookingToCancel);
         bookingService.cancelReservation(customer, bookingToCancel.getId());
         logger.info("Reservation ID: {} canceled successfully.", bookingToCancel.getId());
-        UserOutPut.log("Reservation canceled successfully!");
+        OutputLogger.log("Reservation canceled successfully!");
     }
 
     private int getIntInput() {
@@ -361,7 +361,7 @@ public class MenuController {
                 return Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
                 logger.warn("Invalid number input.");
-                UserOutPut.log("Please enter a valid number!");
+                OutputLogger.log("Please enter a valid number!");
             }
         }
     }

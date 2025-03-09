@@ -2,7 +2,7 @@ package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.logger.Loge;
+import com.andersen.logger.ConsoleLogger;
 import com.andersen.repository.workspace.WorkspaceRepositoryEntityImpl;
 import org.slf4j.Logger;
 
@@ -15,7 +15,7 @@ import java.util.Optional;
  * It interacts with a repository to persist workspace data.
  */
 public class WorkspaceServiceImpl implements WorkspaceService {
-    private static final Logger logger = Loge.getLogger(WorkspaceServiceImpl.class);
+    private static final Logger logger = ConsoleLogger.getLogger(WorkspaceServiceImpl.class);
     private final WorkspaceRepositoryEntityImpl workspaceRepository;
 
     /**
@@ -25,7 +25,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         try {
             workspaceRepository.loadWorkspaces();
         } catch (WorkspaceNotFoundException e) {
-            Loge.log(e.getMessage());
+            ConsoleLogger.log(e.getMessage());
         }
     }
 

@@ -3,7 +3,7 @@ package com.andersen.service.booking;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.logger.Loge;
+import com.andersen.logger.ConsoleLogger;
 import com.andersen.repository.booking.BookingRepositoryEntityImpl;
 import org.slf4j.Logger;
 
@@ -16,7 +16,7 @@ import java.util.List;
  * It interacts with a repository to persist booking data.
  */
 public class BookingServiceImpl implements BookingService {
-    private static final Logger logger = Loge.getLogger(BookingServiceImpl.class);
+    private static final Logger logger = ConsoleLogger.getLogger(BookingServiceImpl.class);
     private final BookingRepositoryEntityImpl bookingRepository;
 
     /**
@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
      * @return the created Booking object
      */
     public Booking createBooking(Customer customer, Workspace workspace, LocalTime startTime, LocalTime endTime) {
-        long id = bookingRepository.generateId();
+        int id = (int) bookingRepository.generateId();
         return new Booking(id, customer, workspace, startTime, endTime);
     }
 

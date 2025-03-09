@@ -11,7 +11,7 @@ import java.time.format.DateTimeParseException;
  * Represents a booking made by a customer for a specific workspace during a defined time period.
  */
 public class Booking {
-    private long id;
+    private int id;
     private Customer customer;
     private Workspace workspace;
     private LocalTime startTime;
@@ -26,7 +26,7 @@ public class Booking {
      * @param startTime    the start time of the booking
      * @param endTime      the end time of the booking
      */
-    public Booking(Long id, Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
+    public Booking(int id, Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
         this.id = id;
         this.customer = customer;
         this.workspace = selectedWorkspace;
@@ -44,7 +44,7 @@ public class Booking {
      * @param endTime      the end time of the booking as a string (format HH:mm)
      * @throws IllegalArgumentException if the time format is invalid
      */
-    public Booking(Long id, Customer customer, Workspace selectedWorkspace, String startTime, String endTime) {
+    public Booking(int id, Customer customer, Workspace selectedWorkspace, String startTime, String endTime) {
         this(id, customer, selectedWorkspace, parseTime(startTime), parseTime(endTime));
     }
 
@@ -77,7 +77,7 @@ public class Booking {
      *
      * @param id the booking ID to set
      */
-    public void setId(long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

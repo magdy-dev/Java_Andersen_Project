@@ -9,7 +9,7 @@ import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
-import com.andersen.logger.Loge;
+import com.andersen.logger.ConsoleLogger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -32,7 +32,7 @@ public class Main {
             MenuController menuController = new MenuController(workspaceService, bookingService, authService, scanner);
             menuController.mainMenu();
         } catch (Exception e) {
-            Loge.log("An unexpected error occurred: " + e.getMessage());
+            ConsoleLogger.log("An unexpected error occurred: " + e.getMessage());
         } finally {
             scanner.close();
         }
