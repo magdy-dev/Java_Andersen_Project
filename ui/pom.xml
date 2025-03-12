@@ -3,10 +3,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.andersen</groupId> <!-- Ensure this is correct -->
+        <groupId>com.andersen</groupId>
         <artifactId>CoworkingSpaceReservation</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>pom.xml</relativePath> <!-- This line should point to the correct parent POM -->
+        <relativePath>pom.xml</relativePath>
     </parent>
     <artifactId>ui</artifactId>
     <packaging>jar</packaging>

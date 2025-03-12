@@ -33,6 +33,20 @@ public class Workspace {
         this.description = description;
     }
 
+    public Workspace(long id, String name, String description, List<Booking> bookings, List<Availability> availabilities) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.bookings = bookings;
+        this.availabilities = availabilities;
+    }
+
+    public Workspace(long id, String name, String description) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+    }
+
     /**
      * Gets the unique identifier for the workspace.
      *

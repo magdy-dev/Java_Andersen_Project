@@ -1,13 +1,13 @@
 # Java_Andersen_Project
-# Coworking Space Reservation Application
+## Coworking Space Reservation Application
 
-## Overview
+### Overview
 The Coworking Space Reservation Application is a console-based application that allows users to browse available coworking spaces, make reservations, and manage bookings. It provides an intuitive interface for both customers and admins, making it easy to handle coworking space reservations and management.
 
-## Features
+### Features
 
-### User Roles
-- **Customer**: 
+#### User Roles
+- **Customer**:
   - Browse available spaces
   - Make reservations
   - Cancel bookings
@@ -31,19 +31,21 @@ Users can:
 - Cancel existing reservations
 - View their booking history
 
-## Flow
+### Flow
 1. **Welcome Message**: Upon starting the application, users are greeted with a welcome message.
 2. **Main Menu**: Users can choose to register, log in, or exit the application.
 3. **Admin Login**: Admins can log in to access admin functionalities.
 4. **Customer Login**: Customers can log in to manage their reservations.
 
-## Getting Started
+### User Registration
+Users must register to create an account. During registration, users will provide their username, password, and any other required information. Once registered, users can log in using their credentials.
 
-### Prerequisites
+### Admin Credentials
+- **Username**: admina
+- **Password**: admin
+
+### Getting Started
+
+#### Prerequisites
 - Java Development Kit (JDK) installed
 - IDE (e.g., IntelliJ IDEA, Eclipse) for Java development
-
-### Installation
-1. Clone the repository:
-   ```bash
-   git clone https://github.com

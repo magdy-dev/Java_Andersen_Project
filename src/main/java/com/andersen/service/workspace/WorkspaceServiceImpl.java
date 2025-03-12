@@ -73,27 +73,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         // Fetch the workspace directly by its ID
         Optional<Workspace> workspaceOptional = workspaceRepository.getWorkspaceById(workspaceId);
 
-        workspaceOptional.ifPresentOrElse(
-                workspace -> {
-                    logger.debug("Removing workspace: {}", workspace);
-                    try {
-                        workspaceRepository.removeWorkspace(workspace);
-                        logger.info("Workspace removed successfully: {}", workspace);
-                    } catch (WorkspaceNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                },
-                () -> {
-                    logger.error("Invalid workspace ID for removal: {}", workspaceId);
-                    try {
-                        throw new WorkspaceNotFoundException("Workspace not found.");
-                    } catch (WorkspaceNotFoundException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-        );
+        // Check if the workspace exists
+        if (workspaceOptional.isPresent()) {
+            Workspace workspace = workspaceOptional.get();
+            logger.debug("Removing workspace: {}", workspace);
+            workspaceRepository.removeWorkspace(workspace); // Remove the workspace from the repository
+            logger.info("Workspace removed successfully: {}", workspace);
+        } else {
+            // If the workspace does not exist, throw an exception
+            logger.error("Invalid workspace ID for removal: {}", workspaceId);
+            throw new WorkspaceNotFoundException("Workspace not found for ID: " + workspaceId);
+        }
     }
-
     /**
      * Retrieves all workspaces from the repository.
      *
