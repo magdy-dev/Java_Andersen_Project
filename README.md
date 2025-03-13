@@ -49,3 +49,11 @@ Users must register to create an account. During registration, users will provid
 #### Prerequisites
 - Java Development Kit (JDK) installed
 - IDE (e.g., IntelliJ IDEA, Eclipse) for Java development
+
+#### Building and Running the Application
+To build and run the application, execute the following command:
+
+```bash
+---->cd C:\Users\marko\Downloads\CoworkingSpaceReservation\ui && 
+---->mvn clean package && 
+---->java -jar target\ui-1.0-SNAPSHOT.jar
