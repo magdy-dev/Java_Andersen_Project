@@ -35,7 +35,7 @@ public class MenuController {
         this.scanner = scanner;
     }
 
-    public void mainMenu() {
+    public void mainMenu() throws UserAuthenticationException, WorkspaceNotFoundException {
         while (true) {
             OutputLogger.log("\n=== Welcome to the Coworking Space Reservation ===");
             OutputLogger.log("1. Admin Login");
@@ -64,7 +64,7 @@ public class MenuController {
         System.exit(0);
     }
 
-    private void registerUser() {
+    private void registerUser() throws UserAuthenticationException {
         OutputLogger.log("Enter username: ");
         String username = scanner.nextLine();
         OutputLogger.log("Enter password: ");
@@ -74,50 +74,37 @@ public class MenuController {
             authService.registerUser(username, password);
             logger.info("User registered successfully: {}", username);
             OutputLogger.log("User registered successfully!");
-        } catch (UserAuthenticationException e) {
-            logger.error("Registration failed for username: {}", username);
-            OutputLogger.log("Registration failed: " + e.getMessage());
         } catch (IllegalArgumentException e) {
             logger.warn("Invalid input during registration for username: {}", username);
             OutputLogger.log("Invalid input: " + e.getMessage());
         }
     }
 
-    private void userLogin() {
+    private void userLogin() throws UserAuthenticationException {
         OutputLogger.log("Username: ");
         String username = scanner.nextLine();
         OutputLogger.log("Password: ");
         String password = scanner.nextLine();
 
-        try {
-            Customer authenticatedCustomer = authService.loginCustomer(username, password);
-            if (authenticatedCustomer != null) {
-                logger.info("User {} logged in successfully.", username);
-                customerMenu(authenticatedCustomer);
-            }
-        } catch (UserAuthenticationException e) {
-            logger.error("User login failed for username: {}", username);
-            OutputLogger.log("Invalid username or password. Please try again.");
+        Customer authenticatedCustomer = authService.loginCustomer(username, password);
+        if (authenticatedCustomer != null) {
+            logger.info("User {} logged in successfully.", username);
+            customerMenu(authenticatedCustomer);
         }
     }
 
-    private void adminLogin() {
+    private void adminLogin() throws UserAuthenticationException, WorkspaceNotFoundException {
         OutputLogger.log("Admin Username: ");
         String username = scanner.nextLine();
         OutputLogger.log("Admin Password: ");
         String password = scanner.nextLine();
 
-        try {
-            Admin admin = authService.loginAdmin(username, password);
-            logger.info("Admin {} logged in successfully.", username);
-            adminMenu();
-        } catch (UserAuthenticationException e) {
-            logger.error("Admin login failed for username: {}", username);
-            OutputLogger.log("Invalid admin credentials. Please try again.");
-        }
+        Admin admin = authService.loginAdmin(username, password);
+        logger.info("Admin {} logged in successfully.", username);
+        adminMenu();
     }
 
-    private void adminMenu() {
+    private void adminMenu() throws WorkspaceNotFoundException {
         logger.info("Admin menu accessed.");
         OutputLogger.log("Admin Logged In");
 
@@ -176,33 +163,23 @@ public class MenuController {
         }
     }
 
-    private void addWorkspace() {
+    private void addWorkspace() throws WorkspaceNotFoundException {
         OutputLogger.log("Enter workspace name: ");
         String name = scanner.nextLine();
         OutputLogger.log("Enter workspace description: ");
         String description = scanner.nextLine();
 
-        try {
-            workspaceService.addWorkspace(new Workspace(name, description));
-            logger.info("Workspace added successfully: {}", name);
-            OutputLogger.log("Workspace added successfully!");
-        } catch (WorkspaceNotFoundException e) {
-            logger.error("Error adding workspace: {}", e.getMessage());
-            OutputLogger.log(e.getMessage());
-        }
+        workspaceService.addWorkspace(new Workspace(name, description));
+        logger.info("Workspace added successfully: {}", name);
+        OutputLogger.log("Workspace added successfully!");
     }
 
-    private void removeWorkspace() {
+    private void removeWorkspace() throws WorkspaceNotFoundException {
         OutputLogger.log("Enter workspace index to remove: ");
         int index = getIntInput();
-        try {
-            workspaceService.removeWorkspace(index);
-            logger.info("Workspace removed successfully at index: {}", index);
-            OutputLogger.log("Workspace removed successfully!");
-        } catch (WorkspaceNotFoundException e) {
-            logger.error("Error removing workspace: {}", e.getMessage());
-            OutputLogger.log(e.getMessage());
-        }
+        workspaceService.removeWorkspace(index);
+        logger.info("Workspace removed successfully at index: {}", index);
+        OutputLogger.log("Workspace removed successfully!");
     }
 
     private void viewAllReservations() {

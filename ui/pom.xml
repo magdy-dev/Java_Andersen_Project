@@ -18,6 +18,18 @@
             <artifactId>service</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.andersen</groupId>
+            <artifactId>CoworkingSpaceReservation</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.andersen</groupId>
+            <artifactId>logger</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
         <!-- Additional UI-specific dependencies can be added here -->
     </dependencies>
 </project>
