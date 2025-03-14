@@ -7,18 +7,9 @@
         <groupId>com.andersen</groupId>
         <artifactId>CoworkingSpaceReservation</artifactId>
         <version>1.0-SNAPSHOT</version>
-        <relativePath>../pom.xml</relativePath>
     </parent>
 
     <artifactId>domain</artifactId>
 
-    <dependencies>
-        <!-- Dependencies specific to domain module can be added here -->
-        <dependency>
-            <groupId>com.andersen</groupId>
-            <artifactId>CoworkingSpaceReservation</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>
-    </dependencies>
+
 </project>
