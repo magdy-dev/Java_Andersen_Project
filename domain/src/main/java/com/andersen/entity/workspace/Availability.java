@@ -8,7 +8,7 @@ import java.time.LocalTime;
  * This class keeps track of the total capacity and the remaining available spots.
  */
 public class Availability {
-    private long id ;
+    private Long id ;
     private LocalDate date;
     private LocalTime time;
     private int capacity;
@@ -28,7 +28,7 @@ public class Availability {
      * @param capacity the total capacity available at this date and time
      * @param remaining the number of remaining spots available (initialized to capacity)
      */
-    public Availability(long id,LocalDate date, LocalTime time, int capacity, int remaining) {
+    public Availability(Long id,LocalDate date, LocalTime time, int capacity, int remaining) {
        this.id=id;
         this.date = date;
         this.time = time;

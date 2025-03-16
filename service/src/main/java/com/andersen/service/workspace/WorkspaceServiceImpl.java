@@ -69,7 +69,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @throws WorkspaceNotFoundException if the workspace with the specified ID cannot be found
      */
     @Override
-    public void removeWorkspace(long workspaceId) throws WorkspaceNotFoundException {
+    public void removeWorkspace(Long workspaceId) throws WorkspaceNotFoundException {
         // Fetch the workspace directly by its ID
         Optional<Workspace> workspaceOptional = workspaceRepository.getWorkspaceById(workspaceId);
 

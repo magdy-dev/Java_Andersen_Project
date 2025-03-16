@@ -48,7 +48,7 @@ public class BookingRepositoryEntityImpl implements BookingRepository {
      * @return a long value representing the unique ID (current system time in milliseconds)
      */
     @Override
-    public long generateId() {
+    public Long generateId() {
         return System.currentTimeMillis();
     }
 }

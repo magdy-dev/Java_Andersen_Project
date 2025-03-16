@@ -10,7 +10,7 @@ import java.util.List;
  * A workspace has a name, description, a list of bookings, and availability options.
  */
 public class Workspace {
-    private long id;
+    private Long id;
     private String name;
     private String description;
     private List<Booking> bookings = new ArrayList<>();
@@ -33,7 +33,7 @@ public class Workspace {
         this.description = description;
     }
 
-    public Workspace(long id, String name, String description, List<Booking> bookings, List<Availability> availabilities) {
+    public Workspace(Long id, String name, String description, List<Booking> bookings, List<Availability> availabilities) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -41,7 +41,7 @@ public class Workspace {
         this.availabilities = availabilities;
     }
 
-    public Workspace(long id, String name, String description) {
+    public Workspace(Long id, String name, String description) {
         this.id = id;
         this.name = name;
         this.description = description;

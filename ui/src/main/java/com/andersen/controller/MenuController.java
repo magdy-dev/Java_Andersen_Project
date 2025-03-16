@@ -176,7 +176,7 @@ public class MenuController {
 
     private void removeWorkspace() throws WorkspaceNotFoundException {
         OutputLogger.log("Enter workspace index to remove: ");
-        int index = getIntInput();
+        Long index = (long) getIntInput();
         workspaceService.removeWorkspace(index);
         logger.info("Workspace removed successfully at index: {}", index);
         OutputLogger.log("Workspace removed successfully!");

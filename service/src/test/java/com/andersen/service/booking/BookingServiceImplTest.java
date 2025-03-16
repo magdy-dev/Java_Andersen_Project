@@ -33,8 +33,8 @@ class BookingServiceImplTest {
 
         // Create a customer and workspace for testing
         customer = new Customer("john_doe", "securePassword123");
-        workspace = new Workspace(1, "Cozy Office", "Comfortable workspace.");
-        booking = new Booking(1, customer, workspace, LocalTime.of(9, 0), LocalTime.of(11, 0));
+        workspace = new Workspace(1L, "Cozy Office", "Comfortable workspace.");
+        booking = new Booking(1L, customer, workspace, LocalTime.of(9, 0), LocalTime.of(11, 0));
 
         // Initialize the customer's bookings list
         customer.setBookings(new ArrayList<>());

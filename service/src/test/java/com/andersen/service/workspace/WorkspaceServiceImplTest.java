@@ -29,8 +29,8 @@ class WorkspaceServiceImplTest {
     private Availability availability2; // Second availability for testing
 
     // Constants for workspace IDs
-    private static final long WORKSPACE1_ID = 1;
-    private static final long WORKSPACE2_ID = 2;
+    private static final Long WORKSPACE1_ID = 1L;
+    private static final Long WORKSPACE2_ID = 2L;
 
     // Setup method to initialize the test environment
     @BeforeEach
@@ -48,10 +48,10 @@ class WorkspaceServiceImplTest {
         workspace2 = new Workspace(WORKSPACE2_ID, "Modern Desk", "A sleek workspace with modern amenities.");
 
         // Create a booking for the first workspace
-        booking = new Booking(1, customer, workspace1, LocalTime.of(9, 0), LocalTime.of(17, 0));
+        booking = new Booking(1L, customer, workspace1, LocalTime.of(9, 0), LocalTime.of(17, 0));
         // Create availability instances for testing
-        availability1 = new Availability(1, LocalDate.now(), LocalTime.of(14, 0), 20, 15);
-        availability2 = new Availability(2, LocalDate.now(), LocalTime.of(13, 0), 30, 16);
+        availability1 = new Availability(1L, LocalDate.now(), LocalTime.of(14, 0), 20, 15);
+        availability2 = new Availability(2L, LocalDate.now(), LocalTime.of(13, 0), 30, 16);
 
         // Mock repository responses
         when(workspaceRepository.getAllWorkspaces()).thenReturn(List.of(workspace1, workspace2));

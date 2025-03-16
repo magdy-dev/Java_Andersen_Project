@@ -12,7 +12,7 @@ public interface BookingRepositoryEntity<T extends Booking> {
 
     List<Booking> getAllBookings();
 
-    long generateId();
+    Long generateId();
 
 
 }

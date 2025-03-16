@@ -42,7 +42,7 @@ class AuthServiceImpTest {
 
         // Verify that the logged-in customer is not null and username matches
         assertNotNull(loggedInCustomer, "Logged in customer should not be null.");
-        assertEquals("ohn_doe", loggedInCustomer.getUserName(), "Logged in customer's username should match.");
+        assertEquals("john_doe", loggedInCustomer.getUserName(), "Logged in customer's username should match.");
     }
 
     // Test scenario: Failed login due to invalid credentials (wrong password)

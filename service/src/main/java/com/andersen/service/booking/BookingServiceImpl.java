@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
      * @return the created Booking object
      */
     public Booking createBooking(Customer customer, Workspace workspace, LocalTime startTime, LocalTime endTime) {
-        int id = (int) bookingRepository.generateId();
+        Long id = bookingRepository.generateId();
         return new Booking(id, customer, workspace, startTime, endTime);
     }
 
