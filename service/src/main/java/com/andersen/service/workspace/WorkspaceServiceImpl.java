@@ -71,19 +71,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     @Override
     public void removeWorkspace(Long workspaceId) throws WorkspaceNotFoundException {
         // Fetch the workspace directly by its ID
-        Optional<Workspace> workspaceOptional = workspaceRepository.getWorkspaceById(workspaceId);
+        Workspace workspace = workspaceRepository.getWorkspaceById(workspaceId)
+                .orElseThrow(() -> {
+                    logger.error("Invalid workspace ID for removal: {}", workspaceId);
+                    return new WorkspaceNotFoundException("Workspace not found for ID: " + workspaceId);
+                });
 
-        // Check if the workspace exists
-        if (workspaceOptional.isPresent()) {
-            Workspace workspace = workspaceOptional.get();
-            logger.debug("Removing workspace: {}", workspace);
-            workspaceRepository.removeWorkspace(workspace); // Remove the workspace from the repository
-            logger.info("Workspace removed successfully: {}", workspace);
-        } else {
-            // If the workspace does not exist, throw an exception
-            logger.error("Invalid workspace ID for removal: {}", workspaceId);
-            throw new WorkspaceNotFoundException("Workspace not found for ID: " + workspaceId);
-        }
+        logger.debug("Removing workspace: {}", workspace);
+        workspaceRepository.removeWorkspace(workspace); // Remove the workspace from the repository
+        logger.info("Workspace removed successfully: {}", workspace);
     }
     /**
      * Retrieves all workspaces from the repository.
