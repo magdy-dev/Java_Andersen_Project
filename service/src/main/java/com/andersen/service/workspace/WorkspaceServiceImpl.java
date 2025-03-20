@@ -7,7 +7,7 @@ import com.andersen.repository.workspace.WorkspaceRepositoryEntityImpl;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.Optional;
+
 
 /**
  * Implementation of the {@link WorkspaceService} interface for managing workspaces.
@@ -17,17 +17,6 @@ import java.util.Optional;
 public class WorkspaceServiceImpl implements WorkspaceService {
     private static final Logger logger = ConsoleLogger.getLogger(WorkspaceServiceImpl.class);
     private final WorkspaceRepositoryEntityImpl workspaceRepository;
-
-    /**
-     * Initializes the service and loads existing workspaces from the repository.
-     */
-    private void initialize() {
-        try {
-            workspaceRepository.loadWorkspaces();
-        } catch (WorkspaceNotFoundException e) {
-            ConsoleLogger.log(e.getMessage());
-        }
-    }
 
     /**
      * Constructs a new WorkspaceServiceImpl with the specified repository.
@@ -41,8 +30,9 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
         this.workspaceRepository = workspaceRepository;
         logger.info("WorkspaceServiceImpl initialized with repository: {}", workspaceRepository.getClass().getSimpleName());
-        initialize();
+
     }
+
 
     /**
      * Adds a new workspace to the repository.
@@ -59,7 +49,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
         logger.debug("Adding workspace: {}", workspace);
         workspaceRepository.addWorkspace(workspace);
-        logger.info("Workspace added successfully: {}", workspace);
+        logger.info("Workspace added successfully: {}", workspace.getName());
     }
 
     /**
@@ -77,17 +67,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                     return new WorkspaceNotFoundException("Workspace not found for ID: " + workspaceId);
                 });
 
-        logger.debug("Removing workspace: {}", workspace);
+        logger.debug("Removing workspace: {}", workspace.getName());
         workspaceRepository.removeWorkspace(workspace); // Remove the workspace from the repository
-        logger.info("Workspace removed successfully: {}", workspace);
+        logger.info("Workspace removed successfully: {}", workspace.getName());
     }
+
     /**
      * Retrieves all workspaces from the repository.
      *
      * @return a list of all workspaces
+     * @throws WorkspaceNotFoundException if there is an error retrieving workspaces
      */
     @Override
-    public List<Workspace> getAllWorkspaces() {
+    public List<Workspace> getAllWorkspaces() throws WorkspaceNotFoundException {
         logger.debug("Fetching all workspaces.");
         List<Workspace> workspaces = workspaceRepository.getAllWorkspaces();
         logger.info("Retrieved {} workspaces.", workspaces.size());

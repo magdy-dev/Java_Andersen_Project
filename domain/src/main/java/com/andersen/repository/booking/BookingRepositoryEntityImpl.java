@@ -1,5 +1,8 @@
 package com.andersen.repository.booking;
 
+import com.andersen.dao.booking.BookingDAOImpl;
+import com.andersen.dao.user.UserDAOImpl;
+import com.andersen.dao.workspace.WorkspaceDAO;
 import com.andersen.entity.booking.Booking;
 
 import java.util.ArrayList;
@@ -12,6 +15,17 @@ import java.util.List;
 public class BookingRepositoryEntityImpl implements BookingRepository {
     private final List<Booking> bookings = new ArrayList<>();
 
+    public BookingRepositoryEntityImpl() {
+    }
+
+    private  UserDAOImpl userDAO;
+    private  WorkspaceDAO workspaceDAO;
+    private BookingDAOImpl bookingDAO;
+    public BookingRepositoryEntityImpl(UserDAOImpl userDAO, WorkspaceDAO workspaceDAO, BookingDAOImpl bookingDAO) {
+        this.userDAO = userDAO;
+        this.workspaceDAO = workspaceDAO;
+        this.bookingDAO = bookingDAO;
+    }
     /**
      * Adds a new booking to the repository.
      *

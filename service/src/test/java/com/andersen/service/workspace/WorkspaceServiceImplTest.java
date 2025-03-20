@@ -74,7 +74,7 @@ class WorkspaceServiceImplTest {
 
     // Test to retrieve all workspaces
     @Test
-    void getAllWorkspaces() {
+    void getAllWorkspaces() throws WorkspaceNotFoundException {
         List<Workspace> allWorkspaces = workspaceService.getAllWorkspaces(); // Call the service method
 
         // Assertions to verify the retrieved workspaces

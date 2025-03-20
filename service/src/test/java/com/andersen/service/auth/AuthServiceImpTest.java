@@ -4,6 +4,7 @@ import com.andersen.entity.role.User;
 import com.andersen.entity.users.Admin;
 import com.andersen.entity.users.Customer;
 import com.andersen.exception.UserAuthenticationException;
+import com.andersen.repository.user.UserRepositoryEntityImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +32,7 @@ class AuthServiceImpTest {
         customer = new Customer("john_doe", "securePassword123");
         users.add(customer);
         // Initialize the AuthService with the users list
-        authService = new AuthServiceImp(users);
+        authService = new AuthServiceImp((UserRepositoryEntityImpl) users);
     }
 
     // Test successful login for a customer

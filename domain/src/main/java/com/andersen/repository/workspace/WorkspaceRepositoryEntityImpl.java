@@ -1,5 +1,6 @@
 package com.andersen.repository.workspace;
 
+import com.andersen.dao.workspace.WorkspaceDAOImpl;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
 
@@ -18,7 +19,7 @@ public class WorkspaceRepositoryEntityImpl implements WorkspaceRepository {
     /**
      * Constructs a new WorkspaceRepositoryEntityImpl.
      */
-    public WorkspaceRepositoryEntityImpl() {
+    public WorkspaceRepositoryEntityImpl(WorkspaceDAOImpl workspaceDAO) {
         // Default constructor
     }
 

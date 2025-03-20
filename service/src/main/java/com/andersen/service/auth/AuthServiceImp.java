@@ -4,35 +4,31 @@ import com.andersen.entity.role.User;
 import com.andersen.entity.users.Admin;
 import com.andersen.entity.users.Customer;
 import com.andersen.exception.UserAuthenticationException;
-import com.andersen.logger.ConsoleLogger;
-import org.slf4j.Logger;
+import com.andersen.repository.user.UserRepositoryEntityImpl;
 
-import java.util.List;
-import java.util.Optional;
+
+import java.sql.SQLException;
 
 /**
  * Implementation of the {@link AuthService} interface for user authentication.
  * This service provides methods for logging in customers and admins, as well as registering new users.
  */
 public class AuthServiceImp implements AuthService {
-    private static final Logger logger = ConsoleLogger.getLogger(AuthServiceImp.class); // For internal logs
     private static final String ADMIN_USERNAME = "admin";
     private static final String ADMIN_PASSWORD = "admin";
-    private final List<User> users;
+    private final UserRepositoryEntityImpl userRepository;
 
     /**
-     * Constructs a new AuthServiceImp with the specified list of users.
+     * Constructs a new AuthServiceImp with the specified UserRepository.
      *
-     * @param users the list of users for authentication
-     * @throws IllegalArgumentException if the provided user list is null
+     * @param userRepository the repository to manage user data
+     * @throws IllegalArgumentException if userRepository is null
      */
-    public AuthServiceImp(List<User> users) {
-        if (users == null) {
-            logger.error("User list cannot be null.");
-            throw new IllegalArgumentException("User list cannot be null.");
+    public AuthServiceImp(UserRepositoryEntityImpl userRepository) {
+        if (userRepository == null) {
+            throw new IllegalArgumentException("UserRepository cannot be null.");
         }
-        this.users = users;
-        logger.info("AuthServiceImp initialized with {} users.", users.size());
+        this.userRepository = userRepository;
     }
 
     /**
@@ -47,25 +43,21 @@ public class AuthServiceImp implements AuthService {
     @Override
     public Customer loginCustomer(String username, String password) throws UserAuthenticationException {
         if (username == null || password == null) {
-            logger.error("Username or password cannot be null.");
             throw new IllegalArgumentException("Username or password cannot be null.");
         }
 
-        logger.debug("Attempting to log in customer with username: {}", username);
+        try {
+            User user = userRepository.getUserByUsername(username); // Retrieve user from repo
 
-        // Optional to find the customer
-        Optional<Customer> customerOptional = users.stream()
-                .filter(user -> user instanceof Customer &&
-                        user.getUserName().equals(username) &&
-                        user.getPassword().equals(password))
-                .map(user -> (Customer) user)
-                .findFirst();
+            // Verify password
+            if (user != null && user.getPassword().equals(password)) {
+                return (Customer) user; // Return customer if credentials match
+            }
+        } catch (SQLException e) {
+            throw new UserAuthenticationException("Error during customer authentication: " + e.getMessage());
+        }
 
-        return customerOptional.orElseThrow(() -> {
-            logger.error("Customer login failed for username: {}", username);
-            logger.info("Invalid username or password. Please try again.");
-            return new UserAuthenticationException("Customer not found or invalid credentials.");
-        });
+        throw new UserAuthenticationException("Customer not found or invalid credentials.");
     }
 
     /**
@@ -80,19 +72,14 @@ public class AuthServiceImp implements AuthService {
     @Override
     public Admin loginAdmin(String username, String password) throws UserAuthenticationException {
         if (username == null || password == null) {
-            logger.error("Username or password cannot be null.");
             throw new IllegalArgumentException("Username or password cannot be null.");
         }
 
-        logger.debug("Attempting to log in admin with username: {}", username);
-
+        // Check admin credentials
         if (ADMIN_USERNAME.equals(username) && ADMIN_PASSWORD.equals(password)) {
-            logger.info("Admin logged in successfully.");
-            return new Admin(username, password);
+            return new Admin(username, password); // Return new Admin object
         }
 
-        logger.error("Admin login failed for username: {}", username);
-        logger.info("Invalid admin credentials. Please try again.");
         throw new UserAuthenticationException("Admin not found or invalid credentials.");
     }
 
@@ -107,19 +94,20 @@ public class AuthServiceImp implements AuthService {
     @Override
     public void registerUser(String username, String password) throws UserAuthenticationException {
         if (username == null || password == null) {
-            logger.error("Username or password cannot be null.");
             throw new IllegalArgumentException("Username or password cannot be null.");
         }
 
-        logger.debug("Attempting to register user with username: {}", username);
+        try {
+            User existingUser = userRepository.getUserByUsername(username);
+            if (existingUser != null) {
+                throw new UserAuthenticationException("Username already exists.");
+            }
 
-        if (users.stream().anyMatch(user -> user.getUserName().equals(username))) {
-            logger.error("Username already exists: {}", username);
-            logger.info("Username already exists. Please choose a different username.");
-            throw new UserAuthenticationException("Username already exists.");
+            // Create and register new customer
+            Customer newUser = new Customer(username, password); // Assuming you have a constructor for Customer
+            userRepository.registerCustomer(newUser);
+        } catch (SQLException e) {
+            throw new UserAuthenticationException("Error registering user: " + e.getMessage());
         }
-
-        users.add(new Customer(username, password));
-        logger.info("User registered successfully: {}", username);
     }
 }

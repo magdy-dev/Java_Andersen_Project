@@ -80,7 +80,7 @@ public class MenuController {
         }
     }
 
-    private void userLogin() throws UserAuthenticationException {
+    private void userLogin() throws UserAuthenticationException, WorkspaceNotFoundException {
         OutputLogger.log("Username: ");
         String username = scanner.nextLine();
         OutputLogger.log("Password: ");
@@ -133,7 +133,7 @@ public class MenuController {
         }
     }
 
-    private void customerMenu(Customer customer) {
+    private void customerMenu(Customer customer) throws WorkspaceNotFoundException {
         logger.info("Customer menu accessed for user: {}", customer.getUserName());
         while (true) {
             OutputLogger.log("\n=== Customer Menu ===");
@@ -182,7 +182,7 @@ public class MenuController {
         OutputLogger.log("Workspace removed successfully!");
     }
 
-    private void viewAllReservations() {
+    private void viewAllReservations() throws WorkspaceNotFoundException {
         logger.info("Viewing all reservations.");
         OutputLogger.log("\n=== All Reservations ===");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
@@ -210,7 +210,7 @@ public class MenuController {
         }
     }
 
-    private void browseAvailableSpaces() {
+    private void browseAvailableSpaces() throws WorkspaceNotFoundException {
         logger.info("Browsing available spaces.");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (workspaces.isEmpty()) {
@@ -225,7 +225,7 @@ public class MenuController {
         }
     }
 
-    private void makeReservation(Customer customer) {
+    private void makeReservation(Customer customer) throws WorkspaceNotFoundException {
         OutputLogger.log("Enter workspace index to reserve: ");
         int index = getIntInput() - 1;
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
