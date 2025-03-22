@@ -25,18 +25,34 @@ public class UserDAOImpl implements UserDAO {
             logger.info("User  created: {}", user.getUserName());
         }
     }
-
     @Override
-    public User readUser (String username) throws SQLException {
+    public User readUser(String username) throws SQLException {
         String sql = "SELECT * FROM users WHERE username = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = DatabaseConnection.getDataSource().getConnection();
+            statement = connection.prepareStatement(sql);
             statement.setString(1, username);
-            ResultSet resultSet = statement.executeQuery();
+            resultSet = statement.executeQuery();
+
             if (resultSet.next()) {
                 return new User(resultSet.getString("username"),
                         resultSet.getString("password"),
                         UserRole.values()[resultSet.getInt("role_id") - 1]);
+            }
+        } finally {
+            // Close resources in reverse order of creation
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
             }
         }
         return null; // User not found
@@ -70,13 +86,30 @@ public class UserDAOImpl implements UserDAO {
     public List<User> getAllUsers() throws SQLException {
         List<User> users = new ArrayList<>();
         String sql = "SELECT * FROM users";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+
+        try {
+            connection = DatabaseConnection.getDataSource().getConnection();
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+
             while (resultSet.next()) {
                 users.add(new User(resultSet.getString("username"),
                         resultSet.getString("password"),
                         UserRole.values()[resultSet.getInt("role_id") - 1]));
+            }
+        } finally {
+            // Close resources in reverse order
+            if (resultSet != null) {
+                resultSet.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+            if (connection != null) {
+                connection.close();
             }
         }
         return users;

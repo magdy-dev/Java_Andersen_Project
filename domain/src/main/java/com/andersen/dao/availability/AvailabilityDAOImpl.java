@@ -12,18 +12,17 @@ import java.util.List;
 
 public class AvailabilityDAOImpl implements AvailabilityDAO {
     private static final Logger logger = LoggerFactory.getLogger(AvailabilityDAOImpl.class);
-
     @Override
     public void createAvailability(Availability availability) throws SQLException {
         String sql = "INSERT INTO availabilities (workspace_id, date, time, capacity, remaining) VALUES (?, ?, ?, ?, ?)";
         try (Connection connection = DatabaseConnection.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setLong(1, availability.getId());
-            statement.setDate(2, Date.valueOf(availability.getDate()));
-            statement.setTime(3, Time.valueOf(availability.getTime()));
-            statement.setInt(4, availability.getCapacity());
-            statement.setInt(5, availability.getRemaining());
+            statement.setLong(1, availability.getId()); // Workspace ID
+            statement.setDate(2, Date.valueOf(availability.getDate())); // Date (e.g., 2023-10-15)
+            statement.setTime(3, Time.valueOf(availability.getTime())); // Time (e.g., 10:00 AM)
+            statement.setInt(4, availability.getCapacity()); // Capacity (e.g., 5)
+            statement.setInt(5, availability.getRemaining()); // Remaining spots (e.g., 5)
             statement.executeUpdate();
             logger.info("Availability created: {}", availability.getId());
         } catch (SQLException e) {
@@ -60,11 +59,11 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
         try (Connection connection = DatabaseConnection.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setDate(1, Date.valueOf(availability.getDate()));
-            statement.setTime(2, Time.valueOf(availability.getTime()));
-            statement.setInt(3, availability.getCapacity());
-            statement.setInt(4, availability.getRemaining());
-            statement.setLong(5, availability.getId());
+            statement.setDate(1, Date.valueOf(availability.getDate())); // Update date
+            statement.setTime(2, Time.valueOf(availability.getTime())); // Update time
+            statement.setInt(3, availability.getCapacity()); // Update capacity
+            statement.setInt(4, availability.getRemaining()); // Update remaining spots
+            statement.setLong(5, availability.getId()); // ID of the availability record
             statement.executeUpdate();
             logger.info("Availability updated: {}", availability.getId());
         } catch (SQLException e) {
@@ -79,7 +78,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
         try (Connection connection = DatabaseConnection.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
-            statement.setLong(1, id);
+            statement.setLong(1, id); // ID of the availability record
             statement.executeUpdate();
             logger.info("Availability deleted: {}", id);
         } catch (SQLException e) {
@@ -87,7 +86,6 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
             throw e;
         }
     }
-
     @Override
     public List<Availability> getAllAvailabilities() throws SQLException {
         List<Availability> availabilities = new ArrayList<>();
