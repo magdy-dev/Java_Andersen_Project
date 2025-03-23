@@ -33,7 +33,7 @@ public class Workspace {
         this.description = description;
     }
 
-    public Workspace(Long id, String name, String description, List<Booking> bookings, List<Availability> availabilities) {
+    public Workspace(Long id, String name, String description, List<Booking> bookings) {
         this.id = id;
         this.name = name;
         this.description = description;

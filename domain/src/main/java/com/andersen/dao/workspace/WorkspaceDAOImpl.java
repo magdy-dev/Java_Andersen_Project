@@ -4,19 +4,41 @@ import com.andersen.connection.DatabaseConnectionPool;
 import com.andersen.entity.workspace.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WorkspaceDAOImpl implements WorkspaceDAO {
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceDAOImpl.class);
-    @Override
-    public void createWorkspace(Workspace workspace) {
 
+    @Override
+    public void createWorkspace(Workspace workspace) throws SQLException {
+        String sql = "INSERT INTO workspaces (name, description) VALUES (?, ?)";
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+
+            statement.setString(1, workspace.getName());
+            statement.setString(2, workspace.getDescription());
+            statement.executeUpdate();
+
+            // Retrieve the generated ID
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    workspace.setId(generatedKeys.getLong(1)); // Set the generated ID
+                    logger.info("Workspace created successfully with ID: {}", workspace.getId());
+                } else {
+                    throw new SQLException("Failed to retrieve generated workspace ID.");
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Error creating workspace: {}", e.getMessage(), e);
+            throw e; // Rethrow the exception to propagate it
+        }
     }
 
     @Override
-    public Workspace readWorkspace(Long id) {
+    public Workspace readWorkspace(Long id) throws SQLException {
         String sql = "SELECT * FROM workspaces WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -31,16 +53,16 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
                 );
             } else {
                 logger.info("Workspace not found with ID: {}", id);
+                return null; // Workspace not found
             }
         } catch (SQLException e) {
             logger.error("Error reading workspace: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to read workspace", e);
+            throw e; // Rethrow the exception to propagate it
         }
-        return null;
     }
 
     @Override
-    public void updateWorkspace(Workspace workspace) {
+    public void updateWorkspace(Workspace workspace) throws SQLException {
         String sql = "UPDATE workspaces SET name = ?, description = ? WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -57,12 +79,12 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
             }
         } catch (SQLException e) {
             logger.error("Error updating workspace: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to update workspace", e);
+            throw e; // Rethrow the exception to propagate it
         }
     }
 
     @Override
-    public void deleteWorkspace(Long id) {
+    public void deleteWorkspace(Long id) throws SQLException {
         String sql = "DELETE FROM workspaces WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -77,12 +99,12 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
             }
         } catch (SQLException e) {
             logger.error("Error deleting workspace: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to delete workspace", e);
+            throw e; // Rethrow the exception to propagate it
         }
     }
 
     @Override
-    public List<Workspace> getAllWorkspaces() {
+    public List<Workspace> getAllWorkspaces() throws SQLException {
         List<Workspace> workspaces = new ArrayList<>();
         String sql = "SELECT * FROM workspaces";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
@@ -100,7 +122,7 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
             logger.info("Retrieved {} workspaces", workspaces.size());
         } catch (SQLException e) {
             logger.error("Error retrieving workspaces: {}", e.getMessage(), e);
-            throw new RuntimeException("Failed to retrieve workspaces", e);
+            throw e; // Rethrow the exception to propagate it
         }
         return workspaces;
     }

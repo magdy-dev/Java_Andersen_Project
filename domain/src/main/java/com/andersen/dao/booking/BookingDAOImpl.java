@@ -136,7 +136,6 @@ public class BookingDAOImpl implements BookingDAO {
         String sql = "SELECT * FROM bookings WHERE workspace_id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-
             statement.setLong(1, workspaceId);
             ResultSet resultSet = statement.executeQuery();
 

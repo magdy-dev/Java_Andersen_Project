@@ -14,7 +14,7 @@ import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import java.sql.SQLException;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -35,7 +35,7 @@ public class MenuController {
         this.scanner = scanner;
     }
 
-    public void mainMenu() throws UserAuthenticationException, WorkspaceNotFoundException {
+    public void mainMenu() throws UserAuthenticationException, WorkspaceNotFoundException, SQLException {
         while (true) {
             OutputLogger.log("\n=== Welcome to the Coworking Space Reservation ===");
             OutputLogger.log("1. Admin Login");
@@ -80,7 +80,7 @@ public class MenuController {
         }
     }
 
-    private void userLogin() throws UserAuthenticationException, WorkspaceNotFoundException {
+    private void userLogin() throws UserAuthenticationException, WorkspaceNotFoundException, SQLException {
         OutputLogger.log("Username: ");
         String username = scanner.nextLine();
         OutputLogger.log("Password: ");
@@ -93,7 +93,7 @@ public class MenuController {
         }
     }
 
-    private void adminLogin() throws UserAuthenticationException, WorkspaceNotFoundException {
+    private void adminLogin() throws UserAuthenticationException, WorkspaceNotFoundException, SQLException {
         OutputLogger.log("Admin Username: ");
         String username = scanner.nextLine();
         OutputLogger.log("Admin Password: ");
@@ -104,7 +104,7 @@ public class MenuController {
         adminMenu();
     }
 
-    private void adminMenu() throws WorkspaceNotFoundException {
+    private void adminMenu() throws WorkspaceNotFoundException, SQLException {
         logger.info("Admin menu accessed.");
         OutputLogger.log("Admin Logged In");
 
@@ -133,7 +133,7 @@ public class MenuController {
         }
     }
 
-    private void customerMenu(Customer customer) throws WorkspaceNotFoundException {
+    private void customerMenu(Customer customer) throws SQLException {
         logger.info("Customer menu accessed for user: {}", customer.getUserName());
         while (true) {
             OutputLogger.log("\n=== Customer Menu ===");
@@ -163,7 +163,7 @@ public class MenuController {
         }
     }
 
-    private void addWorkspace() throws WorkspaceNotFoundException {
+    private void addWorkspace() throws  SQLException {
         OutputLogger.log("Enter workspace name: ");
         String name = scanner.nextLine();
         OutputLogger.log("Enter workspace description: ");
@@ -174,7 +174,7 @@ public class MenuController {
         OutputLogger.log("Workspace added successfully!");
     }
 
-    private void removeWorkspace() throws WorkspaceNotFoundException {
+    private void removeWorkspace() throws WorkspaceNotFoundException, SQLException {
         OutputLogger.log("Enter workspace index to remove: ");
         Long index = (long) getIntInput();
         workspaceService.removeWorkspace(index);
@@ -182,7 +182,7 @@ public class MenuController {
         OutputLogger.log("Workspace removed successfully!");
     }
 
-    private void viewAllReservations() throws WorkspaceNotFoundException {
+    private void viewAllReservations() throws  SQLException {
         logger.info("Viewing all reservations.");
         OutputLogger.log("\n=== All Reservations ===");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
@@ -210,7 +210,7 @@ public class MenuController {
         }
     }
 
-    private void browseAvailableSpaces() throws WorkspaceNotFoundException {
+    private void browseAvailableSpaces() throws SQLException {
         logger.info("Browsing available spaces.");
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
         if (workspaces.isEmpty()) {
@@ -225,7 +225,7 @@ public class MenuController {
         }
     }
 
-    private void makeReservation(Customer customer) throws WorkspaceNotFoundException {
+    private void makeReservation(Customer customer) throws SQLException {
         OutputLogger.log("Enter workspace index to reserve: ");
         int index = getIntInput() - 1;
         List<Workspace> workspaces = workspaceService.getAllWorkspaces();
@@ -294,7 +294,7 @@ public class MenuController {
         }
     }
 
-    private void cancelReservation(Customer customer) {
+    private void cancelReservation(Customer customer) throws SQLException {
         List<Booking> bookings = bookingService.getCustomerBookings(customer);
         if (bookings.isEmpty()) {
             logger.info("Customer {} has no reservations to cancel.", customer.getUserName());

@@ -1,10 +1,10 @@
 package com.andersen.service.booking;
 
+import com.andersen.dao.booking.BookingDAOImpl;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.logger.ConsoleLogger;
-import com.andersen.repository.booking.BookingRepositoryEntityImpl;
 import org.slf4j.Logger;
 
 import java.sql.SQLException;
@@ -18,15 +18,15 @@ import java.util.List;
  */
 public class BookingServiceImpl implements BookingService {
     private static final Logger logger = ConsoleLogger.getLogger(BookingServiceImpl.class);
-    private final BookingRepositoryEntityImpl bookingRepository;
+    private final BookingDAOImpl bookingDAO;
 
     /**
      * Constructs a new BookingServiceImpl with the specified repository.
      *
-     * @param bookingRepository the repository to manage bookings
+     * @param bookingDAO the repository to manage bookings
      */
-    public BookingServiceImpl(BookingRepositoryEntityImpl bookingRepository) {
-        this.bookingRepository = bookingRepository;
+    public BookingServiceImpl(BookingDAOImpl bookingDAO) {
+        this.bookingDAO = bookingDAO;
     }
 
     /**
@@ -38,7 +38,7 @@ public class BookingServiceImpl implements BookingService {
      * @param endTime    the end time of the booking
      * @return the created Booking object
      */
-        public Booking createBooking(Customer customer, Workspace workspace, LocalTime startTime, LocalTime endTime) {
+        public Booking createBooking(Customer customer, Workspace workspace, LocalTime startTime, LocalTime endTime) throws SQLException {
             if (customer == null || workspace == null || startTime == null || endTime == null) {
                 throw new IllegalArgumentException("Customer, workspace, start time, and end time cannot be null.");
             }
@@ -47,7 +47,7 @@ public class BookingServiceImpl implements BookingService {
             Booking booking = new Booking(null, customer, workspace, startTime, endTime);
 
             // Save the booking in the repository and retrieve the generated ID
-            Long generatedId = bookingRepository.addBooking(booking);
+            Long generatedId = bookingDAO.createBooking(booking);
             booking.setId(generatedId); // Set the generated ID on the booking object
 
             logger.info("Booking created successfully with ID: {}", generatedId);
@@ -61,8 +61,8 @@ public class BookingServiceImpl implements BookingService {
      * @param booking  the booking to be made
      */
     @Override
-    public void makeReservation(Customer customer, Booking booking) {
-        bookingRepository.addBooking(booking);
+    public void makeReservation(Customer customer, Booking booking) throws SQLException {
+        bookingDAO.createBooking(booking);
         customer.getBookings().add(booking);
         logger.info("Booking made for customer: {} with ID: {}", customer.getId(), booking.getId());
     }
@@ -74,7 +74,7 @@ public class BookingServiceImpl implements BookingService {
      * @param bookingId the ID of the booking to be canceled
      */
     @Override
-    public void cancelReservation(Customer customer, long bookingId) {
+    public void cancelReservation(Customer customer, long bookingId) throws SQLException {
         List<Booking> bookings = customer.getBookings();
         Booking bookingToRemove = null;
         for (Booking booking : bookings) {
@@ -85,7 +85,7 @@ public class BookingServiceImpl implements BookingService {
         }
         if (bookingToRemove != null) {
             bookings.remove(bookingToRemove);
-            bookingRepository.removeBooking(bookingToRemove);
+            bookingDAO.deleteBooking(bookingToRemove.getId());
             logger.info("Booking with ID: {} has been canceled for customer: {}", bookingId, customer.getId());
         } else {
             logger.warn("No reservation found with the provided ID: {}", bookingId);
