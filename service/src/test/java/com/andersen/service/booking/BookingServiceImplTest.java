@@ -44,7 +44,7 @@ class BookingServiceImplTest {
     @Test
     void createBooking() {
         // Mock the ID generation for the booking
-        when(bookingRepository.generateId()).thenReturn(1L);
+        when(bookingRepository.getBookingById(1L));
 
         // Call the method to create a booking
         Booking newBooking = bookingService.createBooking(customer, workspace, LocalTime.of(9, 0), LocalTime.of(11, 0));
@@ -61,7 +61,7 @@ class BookingServiceImplTest {
     @Test
     void makeReservation() {
         // Mock the ID generation for the booking
-        when(bookingRepository.generateId()).thenReturn(1L);
+        when(bookingRepository.getBookingById(1L));
 
         // Create a new booking
         Booking newBooking = bookingService.createBooking(customer, workspace, LocalTime.of(9, 0), LocalTime.of(11, 0));
@@ -78,7 +78,7 @@ class BookingServiceImplTest {
     @Test
     void cancelReservation() {
         // Mock the ID generation for the booking
-        when(bookingRepository.generateId()).thenReturn(1L);
+        when(bookingRepository.getBookingById(1L));
         // Create and reserve a new booking
         Booking newBooking = bookingService.createBooking(customer, workspace, LocalTime.of(9, 0), LocalTime.of(11, 0));
         bookingService.makeReservation(customer, newBooking);
@@ -98,7 +98,7 @@ class BookingServiceImplTest {
     @Test
     void getCustomerBookings() {
         // Mock the ID generation for the booking
-        when(bookingRepository.generateId()).thenReturn(1L);
+        when(bookingRepository.getBookingById(1L));
         // Create and reserve a new booking
         Booking newBooking = bookingService.createBooking(customer, workspace, LocalTime.of(9, 0), LocalTime.of(11, 0));
         bookingService.makeReservation(customer, newBooking);

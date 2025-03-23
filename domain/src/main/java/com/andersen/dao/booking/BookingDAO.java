@@ -5,7 +5,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public interface BookingDAO{
-    void createBooking(Booking booking) throws SQLException;
+    Long createBooking(Booking booking) throws SQLException;
     Booking readBooking(Long id) throws SQLException;
     void updateBooking(Booking booking) throws SQLException;
     void deleteBooking(Long id) throws SQLException;

@@ -22,21 +22,32 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public void createBooking(Booking booking) throws SQLException {
+    public Long createBooking(Booking booking) throws SQLException {
         String sql = "INSERT INTO bookings (customer_id, workspace_id, start_time, end_time) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             statement.setLong(1, booking.getCustomer().getId());
             statement.setLong(2, booking.getWorkspace().getId());
             statement.setTimestamp(3, Timestamp.valueOf(booking.getStartTime()));
             statement.setTimestamp(4, Timestamp.valueOf(booking.getEndTime()));
             statement.executeUpdate();
-            logger.info("Booking created successfully: {}", booking.getId());
+
+            // Retrieve the generated ID
+            try (ResultSet generatedKeys = statement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    Long id = generatedKeys.getLong(1); // Get the generated ID
+                    logger.info("Booking created successfully with ID: {}", id);
+                    return id;
+                } else {
+                    throw new SQLException("Failed to retrieve generated booking ID.");
+                }
+            }
         } catch (SQLException e) {
             logger.error("Error creating booking: {}", e.getMessage());
 
         }
+        return null;
     }
 
     @Override

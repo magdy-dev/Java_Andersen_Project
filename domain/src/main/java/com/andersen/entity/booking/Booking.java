@@ -4,6 +4,7 @@ import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -48,6 +49,12 @@ public class Booking {
         this(id, customer, selectedWorkspace, parseTime(startTime), parseTime(endTime));
     }
 
+    public Booking(Long o, Customer customer, Workspace workspace, LocalTime startTime, LocalTime endTime) {
+        this.customer = customer;
+        this.workspace = workspace;
+        this.startTime = LocalDateTime.from(startTime);
+        this.endTime = LocalDateTime.from(endTime);
+    }
 
 
     /**

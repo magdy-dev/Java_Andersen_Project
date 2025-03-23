@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface BookingRepositoryEntity<T extends Booking> {
 
-    void addBooking(Booking booking);
+    Long addBooking(Booking booking);
     void removeBooking(Booking booking);
     List<Booking> getAllBookings();
     Booking getBookingById(Long id);

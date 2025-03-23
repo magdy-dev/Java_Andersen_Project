@@ -1,10 +1,7 @@
 package com.andersen.repository.booking;
 
 import com.andersen.entity.booking.Booking;
-import com.andersen.entity.users.Customer;
-import com.andersen.entity.workspace.Workspace;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -25,13 +22,15 @@ public class BookingRepositoryEntityImpl implements BookingRepository {
      * Adds a new booking to the repository.
      *
      * @param booking the booking to add
+     * @return
      */
     @Override
-    public void addBooking(Booking booking) {
+    public Long addBooking(Booking booking) {
         if (booking == null) {
             throw new IllegalArgumentException("Booking cannot be null");
         }
         bookings.add(booking);
+        return null;
     }
 
     /**

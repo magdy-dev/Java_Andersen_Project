@@ -14,7 +14,7 @@ public class Workspace {
     private String name;
     private String description;
     private List<Booking> bookings = new ArrayList<>();
-    private List<Availability> availabilities = new ArrayList<>();
+
 
     /**
      * Default constructor for Workspace.
@@ -38,7 +38,7 @@ public class Workspace {
         this.name = name;
         this.description = description;
         this.bookings = bookings;
-        this.availabilities = availabilities;
+
     }
 
     public Workspace(Long id, String name, String description) {
@@ -133,16 +133,5 @@ public class Workspace {
      *
      * @param availability the availability to add
      */
-    public void addAvailability(Availability availability) {
-        this.availabilities.add(availability);
-    }
 
-    /**
-     * Gets the list of availabilities for the workspace.
-     *
-     * @return a list of availabilities
-     */
-    public List<Availability> getAvailabilities() {
-        return availabilities;
-    }
 }
