@@ -10,6 +10,6 @@ public interface BookingDAO{
     void updateBooking(Booking booking) throws SQLException;
     void deleteBooking(Long id) throws SQLException;
     List<Booking> getAllBookings() throws SQLException;
-    Long generateId();
+    List<Booking> getBookingsByWorkspace(Long workspaceId) throws SQLException;
 
 }

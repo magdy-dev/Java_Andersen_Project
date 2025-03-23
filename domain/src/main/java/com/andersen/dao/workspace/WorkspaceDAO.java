@@ -7,7 +7,6 @@ import java.util.List;
 
 public interface WorkspaceDAO {
 
-
     void createWorkspace(Workspace workspace) throws SQLException;
     Workspace readWorkspace(Long id) throws SQLException;
     void updateWorkspace(Workspace workspace) throws SQLException;

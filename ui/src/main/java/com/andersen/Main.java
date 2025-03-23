@@ -1,9 +1,7 @@
 package com.andersen;
 
 import com.andersen.controller.MenuController;
-
 import com.andersen.dao.user.UserDAOImpl;
-import com.andersen.dao.workspace.WorkspaceDAO;
 import com.andersen.dao.workspace.WorkspaceDAOImpl;
 import com.andersen.dao.booking.BookingDAOImpl;
 import com.andersen.repository.user.UserRepositoryEntityImpl;
@@ -23,28 +21,28 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         try {
-            // Create instances of DAO implementations
-            UserDAOImpl userDAO= new UserDAOImpl(); // Assuming this exists
-            WorkspaceDAOImpl workspaceDAO = new WorkspaceDAOImpl(); // Create Workspace DAO
-            BookingDAOImpl bookingDAO = new BookingDAOImpl(userDAO, (WorkspaceDAOImpl) workspaceDAO); // Create Booking DAO
+            // Initialize DAOs
+            UserDAOImpl userDAO = new UserDAOImpl(); // User DAO
+            WorkspaceDAOImpl workspaceDAO = new WorkspaceDAOImpl(); // Workspace DAO
+            BookingDAOImpl bookingDAO = new BookingDAOImpl(userDAO, workspaceDAO); // Booking DAO
 
             // Initialize repositories
-            UserRepositoryEntityImpl userRepository = new UserRepositoryEntityImpl(userDAO); // Initialize User Repository
-            WorkspaceRepositoryEntityImpl workspaceRepository = new WorkspaceRepositoryEntityImpl(workspaceDAO);
-            BookingRepositoryEntityImpl bookingRepository = new BookingRepositoryEntityImpl(userDAO, (WorkspaceDAO)workspaceDAO, bookingDAO);
+            UserRepositoryEntityImpl userRepository = new UserRepositoryEntityImpl(userDAO); // User Repository
+            WorkspaceRepositoryEntityImpl workspaceRepository = new WorkspaceRepositoryEntityImpl(workspaceDAO); // Workspace Repository
+            BookingRepositoryEntityImpl bookingRepository = new BookingRepositoryEntityImpl(); // Booking Repository (no DAO dependencies needed)
 
             // Initialize services
-            WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceRepository);
-            BookingService bookingService = new BookingServiceImpl(bookingRepository);
-            AuthServiceImp authService = new AuthServiceImp(userRepository); // Correct instantiation of AuthServiceImp
+            WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceRepository); // Workspace Service
+            BookingService bookingService = new BookingServiceImpl(bookingRepository); // Booking Service
+            AuthServiceImp authService = new AuthServiceImp(userRepository); // Auth Service
 
-            // Launch the menu
+            // Initialize and launch the menu controller
             MenuController menuController = new MenuController(workspaceService, bookingService, authService, scanner);
             menuController.mainMenu();
         } catch (Exception e) {
             ConsoleLogger.log("An unexpected error occurred: " + e.getMessage());
         } finally {
-            scanner.close();
+            scanner.close(); // Close the scanner to avoid resource leaks
         }
     }
 }

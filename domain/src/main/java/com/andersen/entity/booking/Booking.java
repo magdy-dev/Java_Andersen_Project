@@ -3,7 +3,7 @@ package com.andersen.entity.booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
 
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
@@ -14,8 +14,8 @@ public class Booking {
     private Long id;
     private Customer customer;
     private Workspace workspace;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
     /**
      * Constructs a new Booking with the specified parameters.
@@ -26,7 +26,7 @@ public class Booking {
      * @param startTime    the start time of the booking
      * @param endTime      the end time of the booking
      */
-    public Booking(Long id, Customer customer, Workspace selectedWorkspace, LocalTime startTime, LocalTime endTime) {
+    public Booking(Long id, Customer customer, Workspace selectedWorkspace, LocalDateTime startTime, LocalDateTime endTime) {
         this.id = id;
         this.customer = customer;
         this.workspace = selectedWorkspace;
@@ -48,6 +48,8 @@ public class Booking {
         this(id, customer, selectedWorkspace, parseTime(startTime), parseTime(endTime));
     }
 
+
+
     /**
      * Parses a time string into a LocalTime object.
      *
@@ -55,9 +57,9 @@ public class Booking {
      * @return the corresponding LocalTime object
      * @throws IllegalArgumentException if the time format is invalid
      */
-    private static LocalTime parseTime(String time) {
+    private static LocalDateTime parseTime(String time) {
         try {
-            return LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
+            return LocalDateTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Invalid time format. Please use HH:mm.");
         }
@@ -104,7 +106,7 @@ public class Booking {
      *
      * @return the start time as a LocalTime
      */
-    public LocalTime getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
@@ -113,7 +115,23 @@ public class Booking {
      *
      * @return the end time as a LocalTime
      */
-    public LocalTime getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
+    }
+
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
+
+    public void setWorkspace(Workspace workspace) {
+        this.workspace = workspace;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 }

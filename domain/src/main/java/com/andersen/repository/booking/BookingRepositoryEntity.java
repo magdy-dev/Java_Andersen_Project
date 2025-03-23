@@ -6,13 +6,13 @@ import java.util.List;
 
 public interface BookingRepositoryEntity<T extends Booking> {
 
-    void addBooking(T booking);
-
-    void removeBooking(T booking);
-
+    void addBooking(Booking booking);
+    void removeBooking(Booking booking);
     List<Booking> getAllBookings();
-
-    Long generateId();
+    Booking getBookingById(Long id);
+    List<Booking> getBookingsByWorkspace(Long workspaceId);
+    void updateBooking(Booking booking);
+    void deleteBooking(Long id);
 
 
 }

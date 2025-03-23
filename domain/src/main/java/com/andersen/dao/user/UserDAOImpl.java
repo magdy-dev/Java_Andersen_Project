@@ -1,11 +1,10 @@
 package com.andersen.dao.user;
 
-import com.andersen.connection.DatabaseConnection;
+import com.andersen.connection.DatabaseConnectionPool;
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +15,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public void createUser (User user) throws SQLException {
         String sql = "INSERT INTO users (username, password, role_id) VALUES (?, ?, ?)";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getUserName());
             statement.setString(2, user.getPassword());
@@ -33,7 +32,7 @@ public class UserDAOImpl implements UserDAO {
         ResultSet resultSet = null;
 
         try {
-            connection = DatabaseConnection.getDataSource().getConnection();
+            connection = DatabaseConnectionPool.getDataSource().getConnection();
             statement = connection.prepareStatement(sql);
             statement.setString(1, username);
             resultSet = statement.executeQuery();
@@ -61,7 +60,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public void updateUser (User user) throws SQLException {
         String sql = "UPDATE users SET password = ?, role_id = ? WHERE username = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, user.getPassword());
             statement.setInt(2, user.getRole().ordinal() + 1);
@@ -74,7 +73,7 @@ public class UserDAOImpl implements UserDAO {
     @Override
     public void deleteUser (String username) throws SQLException {
         String sql = "DELETE FROM users WHERE username = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, username);
             statement.executeUpdate();
@@ -91,7 +90,7 @@ public class UserDAOImpl implements UserDAO {
         ResultSet resultSet = null;
 
         try {
-            connection = DatabaseConnection.getDataSource().getConnection();
+            connection = DatabaseConnectionPool.getDataSource().getConnection();
             statement = connection.prepareStatement(sql);
             resultSet = statement.executeQuery();
 

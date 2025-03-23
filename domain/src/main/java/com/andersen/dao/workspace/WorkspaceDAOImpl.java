@@ -1,18 +1,15 @@
 package com.andersen.dao.workspace;
 
-import com.andersen.connection.DatabaseConnection;
-import com.andersen.entity.workspace.Availability;
+import com.andersen.connection.DatabaseConnectionPool;
 import com.andersen.entity.workspace.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class WorkspaceDAOImpl implements WorkspaceDAO {
     private static final Logger logger = LoggerFactory.getLogger(WorkspaceDAOImpl.class);
-
     @Override
     public void createWorkspace(Workspace workspace) {
 
@@ -21,7 +18,7 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
     @Override
     public Workspace readWorkspace(Long id) {
         String sql = "SELECT * FROM workspaces WHERE id = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, id);
@@ -45,7 +42,7 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
     @Override
     public void updateWorkspace(Workspace workspace) {
         String sql = "UPDATE workspaces SET name = ?, description = ? WHERE id = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setString(1, workspace.getName());
@@ -67,7 +64,7 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
     @Override
     public void deleteWorkspace(Long id) {
         String sql = "DELETE FROM workspaces WHERE id = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, id);
@@ -88,7 +85,7 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
     public List<Workspace> getAllWorkspaces() {
         List<Workspace> workspaces = new ArrayList<>();
         String sql = "SELECT * FROM workspaces";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
 
@@ -107,6 +104,4 @@ public class WorkspaceDAOImpl implements WorkspaceDAO {
         }
         return workspaces;
     }
-
-
 }

@@ -1,6 +1,6 @@
 package com.andersen.dao.availability;
 
-import com.andersen.connection.DatabaseConnection;
+import com.andersen.connection.DatabaseConnectionPool;
 
 import com.andersen.entity.workspace.Availability;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     @Override
     public void createAvailability(Availability availability) throws SQLException {
         String sql = "INSERT INTO availabilities (workspace_id, date, time, capacity, remaining) VALUES (?, ?, ?, ?, ?)";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, availability.getId()); // Workspace ID
@@ -34,7 +34,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     @Override
     public Availability readAvailability(Long id) throws SQLException {
         String sql = "SELECT * FROM availabilities WHERE id = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, id);
@@ -56,7 +56,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     @Override
     public void updateAvailability(Availability availability) throws SQLException {
         String sql = "UPDATE availabilities SET date = ?, time = ?, capacity = ?, remaining = ? WHERE id = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setDate(1, Date.valueOf(availability.getDate())); // Update date
@@ -75,7 +75,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     @Override
     public void deleteAvailability(Long id) throws SQLException {
         String sql = "DELETE FROM availabilities WHERE id = ?";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
 
             statement.setLong(1, id); // ID of the availability record
@@ -90,7 +90,7 @@ public class AvailabilityDAOImpl implements AvailabilityDAO {
     public List<Availability> getAllAvailabilities() throws SQLException {
         List<Availability> availabilities = new ArrayList<>();
         String sql = "SELECT * FROM availabilities";
-        try (Connection connection = DatabaseConnection.getDataSource().getConnection();
+        try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(sql)) {
 

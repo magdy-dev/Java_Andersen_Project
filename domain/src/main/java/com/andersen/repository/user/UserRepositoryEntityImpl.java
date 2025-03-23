@@ -27,6 +27,7 @@ public class UserRepositoryEntityImpl implements UserRepository {
      * @throws IllegalArgumentException if the user is null
      * @throws SQLException if there is an error during registration
      */
+    @Override
     public void registerCustomer(User user) throws SQLException {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null.");
@@ -38,6 +39,20 @@ public class UserRepositoryEntityImpl implements UserRepository {
             throw new SQLException("Error registering customer: " + e.getMessage());
         }
     }
+
+    @Override
+    public User userLogin(String username, String password, UserRole role) throws SQLException {
+        if (username == null || password == null || role == null) {
+            throw new IllegalArgumentException("Username, password, and role cannot be null.");
+        }
+
+        User user = userDAO.readUser(username); // Fetch user by username
+        if (user != null && user.getRole() == role && user.getPassword().equals(password)) {
+            return user; // Return user if credentials and role match
+        }
+        return null; // Return null if credentials or role do not match
+    }
+
 
     /**
      * Allows a customer to log in by checking their credentials.
@@ -77,10 +92,12 @@ public class UserRepositoryEntityImpl implements UserRepository {
      * @return a list of all users
      * @throws SQLException if there is an error during retrieval
      */
+    @Override
     public List<User> getAllUsers() throws SQLException {
         return userDAO.getAllUsers(); // Retrieve all users from DAO
     }
 
+    @Override
     public User getUserByUsername(String username) throws SQLException {
         return userDAO.readUser(username); // Fetch user by username
     }
