@@ -5,6 +5,8 @@ import com.andersen.dao.workspace.WorkspaceDAOImpl;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
 import com.andersen.entity.workspace.Workspace;
+import com.andersen.exception.UserAuthenticationException;
+import com.andersen.exception.WorkspaceNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.sql.*;
@@ -22,7 +24,7 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public Long createBooking(Booking booking) throws SQLException {
+    public Long createBooking(Booking booking)  {
         String sql = "INSERT INTO bookings (customer_id, workspace_id, start_time, end_time) VALUES (?, ?, ?, ?)";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -51,7 +53,7 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public Booking readBooking(Long id) throws SQLException {
+    public Booking readBooking(Long id) {
         String sql = "SELECT * FROM bookings WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -70,12 +72,16 @@ public class BookingDAOImpl implements BookingDAO {
         } catch (SQLException e) {
             logger.error("Error reading booking: {}", e.getMessage());
 
+        } catch (WorkspaceNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (UserAuthenticationException e) {
+            throw new RuntimeException(e);
         }
         return null;
     }
 
     @Override
-    public void updateBooking(Booking booking) throws SQLException {
+    public void updateBooking(Booking booking)  {
         String sql = "UPDATE bookings SET start_time = ?, end_time = ? WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -92,7 +98,7 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public void deleteBooking(Long id) throws SQLException {
+    public void deleteBooking(Long id) {
         String sql = "DELETE FROM bookings WHERE id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -107,7 +113,7 @@ public class BookingDAOImpl implements BookingDAO {
     }
 
     @Override
-    public List<Booking> getAllBookings() throws SQLException {
+    public List<Booking> getAllBookings(){
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM bookings";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
@@ -126,12 +132,14 @@ public class BookingDAOImpl implements BookingDAO {
             logger.info("Retrieved {} bookings", bookings.size());
         } catch (SQLException e) {
             logger.error("Error retrieving bookings: {}", e.getMessage());
+        } catch (WorkspaceNotFoundException | UserAuthenticationException e) {
+            throw new RuntimeException(e);
         }
         return bookings;
     }
 
     @Override
-    public List<Booking> getBookingsByWorkspace(Long workspaceId) throws SQLException {
+    public List<Booking> getBookingsByWorkspace(Long workspaceId) throws UserAuthenticationException, WorkspaceNotFoundException {
         List<Booking> bookings = new ArrayList<>();
         String sql = "SELECT * FROM bookings WHERE workspace_id = ?";
         try (Connection connection = DatabaseConnectionPool.getDataSource().getConnection();
@@ -151,6 +159,8 @@ public class BookingDAOImpl implements BookingDAO {
             logger.info("Retrieved {} bookings for workspace ID: {}", bookings.size(), workspaceId);
         } catch (SQLException e) {
             logger.error("Error retrieving bookings by workspace: {}", e.getMessage());
+        } catch (WorkspaceNotFoundException e) {
+            throw new WorkspaceNotFoundException("");
         }
         return bookings;
     }

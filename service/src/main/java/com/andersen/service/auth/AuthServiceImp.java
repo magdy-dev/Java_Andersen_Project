@@ -1,5 +1,6 @@
 package com.andersen.service.auth;
 
+import com.andersen.dao.user.UserDAO;
 import com.andersen.dao.user.UserDAOImpl;
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
@@ -14,7 +15,7 @@ import java.sql.SQLException;
  * This service provides methods for logging in customers and admins, as well as registering new users.
  */
 public class AuthServiceImp implements AuthService {
-    private final UserDAOImpl userDAO;
+    private final UserDAO userDAO;
 
     /**
      * Constructs a new AuthServiceImp with the specified UserDAO.
@@ -44,14 +45,10 @@ public class AuthServiceImp implements AuthService {
             throw new UserAuthenticationException("Username or password cannot be null.");
         }
 
-        try {
-            User user = userDAO.readUser(username); // Retrieve user from DAO
+        User user = userDAO.readUser(username); // Retrieve user from DAO
 
-            if (user != null && user.getPassword().equals(password) && user.getRole() == UserRole.CUSTOMER) {
-                return new Customer(user.getUserName(), user.getPassword()); // Return customer if credentials match
-            }
-        } catch (SQLException e) {
-            throw new UserAuthenticationException("Error during customer authentication: " + e.getMessage());
+        if (user != null && user.getPassword().equals(password) && user.getRole() == UserRole.CUSTOMER) {
+            return new Customer(user.getUserName(), user.getPassword()); // Return customer if credentials match
         }
 
         throw new UserAuthenticationException("Customer not found or invalid credentials.");
@@ -72,14 +69,10 @@ public class AuthServiceImp implements AuthService {
             throw new IllegalArgumentException("Username or password cannot be null.");
         }
 
-        try {
-            User user = userDAO.readUser(username); // Retrieve user from DAO
+        User user = userDAO.readUser(username); // Retrieve user from DAO
 
-            if (user != null && user.getPassword().equals(password) && user.getRole() == UserRole.ADMIN) {
-                return new Admin(user.getUserName(), user.getPassword()); // Return admin if credentials match
-            }
-        } catch (SQLException e) {
-            throw new UserAuthenticationException("Error during admin authentication: " + e.getMessage());
+        if (user != null && user.getPassword().equals(password) && user.getRole() == UserRole.ADMIN) {
+            return new Admin(user.getUserName(), user.getPassword()); // Return admin if credentials match
         }
 
         throw new UserAuthenticationException("Admin not found or invalid credentials.");
@@ -99,17 +92,13 @@ public class AuthServiceImp implements AuthService {
             throw new IllegalArgumentException("Username or password cannot be null.");
         }
 
-        try {
-            User existingUser = userDAO.readUser(username);
-            if (existingUser != null) {
-                throw new UserAuthenticationException("Username already exists.");
-            }
-
-            // Create and register new customer
-            User newUser = new User(username, password, UserRole.CUSTOMER);
-            userDAO.createUser(newUser);
-        } catch (SQLException e) {
-            throw new UserAuthenticationException("Error registering user: " + e.getMessage());
+        User existingUser = userDAO.readUser(username);
+        if (existingUser != null) {
+            throw new UserAuthenticationException("Username already exists.");
         }
+
+        // Create and register new customer
+        User newUser = new User(username, password, UserRole.CUSTOMER);
+        userDAO.createUser(newUser);
     }
 }

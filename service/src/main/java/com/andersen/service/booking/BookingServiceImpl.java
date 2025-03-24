@@ -1,5 +1,6 @@
 package com.andersen.service.booking;
 
+import com.andersen.dao.booking.BookingDAO;
 import com.andersen.dao.booking.BookingDAOImpl;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.users.Customer;
@@ -7,8 +8,6 @@ import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.InvalidBookingException;
 import com.andersen.logger.ConsoleLogger;
 import org.slf4j.Logger;
-
-import java.sql.SQLException;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -19,7 +18,7 @@ import java.util.List;
  */
 public class BookingServiceImpl implements BookingService {
     private static final Logger logger = ConsoleLogger.getLogger(BookingServiceImpl.class);
-    private final BookingDAOImpl bookingDAO;
+    private final BookingDAO bookingDAO;
 
     /**
      * Constructs a new BookingServiceImpl with the specified repository.
@@ -49,11 +48,7 @@ public class BookingServiceImpl implements BookingService {
 
             // Save the booking and retrieve the generated ID
             Long generatedId = null;
-            try {
-                generatedId = bookingDAO.createBooking(booking);
-            } catch (SQLException e) {
-                throw new InvalidBookingException("Failed to create Booking");
-            }
+            generatedId = bookingDAO.createBooking(booking);
             booking.setId(generatedId); // Set the generated ID on the booking object
 
             logger.info("Booking created successfully with ID: {}", generatedId);
@@ -67,12 +62,8 @@ public class BookingServiceImpl implements BookingService {
      * @param booking  the booking to be made
      */
     @Override
-    public void makeReservation(Customer customer, Booking booking) throws InvalidBookingException {
-        try {
-            bookingDAO.createBooking(booking);
-        } catch (SQLException e) {
-            throw new InvalidBookingException("Failed to Reservation Booking");
-        }
+    public void makeReservation(Customer customer, Booking booking) {
+        bookingDAO.createBooking(booking);
         customer.getBookings().add(booking);
         logger.info("Booking made for customer: {} with ID: {}", customer.getId(), booking.getId());
     }
@@ -84,7 +75,7 @@ public class BookingServiceImpl implements BookingService {
      * @param bookingId the ID of the booking to be canceled
      */
     @Override
-    public void cancelReservation(Customer customer, long bookingId) throws InvalidBookingException {
+    public void cancelReservation(Customer customer, long bookingId)  {
         List<Booking> bookings = customer.getBookings();
         Booking bookingToRemove = null;
         for (Booking booking : bookings) {
@@ -95,11 +86,7 @@ public class BookingServiceImpl implements BookingService {
         }
         if (bookingToRemove != null) {
             bookings.remove(bookingToRemove);
-            try {
-                bookingDAO.deleteBooking(bookingToRemove.getId());
-            } catch (SQLException e) {
-                throw new InvalidBookingException("Failed to delete Booking  ");
-            }
+            bookingDAO.deleteBooking(bookingToRemove.getId());
             logger.info("Booking with ID: {} has been canceled for customer: {}", bookingId, customer.getId());
         } else {
             logger.warn("No reservation found with the provided ID: {}", bookingId);

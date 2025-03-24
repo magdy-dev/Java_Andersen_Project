@@ -1,14 +1,19 @@
 package com.andersen.dao.user;
 
 import com.andersen.entity.role.User;
+import com.andersen.exception.UserAuthenticationException;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Optional;
 
 public interface UserDAO {
-    void  createUser (User user) throws SQLException;
-    User readUser (String username) throws SQLException;
-    void updateUser (User user) throws SQLException;
-    void deleteUser (String username) throws SQLException;
-    List<User> getAllUsers() throws SQLException;
+    void  createUser (User user) throws UserAuthenticationException;
+    User readUser (String username)  throws UserAuthenticationException;
+
+    Optional<User> findByUsername(String username)  throws UserAuthenticationException;
+
+    void updateUser (User user) throws UserAuthenticationException;
+    void deleteUser (String username) throws UserAuthenticationException;
+    List<User> getAllUsers() throws UserAuthenticationException;
 }
