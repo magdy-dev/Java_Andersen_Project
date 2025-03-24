@@ -41,7 +41,7 @@ public class AuthServiceImp implements AuthService {
     @Override
     public Customer loginCustomer(String username, String password) throws UserAuthenticationException {
         if (username == null || password == null) {
-            throw new IllegalArgumentException("Username or password cannot be null.");
+            throw new UserAuthenticationException("Username or password cannot be null.");
         }
 
         try {

@@ -1,14 +1,13 @@
 package com.andersen.service.workspace;
 
-import com.andersen.dao.workspace.WorkspaceDAOImpl;
+import com.andersen.dao.workspace.WorkspaceDAO;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.exception.DatabaseOperationException;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.sql.SQLException;
 import java.util.List;
-
 
 /**
  * Implementation of the {@link WorkspaceService} interface for managing workspaces.
@@ -16,39 +15,45 @@ import java.util.List;
  * It interacts with a repository to persist workspace data.
  */
 public class WorkspaceServiceImpl implements WorkspaceService {
-    private static final Logger logger = ConsoleLogger.getLogger(WorkspaceServiceImpl.class);
-    private final WorkspaceDAOImpl workspaceDAO;
+    private static final Logger logger = LoggerFactory.getLogger(WorkspaceServiceImpl.class);
+    private final WorkspaceDAO workspaceDAO;
 
     /**
-     * Constructs a new WorkspaceServiceImpl with the specified repository.
+     * Constructs a new WorkspaceServiceImpl with the specified DAO.
      *
-     * @param workspaceDAO the repository to manage workspaces
-     * @throws IllegalArgumentException if the provided repository is null
+     * @param workspaceDAO the DAO to manage workspaces
+     * @throws IllegalArgumentException if the provided DAO is null
      */
-    public WorkspaceServiceImpl(WorkspaceDAOImpl workspaceDAO) {
+    public WorkspaceServiceImpl(WorkspaceDAO workspaceDAO) {
         if (workspaceDAO == null) {
-            throw new IllegalArgumentException("WorkspaceRepository cannot be null.");
+            logger.error("WorkspaceDAO cannot be null");
+            throw new IllegalArgumentException("WorkspaceDAO cannot be null");
         }
         this.workspaceDAO = workspaceDAO;
-        logger.info("WorkspaceServiceImpl initialized with repository: {}", workspaceDAO.getClass().getSimpleName());
+        logger.info("WorkspaceServiceImpl initialized with DAO: {}", workspaceDAO.getClass().getSimpleName());
     }
 
     /**
-     * Adds a new workspace to the repository.
+     * Adds a new workspace.
      *
      * @param workspace the workspace to add
      * @throws IllegalArgumentException if the workspace is null
-     * @throws WorkspaceNotFoundException if there is an error adding the workspace
      */
     @Override
-    public void addWorkspace(Workspace workspace) throws  SQLException {
+    public void addWorkspace(Workspace workspace) throws DatabaseOperationException {
         if (workspace == null) {
-            logger.error("Attempted to add a null workspace.");
-            throw new IllegalArgumentException("Workspace cannot be null.");
+            logger.error("Attempted to add a null workspace");
+            throw new IllegalArgumentException("Workspace cannot be null");
         }
+
         logger.debug("Adding workspace: {}", workspace);
-        workspaceDAO.createWorkspace(workspace);
-        logger.info("Workspace added successfully: {}", workspace.getName());
+        try {
+            workspaceDAO.createWorkspace(workspace);
+            logger.info("Workspace added successfully: {}", workspace.getName());
+        } catch (Exception e) {
+            logger.error("Failed to add workspace: {}", workspace.getName(), e);
+            throw new DatabaseOperationException("Failed to create workspace");
+        }
     }
 
     /**
@@ -58,29 +63,44 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      * @throws WorkspaceNotFoundException if the workspace with the specified ID cannot be found
      */
     @Override
-    public void removeWorkspace(Long workspaceId) throws WorkspaceNotFoundException, SQLException {
-        Workspace workspace = workspaceDAO.readWorkspace(workspaceId);
-        if (workspace == null) {
-            logger.error("Invalid workspace ID for removal: {}", workspaceId);
-            throw new WorkspaceNotFoundException("Workspace not found for ID: " + workspaceId);
+    public void removeWorkspace(Long workspaceId) throws WorkspaceNotFoundException, DatabaseOperationException {
+        if (workspaceId == null) {
+            logger.error("Attempted to remove workspace with null ID");
+            throw new IllegalArgumentException("Workspace ID cannot be null");
         }
 
-        logger.debug("Removing workspace: {}", workspace.getName());
-        workspaceDAO.deleteWorkspace(workspace.getId());
-        logger.info("Workspace removed successfully: {}", workspace.getName());
+        logger.debug("Removing workspace with ID: {}", workspaceId);
+        try {
+            Workspace workspace = workspaceDAO.readWorkspace(workspaceId);
+            if (workspace == null) {
+                throw new WorkspaceNotFoundException("Workspace not found for ID: " + workspaceId);
+            }
+            workspaceDAO.deleteWorkspace(workspaceId);
+            logger.info("Workspace removed successfully: {}", workspaceId);
+        } catch (WorkspaceNotFoundException e) {
+            logger.error("Workspace not found for removal: {}", workspaceId);
+            throw e;
+        } catch (Exception e) {
+            logger.error("Failed to remove workspace with ID: {}", workspaceId, e);
+            throw new DatabaseOperationException("Failed to remove workspace");
+        }
     }
 
     /**
-     * Retrieves all workspaces from the repository.
+     * Retrieves all workspaces.
      *
      * @return a list of all workspaces
-     * @throws WorkspaceNotFoundException if there is an error retrieving workspaces
      */
     @Override
-    public List<Workspace> getAllWorkspaces() throws  SQLException {
-        logger.debug("Fetching all workspaces.");
-        List<Workspace> workspaces = workspaceDAO.getAllWorkspaces();
-        logger.info("Retrieved {} workspaces.", workspaces.size());
-        return workspaces;
+    public List<Workspace> getAllWorkspaces() throws DatabaseOperationException {
+        logger.debug("Fetching all workspaces");
+        try {
+            List<Workspace> workspaces = workspaceDAO.getAllWorkspaces();
+            logger.info("Retrieved {} workspaces", workspaces.size());
+            return workspaces;
+        } catch (Exception e) {
+            logger.error("Failed to retrieve workspaces", e);
+            throw new DatabaseOperationException("Failed to retrieve workspaces");
+        }
     }
 }
