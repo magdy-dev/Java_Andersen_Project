@@ -1,137 +1,107 @@
 package com.andersen.entity.workspace;
 
-import com.andersen.entity.booking.Booking;
+import java.util.Objects;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Represents a workspace that can be booked by customers.
- * A workspace has a name, description, a list of bookings, and availability options.
- */
 public class Workspace {
     private Long id;
     private String name;
     private String description;
-    private List<Booking> bookings = new ArrayList<>();
+    private WorkspaceType type;
+    private double pricePerHour;
+    private int capacity;
+    private boolean isActive;
 
-
-    /**
-     * Default constructor for Workspace.
-     */
     public Workspace() {
     }
 
-    /**
-     * Constructs a new Workspace with the specified name and description.
-     *
-     * @param name        the name of the workspace
-     * @param description a brief description of the workspace
-     */
-    public Workspace(String name, String description) {
-        this.name = name;
-        this.description = description;
-    }
-
-    public Workspace(Long id, String name, String description, List<Booking> bookings) {
+    public Workspace(Long id, String name, String description, WorkspaceType type, double pricePerHour, int capacity, boolean isActive) {
         this.id = id;
         this.name = name;
         this.description = description;
-        this.bookings = bookings;
-
+        this.type = type;
+        this.pricePerHour = pricePerHour;
+        this.capacity = capacity;
+        this.isActive = isActive;
     }
 
-    public Workspace(Long id, String name, String description) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-    }
-
-    /**
-     * Gets the unique identifier for the workspace.
-     *
-     * @return the workspace ID
-     */
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    /**
-     * Sets the unique identifier for the workspace.
-     *
-     * @param id the workspace ID to set
-     */
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    /**
-     * Gets the name of the workspace.
-     *
-     * @return the workspace name
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Sets the name of the workspace.
-     *
-     * @param name the workspace name to set
-     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /**
-     * Gets the description of the workspace.
-     *
-     * @return the workspace description
-     */
     public String getDescription() {
         return description;
     }
 
-    /**
-     * Sets the description of the workspace.
-     *
-     * @param description the workspace description to set
-     */
     public void setDescription(String description) {
         this.description = description;
     }
 
-    /**
-     * Gets the list of bookings associated with the workspace.
-     *
-     * @return a list of bookings
-     */
-    public List<Booking> getBookings() {
-        return bookings;
+    public WorkspaceType getType() {
+        return type;
     }
 
-    /**
-     * Adds a booking to the workspace.
-     *
-     * @param booking the booking to add
-     */
-    public void addBooking(Booking booking) {
-        bookings.add(booking);
+    public void setType(WorkspaceType type) {
+        this.type = type;
     }
 
-    /**
-     * Removes a booking from the workspace.
-     *
-     * @param booking the booking to remove
-     */
-    public void removeBooking(Booking booking) {
-        bookings.remove(booking);
+    public double getPricePerHour() {
+        return pricePerHour;
     }
 
-    /**
-     * Adds availability information to the workspace.
-     *
-     * @param availability the availability to add
-     */
+    public void setPricePerHour(double pricePerHour) {
+        this.pricePerHour = pricePerHour;
+    }
 
+    public int getCapacity() {
+        return capacity;
+    }
+
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Workspace workspace = (Workspace) o;
+        return Double.compare(pricePerHour, workspace.pricePerHour) == 0 && capacity == workspace.capacity && isActive == workspace.isActive && Objects.equals(id, workspace.id) && Objects.equals(name, workspace.name) && Objects.equals(description, workspace.description) && type == workspace.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, description, type, pricePerHour, capacity, isActive);
+    }
+
+    @Override
+    public String toString() {
+        return "Workspace{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", type=" + type +
+                ", pricePerHour=" + pricePerHour +
+                ", capacity=" + capacity +
+                ", isActive=" + isActive +
+                '}';
+    }
 }

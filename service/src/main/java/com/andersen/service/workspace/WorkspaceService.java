@@ -1,15 +1,26 @@
 package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.exception.DatabaseOperationException;
-import com.andersen.exception.UserAuthenticationException;
-import com.andersen.exception.WorkspaceNotFoundException;
+import com.andersen.service.excption.WorkspaceServiceException;
 
-import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 public interface WorkspaceService {
-    void addWorkspace(Workspace workspace) throws WorkspaceNotFoundException, SQLException, UserAuthenticationException, DatabaseOperationException;
-    void removeWorkspace(Long index) throws WorkspaceNotFoundException, SQLException, DatabaseOperationException;
-    List<Workspace> getAllWorkspaces() throws WorkspaceNotFoundException, SQLException, DatabaseOperationException;
+
+    Workspace createWorkspace(Workspace workspace) throws WorkspaceServiceException;
+
+    List<Workspace> getAllWorkspaces() throws WorkspaceServiceException;
+
+    Workspace getWorkspaceById(Long id) throws WorkspaceServiceException;
+
+
+    boolean updateWorkspace(Workspace workspace) throws WorkspaceServiceException;
+
+    boolean deleteWorkspace(Long id) throws WorkspaceServiceException;
+
+
+    List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
+                                           LocalTime endTime) throws WorkspaceServiceException, WorkspaceServiceException;
 }

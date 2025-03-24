@@ -1,40 +1,43 @@
 package com.andersen;
 
-import com.andersen.controller.MenuController;
-import com.andersen.dao.user.UserDAOImpl;
-import com.andersen.dao.workspace.WorkspaceDAOImpl;
-import com.andersen.dao.booking.BookingDAOImpl;
-import com.andersen.service.auth.AuthServiceImp;
-import com.andersen.service.booking.BookingService;
+import com.andersen.controller.*;
+import com.andersen.repository.booking.BookingRepositoryImpl;
+import com.andersen.repository.user.UserRepositoryImpl;
+import com.andersen.repository.workspace.WorkspaceRepositoryImpl;
+import com.andersen.service.auth.AuthServiceImpl;
 import com.andersen.service.booking.BookingServiceImpl;
-import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
-import com.andersen.logger.ConsoleLogger;
-
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        try {
-            // Initialize DAOs
-            UserDAOImpl userDAO = new UserDAOImpl(); // User DAO
-            WorkspaceDAOImpl workspaceDAO = new WorkspaceDAOImpl(); // Workspace DAO
-            BookingDAOImpl bookingDAO = new BookingDAOImpl(userDAO, workspaceDAO); // Booking DAO
+        // Initialize DAOs
+        UserRepositoryImpl userDao = new UserRepositoryImpl();
+        BookingRepositoryImpl bookingDao = new BookingRepositoryImpl();
+        WorkspaceRepositoryImpl workspaceDao = new WorkspaceRepositoryImpl();
 
-            // Initialize services directly with DAOs
-            WorkspaceService workspaceService = new WorkspaceServiceImpl(workspaceDAO); // Workspace Service
-            BookingService bookingService = new BookingServiceImpl(bookingDAO); // Booking Service
-            AuthServiceImp authService = new AuthServiceImp(userDAO); // Auth Service
+        // Initialize services
+        AuthServiceImpl authService = new AuthServiceImpl(userDao);
+        WorkspaceServiceImpl workspaceService = new WorkspaceServiceImpl(workspaceDao);
+        BookingServiceImpl bookingService = new BookingServiceImpl(bookingDao, workspaceDao);
 
-            // Initialize and launch the menu controller
-            MenuController menuController = new MenuController(workspaceService, bookingService, authService, scanner);
-            menuController.mainMenu();
-        } catch (Exception e) {
-            ConsoleLogger.log("An unexpected error occurred: " + e.getMessage());
-        } finally {
-            scanner.close(); // Close the scanner to avoid resource leaks
-        }
+        // Initialize flows and components
+        Admin admin = new Admin(scanner, workspaceService, bookingService);
+        Customer customer = new Customer(scanner, workspaceService, bookingService);
+        MenuDisplayer menuDisplayer = new MenuDisplayer();
+
+        // Create and start application
+        Application appFlow = new Application(
+                scanner,
+                authService,
+                admin,
+                customer,
+                menuDisplayer
+        );
+
+        appFlow.start();
+        scanner.close();
     }
 }

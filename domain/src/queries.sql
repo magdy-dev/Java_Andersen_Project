@@ -1,64 +1,63 @@
--- Insert roles
-INSERT INTO user_roles (role_name) VALUES
-('ADMIN'),
-('CUSTOMER');
+-- Already exists in your schema
+-- INSERT INTO user_roles (role_name) VALUES ('ADMIN'), ('CUSTOMER');
 
--- Insert users  users with ADMIN and CUSTOMER roles)
-INSERT INTO users (username, password, role_id) VALUES
-('magy', 'password123', 2),
-('yury', 'password456', 2),
-('john', 'password789', 2),
-('jane', 'password012', 2),
-('bob', 'password345', 2),
-('alice', 'password678', 2),
-('charlie', 'password901', 1),
-('dave', 'password234', 1),
-('eve', 'password567', 1),
-('frank', 'password890', 2),
-('grace', 'password135', 2),
-('heidi', 'password246', 2);
+INSERT INTO users (username, password, email, full_name, role_id) VALUES
+-- Admins (role_id = 1)
+('admin1', 'password123', 'admin1@cowork.com', 'magdy', 1),
+('admin2', 'password1234', 'admin2@cowork.com', 'yura', 1),
 
--- Insert workspaces
-INSERT INTO workspaces (name, description) VALUES
-('Workspace 1', 'This is workspace 1'),
-('Workspace 2', 'This is workspace 2'),
-('Workspace 3', 'This is workspace 3'),
-('Workspace 4', 'This is workspace 4'),
-('Workspace 5', 'This is workspace 5'),
-('Workspace 6', 'This is workspace 6'),
-('Workspace 7', 'This is workspace 7'),
-('Workspace 8', 'This is workspace 8');
+-- Customers (role_id = 2)
+('alice_w', 'password12345', 'alice@email.com', 'Alice Williams', 2),
+('bob_m', 'password123456', 'bob@email.com', 'Bob Miller', 2),
+('charlie_b', 'password123411', 'charlie@email.com', 'Charlie Brown', 2),
+('diana_k', 'password123422', 'diana@email.com', 'Diana King', 2),
+('evan_s', 'password123455', 'evan@email.com', 'Evan Stone', 2);
 
--- Insert bookings  bookings for users)
-INSERT INTO bookings (customer_id, workspace_id, start_time, end_time) VALUES
-(1, 1, '09:00:00', '17:00:00'),
-(2, 2, '10:00:00', '18:00:00'),
-(3, 3, '11:00:00', '19:00:00'),
-(4, 4, '12:00:00', '20:00:00'),
-(5, 5, '13:00:00', '21:00:00'),
-(6, 6, '14:00:00', '22:00:00'),
-(7, 7, '15:00:00', '23:00:00'),
-(8, 8, '16:00:00', '24:00:00'),
-(9, 1, '09:00:00', '17:00:00'),
-(10, 2, '10:00:00', '18:00:00'),
-(11, 3, '11:00:00', '19:00:00'),
-(12, 4, '12:00:00', '20:00:00');
+INSERT INTO workspaces (name, description, type, price_per_hour, capacity) VALUES
+-- Open spaces
+('Open Space A', 'Spacious open area with natural light', 'OPEN_SPACE', 5.00, 20),
+('Open Space B', 'Quiet zone with ergonomic chairs', 'OPEN_SPACE', 6.50, 15),
 
--- Insert availabilities (more availabilities for workspaces)
-INSERT INTO availabilities (workspace_id, date, time, capacity, remaining) VALUES
-(1, '2023-03-01', '09:00:00', 10, 10),
-(1, '2023-03-02', '09:00:00', 10, 10),
-(2, '2023-03-01', '10:00:00', 15, 15),
-(2, '2023-03-02', '10:00:00', 15, 15),
-(3, '2023-03-01', '11:00:00', 20, 20),
-(3, '2023-03-02', '11:00:00', 20, 20),
-(4, '2023-03-01', '12:00:00', 25, 25),
-(4, '2023-03-02', '12:00:00', 25, 25),
-(5, '2023-03-01', '13:00:00', 30, 30),
-(5, '2023-03-02', '13:00:00', 30, 30),
-(6, '2023-03-01', '14:00:00', 35, 35),
-(6, '2023-03-02', '14:00:00', 35, 35),
-(7, '2023-03-01', '15:00:00', 40, 40),
-(7, '2023-03-02', '15:00:00', 40, 40),
-(8, '2023-03-01', '16:00:00', 45, 45),
-(8, '2023-03-02', '16:00:00', 45, 45);
+-- Private rooms
+('Private Room 101', 'Small private office with desk', 'PRIVATE_ROOM', 15.00, 1),
+('Private Room 102', 'Medium private office for 2 people', 'PRIVATE_ROOM', 25.00, 2),
+('Private Room 103', 'Large private office for 4 people', 'PRIVATE_ROOM', 40.00, 4),
+
+-- Meeting rooms
+('Meeting Room A', 'Boardroom style for 8 people', 'MEETING_ROOM', 30.00, 8),
+('Meeting Room B', 'Creative space with whiteboards', 'MEETING_ROOM', 35.00, 6),
+
+-- Desks
+('Hot Desk 1', 'Flexible desk in common area', 'DESK', 8.00, 1),
+('Hot Desk 2', 'Standing desk option', 'DESK', 10.00, 1),
+('Premium Desk', 'Corner desk with extra monitors', 'DESK', 12.00, 1);
+
+INSERT INTO bookings (customer_id, workspace_id, booking_date, start_time, end_time, status, total_price) VALUES
+-- Alice's bookings
+(3, 1, '2023-06-01', '09:00:00', '12:00:00', 'COMPLETED', 15.00),
+(3, 3, '2023-06-15', '10:00:00', '15:00:00', 'COMPLETED', 75.00),
+(3, 6, '2023-07-01', '13:00:00', '16:00:00', 'CONFIRMED', 90.00),
+
+-- Bob's bookings
+(4, 2, '2023-06-02', '08:00:00', '17:00:00', 'COMPLETED', 58.50),
+(4, 9, '2023-06-20', '14:00:00', '18:00:00', 'COMPLETED', 32.00),
+(4, 5, '2023-07-05', '09:00:00', '13:00:00', 'CONFIRMED', 100.00),
+
+-- Charlie's bookings
+(5, 4, '2023-06-10', '11:00:00', '16:00:00', 'COMPLETED', 125.00),
+(5, 7, '2023-06-25', '08:30:00', '10:30:00', 'CANCELLED', 70.00),
+(5, 8, '2023-07-10', '12:00:00', '17:00:00', 'CONFIRMED', 50.00),
+
+-- Diana's bookings
+(6, 10, '2023-06-05', '09:00:00', '18:00:00', 'COMPLETED', 108.00),
+(6, 1, '2023-06-18', '13:00:00', '17:00:00', 'COMPLETED', 20.00),
+(6, 2, '2023-07-15', '10:00:00', '12:00:00', 'CONFIRMED', 13.00),
+
+-- Evan's bookings
+(7, 3, '2023-06-08', '14:00:00', '18:00:00', 'COMPLETED', 60.00),
+(7, 6, '2023-06-22', '08:00:00', '12:00:00', 'COMPLETED', 120.00),
+(7, 4, '2023-07-20', '09:00:00', '11:00:00', 'CONFIRMED', 50.00);
+
+
+
+

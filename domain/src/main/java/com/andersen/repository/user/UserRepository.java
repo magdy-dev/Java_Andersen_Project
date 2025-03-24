@@ -1,15 +1,18 @@
-//package com.andersen.repository.user;
-//
-//import com.andersen.entity.role.User;
-//import com.andersen.entity.role.UserRole;
-//
-//import java.sql.SQLException;
-//import java.util.List;
-//
-//public interface UserRepository {
-//
-//    void registerCustomer(User user) throws SQLException;
-//    User userLogin(String username, String password, UserRole role) throws SQLException;
-//    List<User> getAllUsers() throws SQLException;
-//    User getUserByUsername(String username) throws SQLException;
-//}
+package com.andersen.repository.user;
+
+import com.andersen.entity.role.User;
+import com.andersen.exception.DataAccessException;
+
+import java.util.Optional;
+
+public interface UserRepository {
+    User createUser(User user) throws DataAccessException;
+
+    Optional<User> getUserById(Long id) throws DataAccessException;
+
+    Optional<User> getUserByUsername(String username) throws DataAccessException;
+
+    boolean updateUser(User user) throws DataAccessException;
+
+    boolean deleteUser(Long id) throws DataAccessException;
+}
