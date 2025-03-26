@@ -1,62 +1,90 @@
 package com.andersen.controller;
 
+import com.andersen.service.auth.SessionManager;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.booking.BookingService;
+import com.andersen.logger.OutputLogger; // Import OutputLogger
 import java.util.Scanner;
-
-import static com.andersen.controller.MenuDisplayer.showAdminMenu;
 
 public class Admin {
     private final Scanner scanner;
     private final WorkspaceService workspaceService;
     private final BookingService bookingService;
+    private final SessionManager sessionManager;
+    private String currentToken;
 
-    public Admin(Scanner scanner, WorkspaceService workspaceService,
-                 BookingService bookingService) {
+    public Admin(Scanner scanner,
+                 WorkspaceService workspaceService,
+                 BookingService bookingService,
+                 SessionManager sessionManager) {
         this.scanner = scanner;
         this.workspaceService = workspaceService;
         this.bookingService = bookingService;
+        this.sessionManager = sessionManager;
+    }
+
+    public void setCurrentToken(String token) {
+        this.currentToken = token;
     }
 
     public void start() {
+        if (!verifyAdminSession()) {
+            OutputLogger.error("Admin session expired or invalid"); // Logging error
+            return;
+        }
+
         while (true) {
-            showAdminMenu();
-            int choice = readIntInput("Enter your choice: ");
+            MenuDisplayer.showAdminMenu();
+            String choice = scanner.nextLine();
 
             switch (choice) {
-                case 1 -> addWorkspace();
-                case 2 -> removeWorkspace();
-                case 3 -> viewAllReservations();
-                case 4 -> { return; }
-                default -> System.out.println("Invalid choice. Please try again.");
+                case "1":
+                    addWorkspace();
+                    break;
+                case "2":
+                    removeWorkspace();
+                    break;
+                case "3":
+                    viewAllReservations();
+                    break;
+                case "4":
+                    OutputLogger.log("Returning to main menu..."); // Logging action
+                    return;
+                default:
+                    OutputLogger.warn("Invalid choice. Please try again."); // Logging warning
             }
         }
     }
 
+    private boolean verifyAdminSession() {
+        if (currentToken == null || !sessionManager.isAdmin(currentToken)) {
+            OutputLogger.error("Access denied. Valid admin session required."); // Logging error
+            return false;
+        }
+        return true;
+    }
+
     private void addWorkspace() {
-        System.out.println("\n--- Add New Workspace ---");
+        if (!verifyAdminSession()) return;
+
+        OutputLogger.log("\n--- Add New Workspace ---");
         // Implementation for adding workspace
-        System.out.println("Workspace added successfully!\n");
+        OutputLogger.log("Workspace added successfully!\n"); // Logging action
     }
 
     private void removeWorkspace() {
-        System.out.println("\n--- Remove Workspace ---");
+        if (!verifyAdminSession()) return;
+
+        OutputLogger.log("\n--- Remove Workspace ---");
         // Implementation for removing workspace
-        System.out.println("Workspace removed successfully!\n");
+        OutputLogger.log("Workspace removed successfully!\n"); // Logging action
     }
 
     private void viewAllReservations() {
-        System.out.println("\n--- All Reservations ---");
-        // Implementation to view reservations
-        System.out.println();
-    }
+        if (!verifyAdminSession()) return;
 
-    private int readIntInput(String prompt) {
-        System.out.print(prompt);
-        try {
-            return Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
+        OutputLogger.log("\n--- All Reservations ---");
+        // Implementation to view reservations
+        OutputLogger.log(""); // Logging empty line for formatting
     }
 }

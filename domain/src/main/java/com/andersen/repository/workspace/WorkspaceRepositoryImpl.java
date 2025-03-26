@@ -12,29 +12,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorkspaceRepositoryImpl implements WorkspaceRepository {
-
-    private static final String INSERT_WORKSPACE = "INSERT INTO workspaces (name, description, type, price_per_hour, capacity, is_active) " +
-            "VALUES (?, ?, ?, ?, ?, ?)";
-
+    // SQL queries remain the same
+    private static final String INSERT_WORKSPACE = "INSERT INTO workspaces (name, description, type, price_per_hour, capacity, is_active) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String SELECT_ALL = "SELECT * FROM workspaces WHERE is_active = TRUE ORDER BY name";
-
     private static final String SELECT_BY_ID = "SELECT * FROM workspaces WHERE id = ? AND is_active = TRUE";
-
-    private static final String UPDATE_WORKSPACE = "UPDATE workspaces SET name = ?, description = ?, type = ?, " +
-            "price_per_hour = ?, capacity = ? WHERE id = ?";
-
+    private static final String UPDATE_WORKSPACE = "UPDATE workspaces SET name = ?, description = ?, type = ?, price_per_hour = ?, capacity = ? WHERE id = ?";
     private static final String SOFT_DELETE = "UPDATE workspaces SET is_active = FALSE WHERE id = ?";
-
-    private static final String SELECT_AVAILABLE = "SELECT w.* FROM workspaces w " +
-            "WHERE w.is_active = TRUE AND w.id NOT IN (" +
-            "   SELECT b.workspace_id FROM bookings b " +
-            "   WHERE b.booking_date = ? " +
-            "   AND b.status = 'CONFIRMED' " +
-            "   AND ((b.start_time < ? AND b.end_time > ?) " +
-            "   OR (b.start_time < ? AND b.end_time > ?)))";
+    private static final String SELECT_AVAILABLE = "SELECT w.* FROM workspaces w WHERE w.is_active = TRUE AND w.id NOT IN (SELECT b.workspace_id FROM bookings b WHERE b.booking_date = ? AND b.status = 'CONFIRMED' AND ((b.start_time < ? AND b.end_time > ?) OR (b.start_time < ? AND b.end_time > ?)))";
 
     @Override
     public Workspace createWorkspace(Workspace workspace) throws DataAccessException {
+        // Implementation remains the same
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -48,7 +36,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             stmt.setString(3, workspace.getType().name());
             stmt.setDouble(4, workspace.getPricePerHour());
             stmt.setInt(5, workspace.getCapacity());
-            stmt.setBoolean(6, true); // is_active
+            stmt.setBoolean(6, true);
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -63,7 +51,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
                 throw new DataAccessException("Creating workspace failed - no ID obtained");
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error creating workspace"+ e);
+            throw new DataAccessException("Error creating workspace" + e);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -82,11 +70,19 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             rs = stmt.executeQuery(SELECT_ALL);
 
             while (rs.next()) {
-                workspaces.add(mapRowToWorkspace(rs));
+                Workspace workspace = new Workspace();
+                workspace.setId(rs.getLong("id"));
+                workspace.setName(rs.getString("name"));
+                workspace.setDescription(rs.getString("description"));
+                workspace.setType(WorkspaceType.valueOf(rs.getString("type")));
+                workspace.setPricePerHour(rs.getDouble("price_per_hour"));
+                workspace.setCapacity(rs.getInt("capacity"));
+                workspace.setActive(rs.getBoolean("is_active"));
+                workspaces.add(workspace);
             }
             return workspaces;
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving all workspaces"+e);
+            throw new DataAccessException("Error retrieving all workspaces" + e);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -105,55 +101,21 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapRowToWorkspace(rs);
+                Workspace workspace = new Workspace();
+                workspace.setId(rs.getLong("id"));
+                workspace.setName(rs.getString("name"));
+                workspace.setDescription(rs.getString("description"));
+                workspace.setType(WorkspaceType.valueOf(rs.getString("type")));
+                workspace.setPricePerHour(rs.getDouble("price_per_hour"));
+                workspace.setCapacity(rs.getInt("capacity"));
+                workspace.setActive(rs.getBoolean("is_active"));
+                return workspace;
             }
             throw new DataAccessException("Workspace not found with ID: " + id);
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving workspace: " + id+e);
+            throw new DataAccessException("Error retrieving workspace: " + id + e);
         } finally {
             closeResources(conn, stmt, rs);
-        }
-    }
-
-    @Override
-    public boolean updateWorkspace(Workspace workspace) throws DataAccessException {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-
-        try {
-            conn = DatabaseConnection.getConnection();
-            stmt = conn.prepareStatement(UPDATE_WORKSPACE);
-
-            stmt.setString(1, workspace.getName());
-            stmt.setString(2, workspace.getDescription());
-            stmt.setString(3, workspace.getType().name());
-            stmt.setDouble(4, workspace.getPricePerHour());
-            stmt.setInt(5, workspace.getCapacity());
-            stmt.setLong(6, workspace.getId());
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error updating workspace: " + workspace.getId()+e);
-        } finally {
-            closeResources(conn, stmt, null);
-        }
-    }
-
-    @Override
-    public boolean deleteWorkspace(Long id) throws DataAccessException {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-
-        try {
-            conn = DatabaseConnection.getConnection();
-            stmt = conn.prepareStatement(SOFT_DELETE);
-            stmt.setLong(1, id);
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            throw new DataAccessException("Error deleting workspace: " + id+e);
-        } finally {
-            closeResources(conn, stmt, null);
         }
     }
 
@@ -176,28 +138,67 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             rs = stmt.executeQuery();
             while (rs.next()) {
-                availableWorkspaces.add(mapRowToWorkspace(rs));
+                Workspace workspace = new Workspace();
+                workspace.setId(rs.getLong("id"));
+                workspace.setName(rs.getString("name"));
+                workspace.setDescription(rs.getString("description"));
+                workspace.setType(WorkspaceType.valueOf(rs.getString("type")));
+                workspace.setPricePerHour(rs.getDouble("price_per_hour"));
+                workspace.setCapacity(rs.getInt("capacity"));
+                workspace.setActive(rs.getBoolean("is_active"));
+                availableWorkspaces.add(workspace);
             }
             return availableWorkspaces;
         } catch (SQLException e) {
             throw new DataAccessException(
                     String.format("Error checking available workspaces on %s from %s to %s",
-                            date, startTime, endTime)+e);
+                            date, startTime, endTime) + e);
         } finally {
             closeResources(conn, stmt, rs);
         }
     }
 
-    private Workspace mapRowToWorkspace(ResultSet rs) throws SQLException {
-        Workspace workspace = new Workspace();
-        workspace.setId(rs.getLong("id"));
-        workspace.setName(rs.getString("name"));
-        workspace.setDescription(rs.getString("description"));
-        workspace.setType(WorkspaceType.valueOf(rs.getString("type")));
-        workspace.setPricePerHour(rs.getDouble("price_per_hour"));
-        workspace.setCapacity(rs.getInt("capacity"));
-        workspace.setActive(rs.getBoolean("is_active"));
-        return workspace;
+    // updateWorkspace and deleteWorkspace implementations remain unchanged
+    @Override
+    public boolean updateWorkspace(Workspace workspace) throws DataAccessException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            stmt = conn.prepareStatement(UPDATE_WORKSPACE);
+
+            stmt.setString(1, workspace.getName());
+            stmt.setString(2, workspace.getDescription());
+            stmt.setString(3, workspace.getType().name());
+            stmt.setDouble(4, workspace.getPricePerHour());
+            stmt.setInt(5, workspace.getCapacity());
+            stmt.setLong(6, workspace.getId());
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error updating workspace: " + workspace.getId() + e);
+        } finally {
+            closeResources(conn, stmt, null);
+        }
+    }
+
+    @Override
+    public boolean deleteWorkspace(Long id) throws DataAccessException {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = DatabaseConnection.getConnection();
+            stmt = conn.prepareStatement(SOFT_DELETE);
+            stmt.setLong(1, id);
+
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            throw new DataAccessException("Error deleting workspace: " + id + e);
+        } finally {
+            closeResources(conn, stmt, null);
+        }
     }
 
     private void closeResources(Connection conn, Statement stmt, ResultSet rs) {

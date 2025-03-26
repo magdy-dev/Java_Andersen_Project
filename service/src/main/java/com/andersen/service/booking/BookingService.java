@@ -14,21 +14,12 @@ public interface BookingService {
     Booking createBooking(User customer, Long workspaceId, LocalDate date,
                           LocalTime startTime, LocalTime endTime) throws BookingServiceException;
 
-
     List<Booking> getCustomerBookings(Long customerId) throws BookingServiceException;
-
 
     boolean cancelBooking(Long bookingId, Long userId) throws BookingServiceException;
 
-    boolean checkWorkspaceAvailability(Long workspaceId, LocalDate date,
-                                       LocalTime startTime, LocalTime endTime) throws BookingServiceException;
-
-    boolean isWorkspaceAvailable(Long workspaceId, LocalDate date,
-                                 LocalTime startTime, LocalTime endTime) throws BookingServiceException;
-
     List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
                                            LocalTime endTime) throws BookingServiceException;
-
 
 
 }

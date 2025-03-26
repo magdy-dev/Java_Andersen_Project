@@ -1,34 +1,48 @@
 package com.andersen.controller;
 
+import com.andersen.logger.OutputLogger;
+
 public class MenuDisplayer {
+    private static final String MAIN_MENU = """
+            \n=== Coworking Space Reservation ===
+            1. Admin Login
+            2. Customer Login/Register
+            3. Exit""";
+
+    private static final String CUSTOMER_AUTH_MENU = """
+            \n=== Customer Authentication ===
+            1. Login
+            2. Register
+            3. Back to Main Menu""";
+
+    private static final String ADMIN_MENU = """
+            \n=== Admin Menu ===
+            1. Add a new coworking space
+            2. Remove a coworking space
+            3. View all reservations
+            4. Back to Main Menu""";
+
+    private static final String CUSTOMER_MENU = """
+            \n=== Customer Menu ===
+            1. Browse available spaces
+            2. Make a reservation
+            3. View my reservations
+            4. Cancel a reservation
+            5. Logout""";
+
     public static void showMainMenu() {
-        System.out.println("\n=== Coworking Space Reservation ===");
-        System.out.println("1. Admin Login");
-        System.out.println("2. Customer Login/Register");
-        System.out.println("3. Exit");
+        OutputLogger.log(MAIN_MENU);
     }
 
     public static void showCustomerAuthMenu() {
-        System.out.println("\n=== Customer Authentication ===");
-        System.out.println("1. Login");
-        System.out.println("2. Register");
-        System.out.println("3. Back to Main Menu");
+        OutputLogger.log(CUSTOMER_AUTH_MENU);
     }
 
     public static void showAdminMenu() {
-        System.out.println("\n=== Admin Menu ===");
-        System.out.println("1. Add a new coworking space");
-        System.out.println("2. Remove a coworking space");
-        System.out.println("3. View all reservations");
-        System.out.println("4. Back to Main Menu");
+        OutputLogger.log(ADMIN_MENU);
     }
 
     public static void showCustomerMenu() {
-        System.out.println("\n=== Customer Menu ===");
-        System.out.println("1. Browse available spaces");
-        System.out.println("2. Make a reservation");
-        System.out.println("3. View my reservations");
-        System.out.println("4. Cancel a reservation");
-        System.out.println("5. Logout");
+        OutputLogger.log(CUSTOMER_MENU);
     }
 }

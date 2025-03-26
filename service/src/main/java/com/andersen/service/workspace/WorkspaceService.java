@@ -15,11 +15,9 @@ public interface WorkspaceService {
 
     Workspace getWorkspaceById(Long id) throws WorkspaceServiceException;
 
-
     boolean updateWorkspace(Workspace workspace) throws WorkspaceServiceException;
 
     boolean deleteWorkspace(Long id) throws WorkspaceServiceException;
-
 
     List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
                                            LocalTime endTime) throws WorkspaceServiceException, WorkspaceServiceException;

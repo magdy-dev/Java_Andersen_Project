@@ -2,7 +2,6 @@ package com.andersen.repository.user;
 
 import com.andersen.entity.role.User;
 import com.andersen.exception.DataAccessException;
-
 import java.util.Optional;
 
 public interface UserRepository {
