@@ -6,63 +6,95 @@ import com.andersen.entity.role.UserRole;
 import com.andersen.exception.DataAccessException;
 import com.andersen.service.excption.AuthenticationException;
 import com.andersen.service.excption.RegistrationException;
-import com.andersen.logger.ConsoleLogger;
 import com.andersen.logger.OutputLogger;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
-
+/**
+ * Implementation of the authentication service that provides user registration and login functionality.
+ * This service handles user authentication, password hashing, and session management.
+ *
+ * @see AuthService
+ */
 public class AuthServiceImpl implements AuthService {
-    private UserRepository userRepository;
-    private User currentUser;
 
-    public AuthServiceImpl(UserRepository userRepository) {
+    private final UserRepository userRepository;
+    private final SessionManager sessionManager;
+    /**
+     * Constructs a new AuthServiceImpl with the specified UserRepository and SessionManager.
+     *
+     * @param userRepository the repository for user data access
+     * @param sessionManager the manager for handling user sessions
+     */
+    public AuthServiceImpl(UserRepository userRepository, SessionManager sessionManager) {
         this.userRepository = userRepository;
+        this.sessionManager = sessionManager;  // Fixed assignment
         OutputLogger.log("AuthService initialized");
     }
-
+    /**
+     * Authenticates a user with the given username and password.
+     *
+     * @param username the username of the user attempting to login
+     * @param password the password of the user attempting to login
+     * @return the authenticated User object
+     * @throws AuthenticationException if authentication fails due to invalid credentials or service unavailability
+     */
     @Override
     public User login(String username, String password) throws AuthenticationException {
-        String operation = "User Login";
-        OutputLogger.log(operation + " - Attempting login for username: " + username);
+        OutputLogger.logAction("Attempting login for username: " + username);
 
         try {
             User user = userRepository.getUserByUsername(username)
                     .orElseThrow(() -> {
-                        String errorMsg = operation + " - Invalid username: " + username;
-                        ConsoleLogger.getLogger(AuthServiceImpl.class).warn(errorMsg);
+                        OutputLogger.warn("Invalid username: " + username);
                         return new AuthenticationException("Invalid username or password");
                     });
 
             String hashedInput = hashPassword(password);
             if (!user.getPassword().equals(hashedInput)) {
-                String errorMsg = operation + " - Invalid password for user: " + username;
-                ConsoleLogger.getLogger(AuthServiceImpl.class).warn(errorMsg);
+                OutputLogger.warn("Invalid password for user: " + username);
                 throw new AuthenticationException("Invalid username or password");
             }
 
-            this.currentUser = user;
-            OutputLogger.log(operation + " - Successful login for user: " + username);
+            sessionManager.createSession(user);
+            OutputLogger.log("Successful login for user: " + username);
             return user;
         } catch (DataAccessException e) {
-            String errorMsg = operation + " - Error during authentication";
-            ConsoleLogger.getLogger(AuthServiceImpl.class).error(errorMsg, e);
-            throw new AuthenticationException("Error during authentication"+e);
+            OutputLogger.error("Error during authentication for user: " + username);
+            throw new AuthenticationException("Authentication service unavailable" + e);
         }
     }
+    /**
+     * Terminates the user session associated with the given token.
+     *
+     * @param token the session token to invalidate
+     */
 
+    @Override
+    public void logout(String token) {
+        sessionManager.invalidateSession(token);
+        OutputLogger.log("User logged out");
+    }
+
+    /**
+     * Registers a new customer user with the system.
+     *
+     * @param username the desired username for the new user
+     * @param password the password for the new user
+     * @param email the email address of the new user
+     * @param fullName the full name of the new user
+     * @return the newly created User object
+     * @throws RegistrationException if registration fails due to existing username or service unavailability
+     */
     @Override
     public User registerCustomer(String username, String password, String email, String fullName)
             throws RegistrationException {
-        String operation = "User Registration";
-        OutputLogger.log(String.format("%s - Attempting to register new customer: %s (%s)",
-                operation, username, email));
+        OutputLogger.logAction("Attempting to register new customer: " + username + " (" + email + ")");
 
         try {
             if (userRepository.getUserByUsername(username).isPresent()) {
-                String errorMsg = operation + " - Username already exists: " + username;
-                ConsoleLogger.getLogger(AuthServiceImpl.class).warn(errorMsg);
+                OutputLogger.warn("Username already exists: " + username);
                 throw new RegistrationException("Username already exists");
             }
 
@@ -74,64 +106,28 @@ public class AuthServiceImpl implements AuthService {
             newUser.setRole(UserRole.CUSTOMER);
 
             User createdUser = userRepository.createUser(newUser);
-            this.currentUser = createdUser;
-            OutputLogger.log(operation + " - Successfully registered new customer with ID: " + createdUser.getId());
+            OutputLogger.logWithDivider("Successfully registered new customer with ID: " + createdUser.getId());
             return createdUser;
         } catch (DataAccessException | AuthenticationException e) {
-            String errorMsg = operation + " - Error during registration";
-            ConsoleLogger.getLogger(AuthServiceImpl.class).error(errorMsg, e);
-            throw new RegistrationException("Error during registration", e);
+            OutputLogger.error("Error during registration for username: " + username);
+            throw new RegistrationException("Registration service unavailable", e);
         }
     }
-
-    @Override
-    public void logout() {
-        if (currentUser != null) {
-            OutputLogger.log("User Logout - Logging out user: " + currentUser.getUsername());
-            this.currentUser = null;
-        } else {
-            OutputLogger.log("User Logout - No user was logged in");
-        }
-    }
-
-    @Override
-    public User getCurrentUser() {
-        if (currentUser != null) {
-            ConsoleLogger.getLogger(AuthServiceImpl.class).debug(
-                    "Current user requested: " + currentUser.getUsername());
-        } else {
-            ConsoleLogger.getLogger(AuthServiceImpl.class).debug("No current user");
-        }
-        return currentUser;
-    }
-
-    @Override
-    public boolean isAdmin() {
-        boolean isAdmin = currentUser != null && currentUser.getRole() == UserRole.ADMIN;
-        ConsoleLogger.getLogger(AuthServiceImpl.class).debug(
-                "Admin check for " + (currentUser != null ? currentUser.getUsername() : "null") +
-                        ": " + isAdmin);
-        return isAdmin;
-    }
-
-    @Override
-    public boolean isAuthenticated() {
-        boolean authenticated = currentUser != null;
-        ConsoleLogger.getLogger(AuthServiceImpl.class).debug("Authentication check: " + authenticated);
-        return authenticated;
-    }
-
+    /**
+     * Hashes the given password using SHA-256 algorithm and Base64 encoding.
+     *
+     * @param password the plain text password to hash
+     * @return the hashed password as a Base64 encoded string
+     * @throws AuthenticationException if the hashing algorithm is not available
+     */
     String hashPassword(String password) throws AuthenticationException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(password.getBytes());
-            String hashedPassword = Base64.getEncoder().encodeToString(hash);
-            ConsoleLogger.getLogger(AuthServiceImpl.class).debug("Password hashed successfully");
-            return hashedPassword;
+            return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            String errorMsg = "Password hashing failed";
-            ConsoleLogger.getLogger(AuthServiceImpl.class).error(errorMsg, e);
-            throw new AuthenticationException(errorMsg+e);
+            OutputLogger.error("Password hashing failed");
+            throw new AuthenticationException("Authentication service error");
         }
     }
 }

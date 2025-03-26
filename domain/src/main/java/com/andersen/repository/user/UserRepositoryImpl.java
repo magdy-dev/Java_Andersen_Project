@@ -39,7 +39,7 @@ public class UserRepositoryImpl implements UserRepository {
                 throw new DataAccessException("Creating user failed, no ID obtained.");
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error creating user"+e);
+            throw new DataAccessException("Error creating user" + e);
         } finally {
             closeResources(conn, stmt, generatedKeys);
         }
@@ -50,19 +50,17 @@ public class UserRepositoryImpl implements UserRepository {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-
         try {
             conn = DatabaseConnection.getConnection();
             stmt = conn.prepareStatement(GET_USER_BY_ID_SQL);
             stmt.setLong(1, id);
-
             rs = stmt.executeQuery();
             if (rs.next()) {
                 return Optional.of(mapResultSetToUser(rs));
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving user by ID: " + id+e);
+            throw new DataAccessException("Error retrieving user by ID: " + id + e);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -73,7 +71,6 @@ public class UserRepositoryImpl implements UserRepository {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
-
         try {
             conn = DatabaseConnection.getConnection();
             stmt = conn.prepareStatement(GET_USER_BY_USERNAME_SQL);
@@ -85,7 +82,7 @@ public class UserRepositoryImpl implements UserRepository {
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving user by username: " + username+e);
+            throw new DataAccessException("Error retrieving user by username: " + username + e);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -101,10 +98,9 @@ public class UserRepositoryImpl implements UserRepository {
             stmt = conn.prepareStatement(UPDATE_USER_SQL);
             setUserParameters(stmt, user);
             stmt.setLong(6, user.getId());
-
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Error updating user: " + user.getId()+e);
+            throw new DataAccessException("Error updating user: " + user.getId() + e);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -114,15 +110,13 @@ public class UserRepositoryImpl implements UserRepository {
     public boolean deleteUser(Long id) throws DataAccessException {
         Connection conn = null;
         PreparedStatement stmt = null;
-
         try {
             conn = DatabaseConnection.getConnection();
             stmt = conn.prepareStatement(DELETE_USER_SQL);
             stmt.setLong(1, id);
-
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting user"+e);
+            throw new DataAccessException("Error deleting user" + e);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -147,16 +141,16 @@ public class UserRepositoryImpl implements UserRepository {
         );
     }
 
-    private void closeResources(Connection conn, Statement stmt, ResultSet rs) {
+    private void closeResources(Connection conn, Statement stmt, ResultSet rs) throws DataAccessException {
         try {
             if (rs != null) rs.close();
         } catch (SQLException e) {
-            System.err.println("Error closing ResultSet: " + e.getMessage());
+            throw new DataAccessException("Error closing ResultSet: " + e.getMessage());
         }
         try {
             if (stmt != null) stmt.close();
         } catch (SQLException e) {
-            System.err.println("Error closing Statement: " + e.getMessage());
+            throw new DataAccessException("Error closing Statement: " + e.getMessage());
         }
         DatabaseConnection.closeConnection(conn);
     }

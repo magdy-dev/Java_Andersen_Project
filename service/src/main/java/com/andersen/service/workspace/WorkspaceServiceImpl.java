@@ -9,16 +9,38 @@ import com.andersen.logger.OutputLogger;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+/**
+ * Provides implementation for workspace management operations including creation, retrieval,
+ * updating, and deletion of workspaces. Also handles workspace availability checks.
+ *
+ * <p>This service ensures:
+ * <ul>
+ *   <li>Validation of workspace properties (name, price, capacity)</li>
+ *   <li>Proper time parameter validation for availability checks</li>
+ *   <li>Consistent logging of all operations</li>
+ *   <li>Error handling and proper exception propagation</li>
+ * </ul>
+ */
 
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
-
+    /**
+     * Constructs a new WorkspaceServiceImpl with the specified repository.
+     *
+     * @param workspaceRepository the repository for workspace data access
+     */
     public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository) {
         this.workspaceRepository = workspaceRepository;
         OutputLogger.log("WorkspaceService initialized");
     }
-
+    /**
+     * Creates a new workspace after validating all required properties.
+     *
+     * @param workspace the workspace to create (must have valid name, price, and capacity)
+     * @return the created Workspace object with generated ID
+     * @throws WorkspaceServiceException if validation fails or data access error occurs
+     */
     @Override
     public Workspace createWorkspace(Workspace workspace) throws WorkspaceServiceException {
         String operation = "Create Workspace";
@@ -35,7 +57,12 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg, e);
         }
     }
-
+    /**
+     * Retrieves all workspaces in the system.
+     *
+     * @return list of all workspaces (empty list if none found)
+     * @throws WorkspaceServiceException if data access error occurs
+     */
     @Override
     public List<Workspace> getAllWorkspaces() throws WorkspaceServiceException {
         String operation = "Get All Workspaces";
@@ -51,7 +78,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg, e);
         }
     }
-
+    /**
+     * Retrieves a specific workspace by its ID.
+     *
+     * @param id the ID of the workspace to retrieve
+     * @return the Workspace object, or null if not found
+     * @throws WorkspaceServiceException if ID is null or data access error occurs
+     */
     @Override
     public Workspace getWorkspaceById(Long id) throws WorkspaceServiceException {
         String operation = "Get Workspace by ID";
@@ -77,7 +110,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg, e);
         }
     }
-
+    /**
+     * Updates an existing workspace with new values.
+     *
+     * @param workspace the workspace to update (must have valid ID and properties)
+     * @return true if update was successful, false otherwise
+     * @throws WorkspaceServiceException if validation fails or data access error occurs
+     */
     @Override
     public boolean updateWorkspace(Workspace workspace) throws WorkspaceServiceException {
         String operation = "Update Workspace";
@@ -98,7 +137,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg, e);
         }
     }
-
+    /**
+     * Deletes a workspace by its ID.
+     *
+     * @param id the ID of the workspace to delete
+     * @return true if deletion was successful, false otherwise
+     * @throws WorkspaceServiceException if ID is null or data access error occurs
+     */
     @Override
     public boolean deleteWorkspace(Long id) throws WorkspaceServiceException {
         String operation = "Delete Workspace";
@@ -125,6 +170,15 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         }
     }
 
+    /**
+     * Finds all workspaces available for booking during a specified time period.
+     *
+     * @param date the date to check availability
+     * @param startTime the start time of the desired booking period
+     * @param endTime the end time of the desired booking period
+     * @return list of available workspaces (empty list if none available)
+     * @throws WorkspaceServiceException if time parameters are invalid or data access error occurs
+     */
     @Override
     public List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
                                                   LocalTime endTime) throws WorkspaceServiceException {
@@ -144,6 +198,18 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg, e);
         }
     }
+    /**
+     * Validates all required properties of a workspace.
+     *
+     * @param workspace the workspace to validate
+     * @throws WorkspaceServiceException if any validation fails:
+     *         <ul>
+     *           <li>Workspace is null</li>
+     *           <li>Name is null or empty</li>
+     *           <li>Price per hour is not positive</li>
+     *           <li>Capacity is not positive</li>
+     *         </ul>
+     */
 
     private void validateWorkspace(Workspace workspace) throws WorkspaceServiceException {
         if (workspace == null) {
@@ -167,7 +233,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg);
         }
     }
-
+    /**
+     * Validates time parameters for availability checks.
+     *
+     * @param date the date to validate
+     * @param startTime the start time to validate
+     * @param endTime the end time to validate
+     * @throws WorkspaceServiceException if:
+     *         <ul>
+     *           <li>Any parameter is null</li>
+     *           <li>Start time is after end time</li>
+     *           <li>Date is in the past</li>
+     *         </ul>
+     */
     private void validateTimeParameters(LocalDate date, LocalTime startTime,
                                         LocalTime endTime) throws WorkspaceServiceException {
         if (date == null || startTime == null || endTime == null) {
@@ -186,4 +264,6 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException(errorMsg);
         }
     }
+
+
 }

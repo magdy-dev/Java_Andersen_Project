@@ -5,6 +5,7 @@ import com.andersen.repository.booking.BookingRepositoryImpl;
 import com.andersen.repository.user.UserRepositoryImpl;
 import com.andersen.repository.workspace.WorkspaceRepositoryImpl;
 import com.andersen.service.auth.AuthServiceImpl;
+import com.andersen.service.auth.SessionManager;
 import com.andersen.service.booking.BookingServiceImpl;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
 import java.util.Scanner;
@@ -13,31 +14,33 @@ public class Main {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Initialize DAOs
-        UserRepositoryImpl userDao = new UserRepositoryImpl();
-        BookingRepositoryImpl bookingDao = new BookingRepositoryImpl();
-        WorkspaceRepositoryImpl workspaceDao = new WorkspaceRepositoryImpl();
+        // Initialize repositories
+        UserRepositoryImpl userRepository = new UserRepositoryImpl();
+        BookingRepositoryImpl bookingRepository = new BookingRepositoryImpl();
+        WorkspaceRepositoryImpl workspaceRepository = new WorkspaceRepositoryImpl();
+
+        // Initialize session manager
+        SessionManager sessionManager = new SessionManager();
 
         // Initialize services
-        AuthServiceImpl authService = new AuthServiceImpl(userDao);
-        WorkspaceServiceImpl workspaceService = new WorkspaceServiceImpl(workspaceDao);
-        BookingServiceImpl bookingService = new BookingServiceImpl(bookingDao, workspaceDao);
+        AuthServiceImpl authService = new AuthServiceImpl(userRepository, sessionManager);
+        WorkspaceServiceImpl workspaceService = new WorkspaceServiceImpl(workspaceRepository);
+        BookingServiceImpl bookingService = new BookingServiceImpl(bookingRepository, workspaceRepository, sessionManager);
 
-        // Initialize flows and components
-        Admin admin = new Admin(scanner, workspaceService, bookingService);
-        Customer customer = new Customer(scanner, workspaceService, bookingService);
-        MenuDisplayer menuDisplayer = new MenuDisplayer();
+        // Initialize controllers
+        Admin admin = new Admin(scanner, workspaceService, bookingService, sessionManager);
+        Customer customer = new Customer(scanner, workspaceService, bookingService, sessionManager);
 
         // Create and start application
-        Application appFlow = new Application(
+        Application app = new Application(
                 scanner,
                 authService,
                 admin,
                 customer,
-                menuDisplayer
+                sessionManager
         );
 
-        appFlow.start();
+        app.start();
         scanner.close();
     }
 }

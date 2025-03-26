@@ -3,19 +3,21 @@ package com.andersen.repository.booking;
 import com.andersen.entity.booking.Booking;
 import com.andersen.exception.DataAccessException;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 public interface BookingRepository {
-    Booking createBooking(Booking booking) throws DataAccessException;
+    Booking create(Booking booking) throws DataAccessException;
 
-    List<Booking> getBookingsByCustomer(Long customerId) throws DataAccessException;
+    Booking getById(Long id) throws DataAccessException;
 
-    Booking getBookingById(Long id) throws DataAccessException;
+    Booking update(Booking booking) throws DataAccessException;
 
-    boolean cancelBooking(Long bookingId) throws DataAccessException;
+    void delete(Long id) throws DataAccessException;
 
-    boolean isWorkspaceAvailable(Long workspaceId, LocalDate date, LocalTime startTime, LocalTime endTime) throws DataAccessException;
+    List<Booking> getByCustomer(Long customerId) throws DataAccessException;
+
+    void updateIsActive(Long bookingId, boolean isActive) throws DataAccessException;
 
 }
