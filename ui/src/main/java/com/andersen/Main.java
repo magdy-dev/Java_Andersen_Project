@@ -1,9 +1,10 @@
 package com.andersen;
 
 import com.andersen.controller.*;
-import com.andersen.repository.booking.BookingRepositoryImpl;
-import com.andersen.repository.user.UserRepositoryImpl;
-import com.andersen.repository.workspace.WorkspaceRepositoryImpl;
+
+import com.andersen.repository_criteria_API.booking.BookingRepositoryImpl;
+import com.andersen.repository_criteria_API.user.UserRepositoryImpl;
+import com.andersen.repository_criteria_API.workspace.WorkspaceRepositoryImpl;
 import com.andersen.service.auth.AuthServiceImpl;
 import com.andersen.service.auth.SessionManager;
 import com.andersen.service.booking.BookingServiceImpl;

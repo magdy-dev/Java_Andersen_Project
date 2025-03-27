@@ -5,8 +5,9 @@ import com.andersen.entity.booking.BookingStatus;
 import com.andersen.entity.role.User;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
-import com.andersen.repository.booking.BookingRepository;
-import com.andersen.repository.workspace.WorkspaceRepository;
+
+import com.andersen.repository_criteria_API.booking.BookingRepository;
+import com.andersen.repository_criteria_API.workspace.WorkspaceRepository;
 import com.andersen.service.auth.SessionManager;
 import com.andersen.service.exception.BookingException;
 import org.junit.jupiter.api.BeforeEach;

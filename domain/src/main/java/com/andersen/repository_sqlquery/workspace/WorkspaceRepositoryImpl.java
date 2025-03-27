@@ -1,14 +1,13 @@
-package com.andersen.repository.workspace;
+package com.andersen.repository_sqlquery.workspace;
 
 import com.andersen.connection.DatabaseConnection;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.entity.workspace.WorkspaceType;
 import com.andersen.exception.DataAccessException;
+import com.andersen.exception.ErrorCode;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new DataAccessException("Creating workspace failed - no rows affected");
+                throw new DataAccessException("Creating workspace failed - no rows affected", ErrorCode.WS_001);
             }
 
             rs = stmt.getGeneratedKeys();
@@ -49,10 +48,10 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
                 workspace.setId(rs.getLong(1));
                 return workspace;
             } else {
-                throw new DataAccessException("Creating workspace failed - no ID obtained");
+                throw new DataAccessException("Creating workspace failed - no ID obtained",ErrorCode.WS_001);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error creating workspace" + e);
+            throw new DataAccessException("Error creating workspace" + e, ErrorCode.WS_001);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -83,7 +82,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             }
             return workspaces;
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving all workspaces" + e);
+            throw new DataAccessException("Error retrieving all workspaces" + e,ErrorCode.WS_002);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -112,9 +111,9 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
                 workspace.setActive(rs.getBoolean("is_active"));
                 return workspace;
             }
-            throw new DataAccessException("Workspace not found with ID: " + id);
+            throw new DataAccessException("Workspace not found with ID: " + id, ErrorCode.WS_002);
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving workspace: " + id + e);
+            throw new DataAccessException("Error retrieving workspace: " + id + e,ErrorCode.WS_002);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -151,7 +150,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             return availableWorkspaces;
         } catch (SQLException e) {
             throw new DataAccessException(
-                    String.format("Error checking available workspaces on %s from %s to %s", startTime, endTime) + e);
+                    String.format("Error checking available workspaces on %s from %s to %s", startTime, endTime) + e, ErrorCode.WS_003);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -176,7 +175,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Error updating workspace: " + workspace.getId() + e);
+            throw new DataAccessException("Error updating workspace: " + workspace.getId() + e, ErrorCode.WS_004);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -194,7 +193,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting workspace: " + id + e);
+            throw new DataAccessException("Error deleting workspace: " + id + e, ErrorCode.WS_004);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -204,12 +203,12 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
         try {
             if (rs != null) rs.close();
         } catch (SQLException e) {
-            throw new DataAccessException("Error closing ResultSet: " + e.getMessage());
+            throw new DataAccessException("Error closing ResultSet: " + e.getMessage(),ErrorCode.WS_007);
         }
         try {
             if (stmt != null) stmt.close();
         } catch (SQLException e) {
-            throw new DataAccessException("Error closing Statement: " + e.getMessage());
+            throw new DataAccessException("Error closing Statement: " + e.getMessage(), ErrorCode.WS_007);
         }
         DatabaseConnection.closeConnection(conn);
     }

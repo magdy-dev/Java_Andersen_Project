@@ -1,9 +1,10 @@
-package com.andersen.repository.user;
+package com.andersen.repository_sqlquery.user;
 
 import com.andersen.connection.DatabaseConnection;
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
 import com.andersen.exception.DataAccessException;
+import com.andersen.exception.ErrorCode;
 
 import java.sql.*;
 import java.util.Optional;
@@ -28,7 +29,7 @@ public class UserRepositoryImpl implements UserRepository {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new DataAccessException("Creating user failed, no rows affected.");
+                throw new DataAccessException("Creating user failed, no rows affected.", ErrorCode.US_001);
             }
 
             generatedKeys = stmt.getGeneratedKeys();
@@ -36,10 +37,10 @@ public class UserRepositoryImpl implements UserRepository {
                 user.setId(generatedKeys.getLong(1));
                 return user;
             } else {
-                throw new DataAccessException("Creating user failed, no ID obtained.");
+                throw new DataAccessException("Creating user failed, no ID obtained.", ErrorCode.US_001);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Error creating user" + e);
+            throw new DataAccessException("Error creating user" + e, ErrorCode.US_001);
         } finally {
             closeResources(conn, stmt, generatedKeys);
         }
@@ -60,7 +61,7 @@ public class UserRepositoryImpl implements UserRepository {
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving user by ID: " + id + e);
+            throw new DataAccessException("Error retrieving user by ID: " + id + e, ErrorCode.US_002);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -82,7 +83,7 @@ public class UserRepositoryImpl implements UserRepository {
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving user by username: " + username + e);
+            throw new DataAccessException("Error retrieving user by username: " + username + e,  ErrorCode.US_008);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -100,7 +101,7 @@ public class UserRepositoryImpl implements UserRepository {
             stmt.setLong(6, user.getId());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Error updating user: " + user.getId() + e);
+            throw new DataAccessException("Error updating user: " + user.getId() + e,  ErrorCode.US_003);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -116,7 +117,7 @@ public class UserRepositoryImpl implements UserRepository {
             stmt.setLong(1, id);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            throw new DataAccessException("Error deleting user" + e);
+            throw new DataAccessException("Error deleting user" + e,  ErrorCode.US_004);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -145,12 +146,12 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             if (rs != null) rs.close();
         } catch (SQLException e) {
-            throw new DataAccessException("Error closing ResultSet: " + e.getMessage());
+            throw new DataAccessException("Error closing ResultSet: " + e.getMessage(),  ErrorCode.US_005);
         }
         try {
             if (stmt != null) stmt.close();
         } catch (SQLException e) {
-            throw new DataAccessException("Error closing Statement: " + e.getMessage());
+            throw new DataAccessException("Error closing Statement: " + e.getMessage(),  ErrorCode.US_005);
         }
         DatabaseConnection.closeConnection(conn);
     }
