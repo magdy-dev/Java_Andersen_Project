@@ -7,6 +7,7 @@ import com.andersen.exception.DataAccessException;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +121,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
     }
 
     @Override
-    public List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime, LocalTime endTime) throws DataAccessException {
+    public List<Workspace> getAvailableWorkspaces(LocalDateTime startTime, LocalDateTime endTime) throws DataAccessException {
         Connection conn = null;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -130,11 +131,10 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             conn = DatabaseConnection.getConnection();
             stmt = conn.prepareStatement(SELECT_AVAILABLE);
 
-            stmt.setDate(1, Date.valueOf(date));
-            stmt.setTime(2, Time.valueOf(endTime));
-            stmt.setTime(3, Time.valueOf(startTime));
-            stmt.setTime(4, Time.valueOf(endTime));
-            stmt.setTime(5, Time.valueOf(startTime));
+            stmt.setTime(1, Time.valueOf(String.valueOf(endTime)));
+            stmt.setTime(2, Time.valueOf(String.valueOf(startTime)));
+            stmt.setTime(3, Time.valueOf(String.valueOf(endTime)));
+            stmt.setTime(4, Time.valueOf(String.valueOf(startTime)));
 
             rs = stmt.executeQuery();
             while (rs.next()) {
@@ -151,8 +151,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             return availableWorkspaces;
         } catch (SQLException e) {
             throw new DataAccessException(
-                    String.format("Error checking available workspaces on %s from %s to %s",
-                            date, startTime, endTime) + e);
+                    String.format("Error checking available workspaces on %s from %s to %s", startTime, endTime) + e);
         } finally {
             closeResources(conn, stmt, rs);
         }

@@ -3,6 +3,7 @@ package com.andersen.repository.workspace;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -18,5 +19,6 @@ public interface WorkspaceRepository {
 
     boolean deleteWorkspace(Long id) throws DataAccessException;
 
-    List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime, LocalTime endTime) throws DataAccessException;
+    List<Workspace> getAvailableWorkspaces( LocalDateTime startTime, LocalDateTime endTime) throws DataAccessException;
+
 }

@@ -10,7 +10,6 @@ import com.andersen.repository.workspace.WorkspaceRepository;
 import com.andersen.service.auth.SessionManager;
 import com.andersen.service.excption.BookingServiceException;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -50,37 +49,36 @@ public class BookingServiceImpl implements BookingService {
      *
      * @param customer the user making the booking
      * @param workspaceId ID of the workspace to book
-     * @param date booking date (must be today or future)
-     * @param startTime booking start time (must be before endTime)
+     *  @param startTime booking start time (must be before endTime)
      * @param endTime booking end time
      * @return the created Booking object with calculated price
      * @throws BookingServiceException if validation fails, workspace is unavailable,
      *         or data access error occurs
      */
     @Override
-    public Booking createBooking(User customer, Long workspaceId, LocalDate date,
-                                 LocalTime startTime, LocalTime endTime) throws BookingServiceException {
+    public Booking createBooking(User customer, Long workspaceId,
+                                 LocalDateTime startTime, LocalDateTime endTime)
+            throws BookingServiceException {
         try {
-            validateParameters(customer, workspaceId, date, startTime, endTime);
+            // Validate input parameters
+            validateParameters(customer, workspaceId, startTime, endTime);
 
+            // Check workspace availability
             Workspace workspace = workspaceRepository.getWorkspaceById(workspaceId);
-            if (workspace == null || !workspace.isActive()) {
-                throw new BookingServiceException("Workspace not available");
+            if (workspace == null) {
+                throw new BookingServiceException("Workspace not found");
+            }
+            if (!workspace.isActive()) {
+                throw new BookingServiceException("Workspace is not active");
             }
 
-
-
-            double totalPrice = calculatePrice(workspace, startTime, endTime);
-
+            // Create and save booking
             Booking booking = new Booking();
             booking.setCustomer(customer);
             booking.setWorkspace(workspace);
-            booking.setBookingDate(date.atStartOfDay());
-            booking.setStartTime(LocalTime.from(LocalDateTime.from(startTime)));
-            booking.setEndTime(endTime);
+            booking.setStartTime(startTime);  // No need for conversion - already LocalDateTime
+            booking.setEndTime(endTime);      // No need for conversion - already LocalDateTime
             booking.setStatus(BookingStatus.CONFIRMED);
-            booking.setTotalPrice(totalPrice);
-
             return bookingRepository.create(booking);
         } catch (DataAccessException e) {
             throw new BookingServiceException("Failed to create booking: " + e.getMessage(), e);
@@ -88,7 +86,6 @@ public class BookingServiceImpl implements BookingService {
     }
     /**
      * Retrieves all bookings for a specific customer.
-     *
      * @param customerId ID of the customer
      * @return list of bookings for the customer (empty list if none found)
      * @throws BookingServiceException if customerId is null or data access error occurs
@@ -134,40 +131,34 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
-                                                  LocalTime endTime) throws BookingServiceException {
+    public List<Workspace> getAvailableWorkspaces( LocalDateTime startTime,
+                                                   LocalDateTime endTime) throws BookingServiceException {
         try {
-            validateTimeParameters(date, startTime, endTime);
-            return workspaceRepository.getAvailableWorkspaces(date, startTime, endTime);
+            validateTimeParameters(startTime, endTime);
+            return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
         } catch (DataAccessException e) {
             throw new BookingServiceException("Failed to find available workspaces: " + e.getMessage(), e);
         }
     }
 
-
-
-
     // Private helper methods
-    private void validateParameters(User customer, Long workspaceId, LocalDate date,
-                                    LocalTime startTime, LocalTime endTime) throws BookingServiceException {
+    private void validateParameters(User customer, Long workspaceId,
+                                    LocalDateTime startTime, LocalDateTime endTime) throws BookingServiceException {
         if (customer == null || workspaceId == null) {
             throw new BookingServiceException("Customer and workspace must be specified");
         }
-        validateTimeParameters(date, startTime, endTime);
+        validateTimeParameters(startTime,endTime);
     }
 
-    private void validateTimeParameters(LocalDate date, LocalTime startTime,
-                                        LocalTime endTime) throws BookingServiceException {
-        if (date == null || startTime == null || endTime == null) {
-            throw new BookingServiceException("Date and time must be specified");
+    private void validateTimeParameters( LocalDateTime startTime,
+                                         LocalDateTime endTime) throws BookingServiceException {
+        if (endTime.isBefore(startTime)) {
+            throw new BookingServiceException("Cannot book for past dates");
         }
         if (startTime.isAfter(endTime)) {
             throw new BookingServiceException("End time must be after start time");
         }
-        if (date.isBefore(LocalDate.now())) {
-            throw new BookingServiceException("Cannot book for past dates");
-        }
-    }
+          }
 
     private double calculatePrice(Workspace workspace, LocalTime startTime, LocalTime endTime) {
         long hours = ChronoUnit.HOURS.between(startTime, endTime);

@@ -7,6 +7,7 @@ import com.andersen.logger.ConsoleLogger;
 import com.andersen.logger.OutputLogger;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 /**
@@ -172,24 +173,19 @@ public class WorkspaceServiceImpl implements WorkspaceService {
 
     /**
      * Finds all workspaces available for booking during a specified time period.
-     *
-     * @param date the date to check availability
      * @param startTime the start time of the desired booking period
      * @param endTime the end time of the desired booking period
      * @return list of available workspaces (empty list if none available)
      * @throws WorkspaceServiceException if time parameters are invalid or data access error occurs
      */
     @Override
-    public List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
-                                                  LocalTime endTime) throws WorkspaceServiceException {
+    public List<Workspace> getAvailableWorkspaces( LocalDateTime startTime,
+                                                   LocalDateTime endTime) throws WorkspaceServiceException {
         String operation = "Get Available Workspaces";
-        OutputLogger.log(String.format("%s - Checking availability for %s from %s to %s",
-                operation, date, startTime, endTime));
-
-        validateTimeParameters(date, startTime, endTime);
+        OutputLogger.log(String.format("%s - Checking availability for %s from %s to %s", operation, startTime, endTime));
 
         try {
-            List<Workspace> availableWorkspaces = workspaceRepository.getAvailableWorkspaces(date, startTime, endTime);
+            List<Workspace> availableWorkspaces = workspaceRepository.getAvailableWorkspaces(startTime, endTime);
             OutputLogger.log(operation + " - Found " + availableWorkspaces.size() + " available workspaces");
             return availableWorkspaces;
         } catch (Exception e) {

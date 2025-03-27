@@ -18,6 +18,5 @@ public interface BookingRepository {
 
     List<Booking> getByCustomer(Long customerId) throws DataAccessException;
 
-    void updateIsActive(Long bookingId, boolean isActive) throws DataAccessException;
 
 }

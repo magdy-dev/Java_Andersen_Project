@@ -2,9 +2,7 @@ package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.service.excption.WorkspaceServiceException;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface WorkspaceService {
@@ -19,6 +17,6 @@ public interface WorkspaceService {
 
     boolean deleteWorkspace(Long id) throws WorkspaceServiceException;
 
-    List<Workspace> getAvailableWorkspaces(LocalDate date, LocalTime startTime,
-                                           LocalTime endTime) throws WorkspaceServiceException, WorkspaceServiceException;
+    List<Workspace> getAvailableWorkspaces( LocalDateTime startTime,
+                                            LocalDateTime endTime) throws WorkspaceServiceException, WorkspaceServiceException;
 }

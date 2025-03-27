@@ -4,7 +4,6 @@ import com.andersen.entity.role.User;
 import com.andersen.entity.workspace.Workspace;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Objects;
 
 /**
@@ -14,9 +13,8 @@ public class Booking {
     private Long id;
     private User customer;
     private Workspace workspace;
-    private LocalDateTime bookingDate;
-    private LocalTime startTime;
-    private LocalTime endTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
     private BookingStatus status;
     private double totalPrice;
 
@@ -25,30 +23,27 @@ public class Booking {
      */
     public Booking() {
     }
-
     /**
      * Constructs a new Booking with the specified details.
      *
      * @param id          the unique identifier for the booking
      * @param customer    the customer making the booking
      * @param workspace   the workspace being booked
-     * @param bookingDate the date when the booking is made
      * @param startTime   the start time of the booking
      * @param endTime     the end time of the booking
      * @param status      the current status of the booking
      * @param totalPrice  the total price for the booking
      */
-    public Booking(Long id, User customer, Workspace workspace, LocalDateTime bookingDate, LocalTime startTime, LocalTime endTime, BookingStatus status, double totalPrice) {
+    public Booking(Long id, User customer, Workspace workspace, LocalDateTime startTime, LocalDateTime endTime, BookingStatus status, double totalPrice) {
         this.id = id;
         this.customer = customer;
         this.workspace = workspace;
-        this.bookingDate = bookingDate;
+
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = status;
         this.totalPrice = totalPrice;
     }
-
     /**
      * Gets the unique identifier for the booking.
      *
@@ -102,31 +97,12 @@ public class Booking {
     public void setWorkspace(Workspace workspace) {
         this.workspace = workspace;
     }
-
-    /**
-     * Gets the booking date.
-     *
-     * @return the booking date and time
-     */
-    public LocalDateTime getBookingDate() {
-        return bookingDate;
-    }
-
-    /**
-     * Sets the booking date.
-     *
-     * @param bookingDate the booking date to set
-     */
-    public void setBookingDate(LocalDateTime bookingDate) {
-        this.bookingDate = bookingDate;
-    }
-
     /**
      * Gets the start time of the booking.
      *
      * @return the start time
      */
-    public LocalTime getStartTime() {
+    public LocalDateTime getStartTime() {
         return startTime;
     }
 
@@ -135,7 +111,7 @@ public class Booking {
      *
      * @param startTime the start time to set
      */
-    public void setStartTime(LocalTime startTime) {
+    public void setStartTime(LocalDateTime startTime) {
         this.startTime = startTime;
     }
 
@@ -144,7 +120,7 @@ public class Booking {
      *
      * @return the end time
      */
-    public LocalTime getEndTime() {
+    public LocalDateTime getEndTime() {
         return endTime;
     }
 
@@ -153,7 +129,7 @@ public class Booking {
      *
      * @param endTime the end time to set
      */
-    public void setEndTime(LocalTime endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
@@ -192,12 +168,12 @@ public class Booking {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Booking booking = (Booking) o;
-        return Double.compare(totalPrice, booking.totalPrice) == 0 && Objects.equals(id, booking.id) && Objects.equals(customer, booking.customer) && Objects.equals(workspace, booking.workspace) && Objects.equals(bookingDate, booking.bookingDate) && Objects.equals(startTime, booking.startTime) && Objects.equals(endTime, booking.endTime) && status == booking.status;
+        return Double.compare(totalPrice, booking.totalPrice) == 0 && Objects.equals(id, booking.id) && Objects.equals(customer, booking.customer) && Objects.equals(workspace, booking.workspace) && Objects.equals(startTime, booking.startTime) && Objects.equals(endTime, booking.endTime) && status == booking.status;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, customer, workspace, bookingDate, startTime, endTime, status, totalPrice);
+        return Objects.hash(id, customer, workspace, startTime, endTime, status, totalPrice);
     }
 
     @Override
@@ -206,7 +182,6 @@ public class Booking {
                 "id=" + id +
                 ", customer=" + customer +
                 ", workspace=" + workspace +
-                ", bookingDate=" + bookingDate +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", status=" + status +
