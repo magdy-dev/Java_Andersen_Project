@@ -2,11 +2,11 @@ package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
-import com.andersen.repository.workspace.WorkspaceRepository;
+import com.andersen.exception.ErrorCode;
+import com.andersen.repository_criteria_API.workspace.WorkspaceRepository;
 import com.andersen.service.excption.WorkspaceServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -57,7 +57,7 @@ class WorkspaceServiceImplTest {
     @Test
     void createWorkspace_ShouldThrowWhenRepositoryFails() throws DataAccessException {
         when(workspaceRepository.createWorkspace(validWorkspace))
-                .thenThrow(new DataAccessException("DB error"));
+                .thenThrow(new DataAccessException("DB error", ErrorCode.WS_001));
 
         assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(validWorkspace));

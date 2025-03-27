@@ -6,12 +6,20 @@
         </Console>
     </Appenders>
     <Loggers>
+        <!-- Logger for BookingRepositoryImpl -->
+        <Logger name="com.andersen.repository_criteria_API.booking.BookingRepositoryImpl" level="info" additivity="false">
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- Other loggers -->
         <Logger name="UserOutPut" level="info" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
         <Logger name="Loge" level="debug" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
+
+        <!-- Root logger -->
         <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>

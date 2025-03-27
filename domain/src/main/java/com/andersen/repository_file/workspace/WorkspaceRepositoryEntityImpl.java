@@ -1,4 +1,4 @@
-package com.andersen.repositoryold.workspace;
+package com.andersen.repository_file.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.WorkspaceNotFoundException;

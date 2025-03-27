@@ -1,10 +1,8 @@
-package com.andersen.repository.booking;
+package com.andersen.repository_sqlquery.booking;
 
 import com.andersen.entity.booking.Booking;
 import com.andersen.exception.DataAccessException;
 
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public interface BookingRepository {

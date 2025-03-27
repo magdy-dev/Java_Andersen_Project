@@ -1,4 +1,4 @@
-package com.andersen.repository.user;
+package com.andersen.repository_sqlquery.user;
 
 import com.andersen.entity.role.User;
 import com.andersen.exception.DataAccessException;

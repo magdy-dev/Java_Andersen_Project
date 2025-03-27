@@ -1,4 +1,4 @@
-package com.andersen.repositoryold.booking;
+package com.andersen.repository_file.booking;
 
 import com.andersen.entity.booking.Booking;
 

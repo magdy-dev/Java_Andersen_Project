@@ -1,10 +1,8 @@
-package com.andersen.repository.workspace;
+package com.andersen.repository_sqlquery.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public interface WorkspaceRepository {

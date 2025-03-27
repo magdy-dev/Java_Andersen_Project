@@ -1,4 +1,4 @@
-package com.andersen.repository.booking;
+package com.andersen.repository_sqlquery.booking;
 
 import com.andersen.connection.DatabaseConnection;
 import com.andersen.entity.booking.Booking;
@@ -6,6 +6,7 @@ import com.andersen.entity.booking.BookingStatus;
 import com.andersen.entity.role.User;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
+import com.andersen.exception.ErrorCode;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class BookingRepositoryImpl implements BookingRepository {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new DataAccessException("Creating booking failed, no rows affected.");
+                throw new DataAccessException("Creating booking failed, no rows affected.", ErrorCode.BK_001);
             }
 
             generatedKeys = stmt.getGeneratedKeys();
@@ -48,10 +49,10 @@ public class BookingRepositoryImpl implements BookingRepository {
                 booking.setId(generatedKeys.getLong(1));
                 return booking;
             } else {
-                throw new DataAccessException("Creating booking failed, no ID obtained.");
+                throw new DataAccessException("Creating booking failed, no ID obtained.",ErrorCode.BK_001);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to create booking: " + e.getMessage() + e);
+            throw new DataAccessException("Failed to create booking: " + e.getMessage() + e,ErrorCode.BK_001);
         } finally {
             closeResources(conn, stmt, generatedKeys);
         }
@@ -72,9 +73,9 @@ public class BookingRepositoryImpl implements BookingRepository {
             if (rs.next()) {
                 return mapResultSetToBooking(rs);
             }
-            throw new DataAccessException("Booking not found with id: " + id);
+            throw new DataAccessException("Booking not found with id: " + id, ErrorCode.BK_002);
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to get booking by id: " + id + e);
+            throw new DataAccessException("Failed to get booking by id: " + id + e, ErrorCode.BK_002);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -96,11 +97,11 @@ public class BookingRepositoryImpl implements BookingRepository {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new DataAccessException("Updating booking failed, no rows affected.");
+                throw new DataAccessException("Updating booking failed, no rows affected.", ErrorCode.BK_003);
             }
             return booking;
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to update booking: " + booking.getId() + e);
+            throw new DataAccessException("Failed to update booking: " + booking.getId() + e, ErrorCode.BK_003);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -118,10 +119,10 @@ public class BookingRepositoryImpl implements BookingRepository {
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
-                throw new DataAccessException("Deleting booking failed, no rows affected.");
+                throw new DataAccessException("Deleting booking failed, no rows affected.", ErrorCode.BK_004);
             }
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to delete booking: " + id + e);
+            throw new DataAccessException("Failed to delete booking: " + id + e, ErrorCode.BK_004);
         } finally {
             closeResources(conn, stmt, null);
         }
@@ -145,7 +146,7 @@ public class BookingRepositoryImpl implements BookingRepository {
             }
             return bookings;
         } catch (SQLException e) {
-            throw new DataAccessException("Failed to get bookings for customer: " + customerId + e);
+            throw new DataAccessException("Failed to get bookings for customer: " + customerId + e, ErrorCode.BK_006);
         } finally {
             closeResources(conn, stmt, rs);
         }
@@ -183,7 +184,7 @@ public class BookingRepositoryImpl implements BookingRepository {
             if (conn != null) {conn.close();}
         } catch (SQLException e) {
 
-            throw new DataAccessException("Error closing database resources: " + e.getMessage());
+            throw new DataAccessException("Error closing database resources: " + e.getMessage(), ErrorCode.BK_006);
         }
     }
 }
