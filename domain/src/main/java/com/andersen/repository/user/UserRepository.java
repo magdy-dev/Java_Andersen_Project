@@ -1,4 +1,4 @@
-package com.andersen.repository_criteria_API.user;
+package com.andersen.repository.user;
 
 import com.andersen.entity.role.User;
 import com.andersen.exception.DataAccessException;
@@ -15,4 +15,6 @@ public interface UserRepository {
     boolean updateUser(User user) throws DataAccessException;
 
     boolean deleteUser(Long id) throws DataAccessException;
+
+
 }

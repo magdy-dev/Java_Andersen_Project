@@ -2,9 +2,9 @@ package com.andersen;
 
 import com.andersen.controller.*;
 
-import com.andersen.repository_criteria_API.booking.BookingRepositoryImpl;
-import com.andersen.repository_criteria_API.user.UserRepositoryImpl;
-import com.andersen.repository_criteria_API.workspace.WorkspaceRepositoryImpl;
+import com.andersen.repository.booking.BookingRepositoryImpl;
+import com.andersen.repository.user.UserRepositoryImpl;
+import com.andersen.repository.workspace.WorkspaceRepositoryImpl;
 import com.andersen.service.auth.AuthServiceImpl;
 import com.andersen.service.auth.SessionManager;
 import com.andersen.service.booking.BookingServiceImpl;
@@ -26,7 +26,7 @@ public class Main {
         // Initialize services
         AuthServiceImpl authService = new AuthServiceImpl(userRepository, sessionManager);
         WorkspaceServiceImpl workspaceService = new WorkspaceServiceImpl(workspaceRepository);
-        BookingServiceImpl bookingService = new BookingServiceImpl(bookingRepository, workspaceRepository, sessionManager);
+        BookingServiceImpl bookingService = new BookingServiceImpl(bookingRepository, workspaceRepository);
 
         // Initialize controllers
         Admin admin = new Admin(scanner, workspaceService, bookingService, sessionManager);

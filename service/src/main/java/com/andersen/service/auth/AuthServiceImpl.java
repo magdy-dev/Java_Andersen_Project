@@ -1,11 +1,12 @@
 package com.andersen.service.auth;
 
-import com.andersen.repository.user.UserRepository;
+
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
 import com.andersen.exception.DataAccessException;
-import com.andersen.service.exception.AuthenticationException;
-import com.andersen.service.exception.RegistrationException;
+import com.andersen.repository_criteria_API.user.UserRepository;
+import com.andersen.service.excption.AuthenticationException;
+import com.andersen.service.excption.RegistrationException;
 import com.andersen.logger.OutputLogger;
 
 import java.security.MessageDigest;

@@ -9,7 +9,7 @@ import com.andersen.exception.DataAccessException;
 import com.andersen.repository_criteria_API.booking.BookingRepository;
 import com.andersen.repository_criteria_API.workspace.WorkspaceRepository;
 import com.andersen.service.auth.SessionManager;
-import com.andersen.service.exception.BookingException;
+import com.andersen.service.excption.BookingServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -51,7 +51,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void createBooking_ShouldSuccess() throws DataAccessException, BookingException {
+    void createBooking_ShouldSuccess() throws DataAccessException, BookingServiceException {
         when(workspaceRepository.getWorkspaceById(1L)).thenReturn(testWorkspace);
         when(bookingRepository.create(any(Booking.class))).thenAnswer(invocation -> {
             Booking b = invocation.getArgument(0);
@@ -73,7 +73,7 @@ class BookingServiceImplTest {
     void createBooking_ShouldThrowWhenWorkspaceNotFound() throws DataAccessException {
         when(workspaceRepository.getWorkspaceById(1L));
 
-        assertThrows(BookingException.class,
+        assertThrows(BookingServiceException.class,
                 () -> bookingService.createBooking(testUser, 1L, startTime, endTime));
     }
 
@@ -82,19 +82,19 @@ class BookingServiceImplTest {
         testWorkspace.setActive(false);
         when(workspaceRepository.getWorkspaceById(1L));
 
-        assertThrows(BookingException.class,
+        assertThrows(BookingServiceException.class,
                 () -> bookingService.createBooking(testUser, 1L, startTime, endTime));
     }
 
     @Test
     void createBooking_ShouldThrowWhenInvalidTime() {
         // End time before start time
-        assertThrows(BookingException.class,
+        assertThrows(BookingServiceException.class,
                 () -> bookingService.createBooking(testUser, 1L, endTime, startTime));
     }
 
     @Test
-    void getCustomerBookings_ShouldReturnList() throws DataAccessException, BookingException {
+    void getCustomerBookings_ShouldReturnList() throws DataAccessException, BookingServiceException {
         Booking testBooking = new Booking(1L, testUser, testWorkspace,
                 startTime, endTime, BookingStatus.CONFIRMED, 30.0);
         when(bookingRepository.getByCustomer(1L));
@@ -107,12 +107,12 @@ class BookingServiceImplTest {
 
     @Test
     void getCustomerBookings_ShouldThrowWhenCustomerIdNull() {
-        assertThrows(BookingException.class,
+        assertThrows(BookingServiceException.class,
                 () -> bookingService.getCustomerBookings(null));
     }
 
     @Test
-    void cancelBooking_ShouldSuccess() throws DataAccessException, BookingException {
+    void cancelBooking_ShouldSuccess() throws DataAccessException, BookingServiceException {
         Booking testBooking = new Booking(1L, testUser, testWorkspace,
                 startTime, endTime, BookingStatus.CONFIRMED, 30.0);
         when(bookingRepository.getById(1L));
@@ -125,7 +125,7 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void cancelBooking_ShouldReturnFalseWhenAlreadyCancelled() throws DataAccessException, BookingException {
+    void cancelBooking_ShouldReturnFalseWhenAlreadyCancelled() throws DataAccessException, BookingServiceException {
         Booking testBooking = new Booking(1L, testUser, testWorkspace,
                 startTime, endTime, BookingStatus.CANCELLED, 30.0);
         when(bookingRepository.getById(1L));
@@ -142,12 +142,12 @@ class BookingServiceImplTest {
                 startTime, endTime, BookingStatus.CONFIRMED, 30.0);
         when(bookingRepository.getById(1L));
 
-        assertThrows(BookingException.class,
+        assertThrows(BookingServiceException.class,
                 () -> bookingService.cancelBooking(1L, 2L)); // Different user ID
     }
 
     @Test
-    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, BookingException {
+    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, BookingServiceException {
         when(workspaceRepository.getAvailableWorkspaces(startTime, endTime))
                 .thenReturn(List.of(testWorkspace));
 
@@ -159,12 +159,12 @@ class BookingServiceImplTest {
 
     @Test
     void getAvailableWorkspaces_ShouldThrowWhenInvalidTime() {
-        assertThrows(BookingException.class,
+        assertThrows(BookingServiceException.class,
                 () -> bookingService.getAvailableWorkspaces(endTime, startTime)); // End before start
     }
 
     @Test
-    void getAvailableWorkspaces_ShouldReturnEmptyList() throws DataAccessException, BookingException {
+    void getAvailableWorkspaces_ShouldReturnEmptyList() throws DataAccessException, BookingServiceException {
         when(workspaceRepository.getAvailableWorkspaces(startTime, endTime))
                 .thenReturn(Collections.emptyList());
         List<Workspace> result = bookingService.getAvailableWorkspaces(startTime, endTime);

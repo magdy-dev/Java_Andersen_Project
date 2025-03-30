@@ -9,7 +9,7 @@ import com.andersen.exception.DataAccessException;
 import com.andersen.repository_criteria_API.booking.BookingRepository;
 import com.andersen.repository_criteria_API.workspace.WorkspaceRepository;
 import com.andersen.service.auth.SessionManager;
-import com.andersen.service.exception.BookingException;
+import com.andersen.service.excption.BookingServiceException;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -53,13 +53,13 @@ public class BookingServiceImpl implements BookingService {
      *  @param startTime booking start time (must be before endTime)
      * @param endTime booking end time
      * @return the created Booking object with calculated price
-     * @throws BookingException if validation fails, workspace is unavailable,
+     * @throws BookingServiceException if validation fails, workspace is unavailable,
      *         or data access error occurs
      */
     @Override
     public Booking createBooking(User customer, Long workspaceId,
                                  LocalDateTime startTime, LocalDateTime endTime)
-            throws BookingException {
+            throws BookingServiceException {
         try {
             // Validate input parameters
             validateParameters(customer, workspaceId, startTime, endTime);
@@ -67,10 +67,10 @@ public class BookingServiceImpl implements BookingService {
             // Check workspace availability
             Workspace workspace = workspaceRepository.getWorkspaceById(workspaceId);
             if (workspace == null) {
-                throw new BookingException("Workspace not found");
+                throw new BookingServiceException("Workspace not found");
             }
             if (!workspace.isActive()) {
-                throw new BookingException("Workspace is not active");
+                throw new BookingServiceException("Workspace is not active");
             }
 
             // Create and save booking
@@ -82,41 +82,41 @@ public class BookingServiceImpl implements BookingService {
             booking.setStatus(BookingStatus.CONFIRMED);
             return bookingRepository.create(booking);
         } catch (DataAccessException e) {
-            throw new BookingException("Failed to create booking: " + e.getMessage(), e);
+            throw new BookingServiceException("Failed to create booking: " + e.getMessage(), e);
         }
     }
     /**
      * Retrieves all bookings for a specific customer.
      * @param customerId ID of the customer
      * @return list of bookings for the customer (empty list if none found)
-     * @throws BookingException if customerId is null or data access error occurs
+     * @throws BookingServiceException if customerId is null or data access error occurs
      */
     @Override
-    public List<Booking> getCustomerBookings(Long customerId) throws BookingException {
+    public List<Booking> getCustomerBookings(Long customerId) throws BookingServiceException {
         try {
             if (customerId == null) {
-                throw new BookingException("Customer ID cannot be null");
+                throw new BookingServiceException("Customer ID cannot be null");
             }
             return bookingRepository.getByCustomer(customerId);
         } catch (DataAccessException e) {
-            throw new BookingException("Failed to get bookings: " + e.getMessage(), e);
+            throw new BookingServiceException("Failed to get bookings: " + e.getMessage(), e);
         }
     }
 
     @Override
-    public boolean cancelBooking(Long bookingId, Long userId) throws BookingException {
+    public boolean cancelBooking(Long bookingId, Long userId) throws BookingServiceException {
         try {
             if (bookingId == null || userId == null) {
-                throw new BookingException("Invalid parameters");
+                throw new BookingServiceException("Invalid parameters");
             }
 
             Booking booking = bookingRepository.getById(bookingId);
             if (booking == null) {
-                throw new BookingException("Booking not found");
+                throw new BookingServiceException("Booking not found");
             }
 
             if (!booking.getCustomer().getId().equals(userId)) {
-                throw new BookingException("Unauthorized to cancel this booking");
+                throw new BookingServiceException("Unauthorized to cancel this booking");
             }
 
             if (booking.getStatus() == BookingStatus.CANCELLED) {
@@ -127,37 +127,37 @@ public class BookingServiceImpl implements BookingService {
             bookingRepository.update(booking);
             return true;
         } catch (DataAccessException e) {
-            throw new BookingException("Failed to cancel booking: " + e.getMessage(), e);
+            throw new BookingServiceException("Failed to cancel booking: " + e.getMessage(), e);
         }
     }
 
     @Override
     public List<Workspace> getAvailableWorkspaces( LocalDateTime startTime,
-                                                   LocalDateTime endTime) throws BookingException {
+                                                   LocalDateTime endTime) throws BookingServiceException {
         try {
             validateTimeParameters(startTime, endTime);
             return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
         } catch (DataAccessException e) {
-            throw new BookingException("Failed to find available workspaces: " + e.getMessage(), e);
+            throw new BookingServiceException("Failed to find available workspaces: " + e.getMessage(), e);
         }
     }
 
     // Private helper methods
     private void validateParameters(User customer, Long workspaceId,
-                                    LocalDateTime startTime, LocalDateTime endTime) throws BookingException {
+                                    LocalDateTime startTime, LocalDateTime endTime) throws BookingServiceException {
         if (customer == null || workspaceId == null) {
-            throw new BookingException("Customer and workspace must be specified");
+            throw new BookingServiceException("Customer and workspace must be specified");
         }
         validateTimeParameters(startTime,endTime);
     }
 
     private void validateTimeParameters( LocalDateTime startTime,
-                                         LocalDateTime endTime) throws BookingException {
+                                         LocalDateTime endTime) throws BookingServiceException {
         if (endTime.isBefore(startTime)) {
-            throw new BookingException("Cannot book for past dates");
+            throw new BookingServiceException("Cannot book for past dates");
         }
         if (startTime.isAfter(endTime)) {
-            throw new BookingException("End time must be after start time");
+            throw new BookingServiceException("End time must be after start time");
         }
           }
 

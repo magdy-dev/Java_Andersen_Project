@@ -2,8 +2,9 @@ package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
-import com.andersen.repository.workspace.WorkspaceRepository;
-import com.andersen.service.exception.WorkspaceException;
+import com.andersen.exception.ErrorCode;
+import com.andersen.repository_criteria_API.workspace.WorkspaceRepository;
+import com.andersen.service.excption.WorkspaceServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -37,7 +38,7 @@ class WorkspaceServiceImplTest {
     }
 
     @Test
-    void createWorkspace_ShouldSuccess() throws DataAccessException, WorkspaceException {
+    void createWorkspace_ShouldSuccess() throws DataAccessException, WorkspaceServiceException {
         when(workspaceRepository.createWorkspace(validWorkspace)).thenReturn(validWorkspace);
 
         Workspace result = workspaceService.createWorkspace(validWorkspace);
@@ -49,21 +50,21 @@ class WorkspaceServiceImplTest {
 
     @Test
     void createWorkspace_ShouldThrowWhenInvalidWorkspace() {
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(invalidWorkspace));
     }
 
     @Test
     void createWorkspace_ShouldThrowWhenRepositoryFails() throws DataAccessException {
         when(workspaceRepository.createWorkspace(validWorkspace))
-                .thenThrow(new DataAccessException("DB error"));
+                .thenThrow(new DataAccessException("DB error", ErrorCode.WS_001));
 
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(validWorkspace));
     }
 
     @Test
-    void getAllWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceException {
+    void getAllWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceServiceException {
         List<Workspace> workspaces = Arrays.asList(validWorkspace);
         when(workspaceRepository.getAllWorkspaces()).thenReturn(workspaces);
 
@@ -74,7 +75,7 @@ class WorkspaceServiceImplTest {
     }
 
     @Test
-    void getAllWorkspaces_ShouldReturnEmptyList() throws DataAccessException, WorkspaceException {
+    void getAllWorkspaces_ShouldReturnEmptyList() throws DataAccessException, WorkspaceServiceException {
         when(workspaceRepository.getAllWorkspaces()).thenReturn(Collections.emptyList());
 
         List<Workspace> result = workspaceService.getAllWorkspaces();
@@ -83,7 +84,7 @@ class WorkspaceServiceImplTest {
     }
 
     @Test
-    void getWorkspaceById_ShouldReturnWorkspace() throws DataAccessException, WorkspaceException {
+    void getWorkspaceById_ShouldReturnWorkspace() throws DataAccessException, WorkspaceServiceException {
         when(workspaceRepository.getWorkspaceById(1L)).thenReturn(validWorkspace);
 
         Workspace result = workspaceService.getWorkspaceById(1L);
@@ -94,12 +95,12 @@ class WorkspaceServiceImplTest {
 
     @Test
     void getWorkspaceById_ShouldThrowWhenIdNull() {
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.getWorkspaceById(null));
     }
 
     @Test
-    void updateWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceException {
+    void updateWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceServiceException {
         when(workspaceRepository.updateWorkspace(validWorkspace)).thenReturn(true);
 
         boolean result = workspaceService.updateWorkspace(validWorkspace);
@@ -109,12 +110,12 @@ class WorkspaceServiceImplTest {
 
     @Test
     void updateWorkspace_ShouldThrowWhenInvalidWorkspace() {
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.updateWorkspace(invalidWorkspace));
     }
 
     @Test
-    void deleteWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceException {
+    void deleteWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceServiceException {
         when(workspaceRepository.deleteWorkspace(1L)).thenReturn(true);
 
         boolean result = workspaceService.deleteWorkspace(1L);
@@ -124,12 +125,12 @@ class WorkspaceServiceImplTest {
 
     @Test
     void deleteWorkspace_ShouldThrowWhenIdNull() {
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.deleteWorkspace(null));
     }
 
     @Test
-    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceException {
+    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceServiceException {
         LocalDateTime startTime = LocalDateTime.now().plusDays(1);
         LocalDateTime endTime = startTime.plusHours(3);
 
@@ -144,28 +145,28 @@ class WorkspaceServiceImplTest {
 
     @Test
     void validateWorkspace_ShouldThrowWhenNull() {
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(null));
     }
 
     @Test
     void validateWorkspace_ShouldThrowWhenEmptyName() {
         Workspace workspace = new Workspace(null, "", "Desc", null, 10.0, 4, true, null);
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(workspace));
     }
 
     @Test
     void validateWorkspace_ShouldThrowWhenInvalidPrice() {
         Workspace workspace = new Workspace(null, "Name", "Desc", null, -1.0, 4, true, null);
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(workspace));
     }
 
     @Test
     void validateWorkspace_ShouldThrowWhenInvalidCapacity() {
         Workspace workspace = new Workspace(null, "Name", "Desc", null, 10.0, 0, true, null);
-        assertThrows(WorkspaceException.class,
+        assertThrows(WorkspaceServiceException.class,
                 () -> workspaceService.createWorkspace(workspace));
     }
 }
