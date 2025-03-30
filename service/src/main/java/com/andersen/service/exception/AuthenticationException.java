@@ -1,4 +1,4 @@
-package com.andersen.service.excption;
+package com.andersen.service.exception;
 
 public class AuthenticationException extends Throwable {
     public AuthenticationException(String invalidUsernameOrPassword) {

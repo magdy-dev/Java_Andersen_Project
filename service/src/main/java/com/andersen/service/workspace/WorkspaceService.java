@@ -1,7 +1,7 @@
 package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.service.excption.WorkspaceException;
+import com.andersen.service.exception.WorkspaceException;
 import java.time.LocalDateTime;
 import java.util.List;
 

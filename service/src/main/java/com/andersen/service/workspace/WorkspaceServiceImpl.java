@@ -2,7 +2,7 @@ package com.andersen.service.workspace;
 
 import com.andersen.repository.workspace.WorkspaceRepository;
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.service.excption.WorkspaceException;
+import com.andersen.service.exception.WorkspaceException;
 import com.andersen.logger.ConsoleLogger;
 import com.andersen.logger.OutputLogger;
 

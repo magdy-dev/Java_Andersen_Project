@@ -3,7 +3,7 @@ package com.andersen.service.booking;
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.role.User;
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.service.excption.BookingException;
+import com.andersen.service.exception.BookingException;
 
 import java.time.LocalDateTime;
 import java.util.List;

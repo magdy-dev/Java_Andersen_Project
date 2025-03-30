@@ -8,7 +8,7 @@ import com.andersen.exception.DataAccessException;
 import com.andersen.repository.booking.BookingRepository;
 import com.andersen.repository.workspace.WorkspaceRepository;
 import com.andersen.service.auth.SessionManager;
-import com.andersen.service.excption.BookingException;
+import com.andersen.service.exception.BookingException;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

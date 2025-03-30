@@ -3,7 +3,7 @@ package com.andersen.service.workspace;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
 import com.andersen.repository.workspace.WorkspaceRepository;
-import com.andersen.service.excption.WorkspaceException;
+import com.andersen.service.exception.WorkspaceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

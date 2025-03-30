@@ -3,7 +3,7 @@ package com.andersen.controller;
 import com.andersen.service.auth.AuthService;
 import com.andersen.entity.role.User;
 import com.andersen.service.auth.SessionManager;
-import com.andersen.service.excption.AuthenticationException;
+import com.andersen.service.exception.AuthenticationException;
 import com.andersen.logger.OutputLogger; // Import the OutputLogger
 import java.util.Scanner;
 
