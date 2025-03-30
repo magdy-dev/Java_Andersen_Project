@@ -1,4 +1,4 @@
-package com.andersen.repository.workspace;
+package com.andersen.repository_Criteria.workspace;
 
 import com.andersen.entity.booking.Booking;
 import com.andersen.entity.booking.BookingStatus;

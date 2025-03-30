@@ -3,7 +3,7 @@ package com.andersen.service.auth;
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
 import com.andersen.exception.DataAccessException;
-import com.andersen.repository.user.UserRepository;
+import com.andersen.repository_Criteria.user.UserRepository;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
 import com.andersen.logger.ConsoleLogger;

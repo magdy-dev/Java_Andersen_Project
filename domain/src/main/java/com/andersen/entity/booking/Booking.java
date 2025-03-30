@@ -35,6 +35,9 @@ public class Booking {
     @Column(nullable = false)
     private BookingStatus status; // Current status of the booking
 
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private boolean isActive = true;
+
     @Column(name = "total_price", nullable = true)
     private double totalPrice; // Total price of the booking
 
@@ -124,6 +127,24 @@ public class Booking {
     }
 
     /**
+     * Determines whether the object is active.
+     *
+     * @return true if the object is active, false otherwise.
+     */
+    public boolean isActive() {
+        return isActive;
+    }
+
+    /**
+     * Sets the active state of the object.
+     *
+     * @param active true to set the object as active, false to set it as inactive.
+     */
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    /**
      * Returns the start time of the booking.
      *
      * @return the start time of the booking
@@ -195,36 +216,41 @@ public class Booking {
         this.totalPrice = totalPrice;
     }
 
-    // equals, hashCode, and toString
-
     /**
-     * Compares this booking to the specified object for equality.
+     * Compares this Booking object to the specified object for equality.
+     * Two Booking objects are considered equal if they have the same values
+     * for the fields: isActive, totalPrice, id, customer, workspace,
+     * startTime, endTime, and status.
      *
-     * @param o the object to compare for equality with this booking
-     * @return true if the specified object is equal to this booking; false otherwise
+     * @param o the object to compare to this Booking
+     * @return true if the specified object is equal to this Booking, false otherwise
      */
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Booking booking = (Booking) o;
-        return Double.compare(booking.totalPrice, totalPrice) == 0 &&
+        return isActive == booking.isActive && Double.compare(totalPrice, booking.totalPrice) == 0 &&
                 Objects.equals(id, booking.id) &&
+                Objects.equals(customer, booking.customer) &&
+                Objects.equals(workspace, booking.workspace) &&
                 Objects.equals(startTime, booking.startTime) &&
                 Objects.equals(endTime, booking.endTime) &&
                 status == booking.status;
     }
 
     /**
-     * Returns a hash code value for this booking.
+     * Returns a hash code value for this Booking object.
+     * The hash code is calculated based on the values of the fields:
+     * id, customer, workspace, startTime, endTime, status,
+     * isActive, and totalPrice. This ensures that two equal Booking
+     * objects have the same hash code.
      *
-     * @return a hash code value for this booking, based on its attributes
+     * @return a hash code value for this Booking object
      */
     @Override
     public int hashCode() {
-        return Objects.hash(id, startTime, endTime, status, totalPrice);
+        return Objects.hash(id, customer, workspace, startTime, endTime, status, isActive, totalPrice);
     }
-
     /**
      * Returns a string representation of the booking.
      *

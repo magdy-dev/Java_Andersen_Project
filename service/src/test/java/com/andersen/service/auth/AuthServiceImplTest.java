@@ -7,7 +7,7 @@ import com.andersen.exception.DataAccessException;
 import com.andersen.logger.OutputLogger;
 
 
-import com.andersen.repository.user.UserRepository;
+import com.andersen.repository_Criteria.user.UserRepository;
 import com.andersen.service.exception.AuthenticationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
