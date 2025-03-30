@@ -167,7 +167,7 @@ public class AuthServiceImpl implements AuthService {
      * @return the hashed password as a Base64-encoded string
      * @throws AuthenticationException if hashing fails due to an unsupported algorithm
      */
-    private String hashPassword(String password) throws AuthenticationException {
+    String hashPassword(String password) throws AuthenticationException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(password.getBytes());
