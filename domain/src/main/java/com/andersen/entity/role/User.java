@@ -148,7 +148,13 @@ public class User {
     public void setRole(UserRole role) {
         this.role = role;
     }
-
+    /**
+     * Compares this user to the specified object for equality.
+     *
+     * @param o the object to be compared for equality with this user
+     * @return true if the specified object is equal to this user;
+     *         false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -160,12 +166,23 @@ public class User {
                 Objects.equals(fullName, user.fullName) &&
                 role == user.role;
     }
+    /**
+     * Returns a hash code value for this user.
+     *
+     * @return a hash code value for this user, based on its attributes,
+     *         which is useful for hashing data structures such as hash tables.
+     */
 
     @Override
     public int hashCode() {
         return Objects.hash(id, username, password, email, fullName, role);
     }
-
+    /**
+     * Returns a string representation of the user.
+     *
+     * @return a string representation of this user, including its
+     *         id, username, email, full name, and role.
+     */
     @Override
     public String toString() {
         return "User{" +

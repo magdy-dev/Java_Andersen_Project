@@ -159,23 +159,44 @@ public class Booking {
     public double getTotalPrice() {
         return totalPrice;
     }
-
+    /**
+     * Sets the total price for the booking.
+     *
+     * @param totalPrice the total price of the booking.
+     *                   This value represents the final amount to be charged.
+     */
     public void setTotalPrice(double totalPrice) {
         this.totalPrice = totalPrice;
     }
-
+    /**
+     * Compares this booking to the specified object for equality.
+     *
+     * @param o the object to be compared for equality with this booking
+     * @return true if the specified object is equal to this booking;
+     *         false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Booking booking = (Booking) o;
         return Double.compare(totalPrice, booking.totalPrice) == 0 && Objects.equals(id, booking.id) && Objects.equals(customer, booking.customer) && Objects.equals(workspace, booking.workspace) && Objects.equals(startTime, booking.startTime) && Objects.equals(endTime, booking.endTime) && status == booking.status;
     }
-
+    /**
+     * Returns a hash code value for this booking.
+     *
+     * @return a hash code value for this booking, based on its attributes
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, customer, workspace, startTime, endTime, status, totalPrice);
     }
-
+    /**
+     * Returns a string representation of the booking.
+     *
+     * @return a string representation of this booking, including its
+     *         id, customer, workspace, start and end times, status,
+     *         and total price
+     */
     @Override
     public String toString() {
         return "Booking{" +

@@ -3,10 +3,9 @@ package com.andersen.service.workspace;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
 import com.andersen.repository.workspace.WorkspaceRepository;
-import com.andersen.service.excption.WorkspaceServiceException;
+import com.andersen.service.excption.WorkspaceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
@@ -38,7 +37,7 @@ class WorkspaceServiceImplTest {
     }
 
     @Test
-    void createWorkspace_ShouldSuccess() throws DataAccessException, WorkspaceServiceException {
+    void createWorkspace_ShouldSuccess() throws DataAccessException, WorkspaceException {
         when(workspaceRepository.createWorkspace(validWorkspace)).thenReturn(validWorkspace);
 
         Workspace result = workspaceService.createWorkspace(validWorkspace);
@@ -50,7 +49,7 @@ class WorkspaceServiceImplTest {
 
     @Test
     void createWorkspace_ShouldThrowWhenInvalidWorkspace() {
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.createWorkspace(invalidWorkspace));
     }
 
@@ -59,12 +58,12 @@ class WorkspaceServiceImplTest {
         when(workspaceRepository.createWorkspace(validWorkspace))
                 .thenThrow(new DataAccessException("DB error"));
 
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.createWorkspace(validWorkspace));
     }
 
     @Test
-    void getAllWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceServiceException {
+    void getAllWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceException {
         List<Workspace> workspaces = Arrays.asList(validWorkspace);
         when(workspaceRepository.getAllWorkspaces()).thenReturn(workspaces);
 
@@ -75,7 +74,7 @@ class WorkspaceServiceImplTest {
     }
 
     @Test
-    void getAllWorkspaces_ShouldReturnEmptyList() throws DataAccessException, WorkspaceServiceException {
+    void getAllWorkspaces_ShouldReturnEmptyList() throws DataAccessException, WorkspaceException {
         when(workspaceRepository.getAllWorkspaces()).thenReturn(Collections.emptyList());
 
         List<Workspace> result = workspaceService.getAllWorkspaces();
@@ -84,7 +83,7 @@ class WorkspaceServiceImplTest {
     }
 
     @Test
-    void getWorkspaceById_ShouldReturnWorkspace() throws DataAccessException, WorkspaceServiceException {
+    void getWorkspaceById_ShouldReturnWorkspace() throws DataAccessException, WorkspaceException {
         when(workspaceRepository.getWorkspaceById(1L)).thenReturn(validWorkspace);
 
         Workspace result = workspaceService.getWorkspaceById(1L);
@@ -95,12 +94,12 @@ class WorkspaceServiceImplTest {
 
     @Test
     void getWorkspaceById_ShouldThrowWhenIdNull() {
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.getWorkspaceById(null));
     }
 
     @Test
-    void updateWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceServiceException {
+    void updateWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceException {
         when(workspaceRepository.updateWorkspace(validWorkspace)).thenReturn(true);
 
         boolean result = workspaceService.updateWorkspace(validWorkspace);
@@ -110,12 +109,12 @@ class WorkspaceServiceImplTest {
 
     @Test
     void updateWorkspace_ShouldThrowWhenInvalidWorkspace() {
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.updateWorkspace(invalidWorkspace));
     }
 
     @Test
-    void deleteWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceServiceException {
+    void deleteWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceException {
         when(workspaceRepository.deleteWorkspace(1L)).thenReturn(true);
 
         boolean result = workspaceService.deleteWorkspace(1L);
@@ -125,12 +124,12 @@ class WorkspaceServiceImplTest {
 
     @Test
     void deleteWorkspace_ShouldThrowWhenIdNull() {
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.deleteWorkspace(null));
     }
 
     @Test
-    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceServiceException {
+    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceException {
         LocalDateTime startTime = LocalDateTime.now().plusDays(1);
         LocalDateTime endTime = startTime.plusHours(3);
 
@@ -145,28 +144,28 @@ class WorkspaceServiceImplTest {
 
     @Test
     void validateWorkspace_ShouldThrowWhenNull() {
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.createWorkspace(null));
     }
 
     @Test
     void validateWorkspace_ShouldThrowWhenEmptyName() {
         Workspace workspace = new Workspace(null, "", "Desc", null, 10.0, 4, true, null);
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.createWorkspace(workspace));
     }
 
     @Test
     void validateWorkspace_ShouldThrowWhenInvalidPrice() {
         Workspace workspace = new Workspace(null, "Name", "Desc", null, -1.0, 4, true, null);
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.createWorkspace(workspace));
     }
 
     @Test
     void validateWorkspace_ShouldThrowWhenInvalidCapacity() {
         Workspace workspace = new Workspace(null, "Name", "Desc", null, 10.0, 0, true, null);
-        assertThrows(WorkspaceServiceException.class,
+        assertThrows(WorkspaceException.class,
                 () -> workspaceService.createWorkspace(workspace));
     }
 }

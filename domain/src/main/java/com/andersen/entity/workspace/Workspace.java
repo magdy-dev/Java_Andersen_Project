@@ -178,19 +178,35 @@ public class Workspace {
     public void setActive(boolean active) {
         isActive = active;
     }
-
+    /**
+     * Compares this workspace to the specified object for equality.
+     *
+     * @param o the object to be compared for equality with this workspace
+     * @return true if the specified object is equal to this workspace;
+     *         false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Workspace workspace = (Workspace) o;
         return Double.compare(pricePerHour, workspace.pricePerHour) == 0 && capacity == workspace.capacity && isActive == workspace.isActive && Objects.equals(id, workspace.id) && Objects.equals(name, workspace.name) && Objects.equals(description, workspace.description) && type == workspace.type && Objects.equals(bookings, workspace.bookings);
     }
-
+    /**
+     * Returns a hash code value for this workspace.
+     *
+     * @return a hash code value for this workspace, based on its attributes
+     */
     @Override
     public int hashCode() {
         return Objects.hash(id, name, description, type, pricePerHour, capacity, isActive, bookings);
     }
-
+    /**
+     * Returns a string representation of the workspace.
+     *
+     * @return a string representation of this workspace, including its
+     *         id, name, description, type, price per hour, capacity,
+     *         active status, and bookings
+     */
     @Override
     public String toString() {
         return "Workspace{" +
