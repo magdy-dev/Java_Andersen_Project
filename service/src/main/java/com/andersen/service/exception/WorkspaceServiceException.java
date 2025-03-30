@@ -1,4 +1,4 @@
-package com.andersen.service.excption;
+package com.andersen.service.exception;
 
 public class WorkspaceServiceException extends Exception {
     public WorkspaceServiceException(String message) {

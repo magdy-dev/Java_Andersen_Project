@@ -1,265 +1,196 @@
 package com.andersen.service.workspace;
 
 import com.andersen.entity.workspace.Workspace;
-import com.andersen.repository_criteria_API.workspace.WorkspaceRepository;
-import com.andersen.service.excption.WorkspaceServiceException;
+import com.andersen.exception.DataAccessException;
+import com.andersen.service.exception.WorkspaceServiceException;
+import com.andersen.repository.workspace.WorkspaceRepository;
 import com.andersen.logger.ConsoleLogger;
-import com.andersen.logger.OutputLogger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
-/**
- * Provides implementation for workspace management operations including creation, retrieval,
- * updating, and deletion of workspaces. Also handles workspace availability checks.
- *
- * <p>This service ensures:
- * <ul>
- *   <li>Validation of workspace properties (name, price, capacity)</li>
- *   <li>Proper time parameter validation for availability checks</li>
- *   <li>Consistent logging of all operations</li>
- *   <li>Error handling and proper exception propagation</li>
- * </ul>
- */
 
+/**
+ * Provides implementation for workspace management services,
+ * including creating, updating, deleting, and retrieving workspaces.
+ */
+@Service
+@Transactional
 public class WorkspaceServiceImpl implements WorkspaceService {
 
     private final WorkspaceRepository workspaceRepository;
+
     /**
-     * Constructs a new WorkspaceServiceImpl with the specified repository.
+     * Constructs a new WorkspaceServiceImpl with the specified WorkspaceRepository.
      *
      * @param workspaceRepository the repository for workspace data access
      */
+    @Autowired
     public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository) {
         this.workspaceRepository = workspaceRepository;
-        OutputLogger.log("WorkspaceService initialized");
     }
+
     /**
-     * Creates a new workspace after validating all required properties.
+     * Creates a new workspace with the given details.
      *
-     * @param workspace the workspace to create (must have valid name, price, and capacity)
-     * @return the created Workspace object with generated ID
-     * @throws WorkspaceServiceException if validation fails or data access error occurs
+     * @param workspace the Workspace object containing details of the new workspace
+     * @return the created Workspace object
+     * @throws WorkspaceServiceException if validation fails or data access errors occur
      */
     @Override
     public Workspace createWorkspace(Workspace workspace) throws WorkspaceServiceException {
-        String operation = "Create Workspace";
-        OutputLogger.log(operation + " - Attempting to create workspace: " + workspace.getName());
-
         try {
             validateWorkspace(workspace);
-            Workspace createdWorkspace = workspaceRepository.createWorkspace(workspace);
-            OutputLogger.log(operation + " - Successfully created workspace with ID: " + createdWorkspace.getId());
-            return createdWorkspace;
-        } catch (Exception e) {
-            String errorMsg = operation + " - Failed: " + e.getMessage();
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg, e);
-            throw new WorkspaceServiceException(errorMsg, e);
+            return workspaceRepository.createWorkspace(workspace);
+        } catch (DataAccessException e) {
+            ConsoleLogger.log("Workspace creation failed: " + e.getMessage());
+            throw new WorkspaceServiceException("Failed to create workspace: " + e.getMessage());
         }
     }
+
     /**
-     * Retrieves all workspaces in the system.
+     * Retrieves all available workspaces.
      *
-     * @return list of all workspaces (empty list if none found)
-     * @throws WorkspaceServiceException if data access error occurs
+     * @return a list of all Workspace objects
+     * @throws WorkspaceServiceException if data access errors occur
      */
     @Override
     public List<Workspace> getAllWorkspaces() throws WorkspaceServiceException {
-        String operation = "Get All Workspaces";
-        OutputLogger.log(operation + " - Fetching all workspaces");
-
         try {
-            List<Workspace> workspaces = workspaceRepository.getAllWorkspaces();
-            OutputLogger.log(operation + " - Found " + workspaces.size() + " workspaces");
-            return workspaces;
-        } catch (Exception e) {
-            String errorMsg = operation + " - Failed to retrieve workspaces";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg, e);
-            throw new WorkspaceServiceException(errorMsg, e);
+            return workspaceRepository.getAllWorkspaces();
+        } catch (DataAccessException e) {
+            ConsoleLogger.log("Failed to retrieve workspaces: " + e.getMessage());
+            throw new WorkspaceServiceException("Failed to retrieve workspaces: " + e.getMessage());
         }
     }
+
     /**
-     * Retrieves a specific workspace by its ID.
+     * Retrieves a workspace by its ID.
      *
      * @param id the ID of the workspace to retrieve
-     * @return the Workspace object, or null if not found
-     * @throws WorkspaceServiceException if ID is null or data access error occurs
+     * @return the Workspace object if found
+     * @throws WorkspaceServiceException if the workspace is not found or data access errors occur
      */
     @Override
     public Workspace getWorkspaceById(Long id) throws WorkspaceServiceException {
-        String operation = "Get Workspace by ID";
-        OutputLogger.log(operation + " - Fetching workspace with ID: " + id);
-
-        if (id == null) {
-            String errorMsg = operation + " - Workspace ID cannot be null";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
-        }
-
         try {
             Workspace workspace = workspaceRepository.getWorkspaceById(id);
-            if (workspace != null) {
-                OutputLogger.log(operation + " - Found workspace: " + workspace.getName());
-            } else {
-                OutputLogger.log(operation + " - Workspace not found with ID: " + id);
+            if (workspace == null) {
+                throw new WorkspaceServiceException("Workspace not found with ID: " + id);
             }
             return workspace;
-        } catch (Exception e) {
-            String errorMsg = operation + " - Failed to retrieve workspace";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg, e);
-            throw new WorkspaceServiceException(errorMsg, e);
+        } catch (DataAccessException e) {
+            ConsoleLogger.log("Workspace retrieval failed: " + e.getMessage());
+            throw new WorkspaceServiceException("Failed to retrieve workspace: " + e.getMessage());
         }
     }
+
     /**
-     * Updates an existing workspace with new values.
+     * Updates the details of an existing workspace.
      *
-     * @param workspace the workspace to update (must have valid ID and properties)
-     * @return true if update was successful, false otherwise
-     * @throws WorkspaceServiceException if validation fails or data access error occurs
+     * @param workspace the Workspace object containing updated details
+     * @return true if the update was successful, false otherwise
+     * @throws WorkspaceServiceException if validation fails or data access errors occur
      */
     @Override
     public boolean updateWorkspace(Workspace workspace) throws WorkspaceServiceException {
-        String operation = "Update Workspace";
-        OutputLogger.log(operation + " - Attempting to update workspace with ID: " + workspace.getId());
-
         try {
             validateWorkspace(workspace);
-            boolean result = workspaceRepository.updateWorkspace(workspace);
-            if (result) {
-                OutputLogger.log(operation + " - Successfully updated workspace: " + workspace.getName());
-            } else {
-                OutputLogger.log(operation + " - Failed to update workspace: " + workspace.getName());
-            }
-            return result;
-        } catch (Exception e) {
-            String errorMsg = operation + " - Failed to update workspace";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg, e);
-            throw new WorkspaceServiceException(errorMsg, e);
+            return workspaceRepository.updateWorkspace(workspace);
+        } catch (DataAccessException e) {
+            ConsoleLogger.log("Workspace update failed: " + e.getMessage());
+            throw new WorkspaceServiceException("Failed to update workspace: " + e.getMessage());
         }
     }
+
     /**
-     * Deletes a workspace by its ID.
+     * Deletes a workspace with the specified ID.
      *
      * @param id the ID of the workspace to delete
-     * @return true if deletion was successful, false otherwise
-     * @throws WorkspaceServiceException if ID is null or data access error occurs
+     * @return true if the deletion was successful, false otherwise
+     * @throws WorkspaceServiceException if data access errors occur
      */
     @Override
     public boolean deleteWorkspace(Long id) throws WorkspaceServiceException {
-        String operation = "Delete Workspace";
-        OutputLogger.log(operation + " - Attempting to delete workspace with ID: " + id);
-
-        if (id == null) {
-            String errorMsg = operation + " - Workspace ID cannot be null";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
-        }
-
         try {
-            boolean result = workspaceRepository.deleteWorkspace(id);
-            if (result) {
-                OutputLogger.log(operation + " - Successfully deleted workspace with ID: " + id);
-            } else {
-                OutputLogger.log(operation + " - Failed to delete workspace with ID: " + id);
-            }
-            return result;
-        } catch (Exception e) {
-            String errorMsg = operation + " - Failed to delete workspace";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg, e);
-            throw new WorkspaceServiceException(errorMsg, e);
+            return workspaceRepository.deleteWorkspace(id);
+        } catch (DataAccessException e) {
+            ConsoleLogger.log("Workspace deletion failed: " + e.getMessage());
+            throw new WorkspaceServiceException("Failed to delete workspace: " + e.getMessage());
         }
     }
 
     /**
-     * Finds all workspaces available for booking during a specified time period.
-     * @param startTime the start time of the desired booking period
-     * @param endTime the end time of the desired booking period
-     * @return list of available workspaces (empty list if none available)
-     * @throws WorkspaceServiceException if time parameters are invalid or data access error occurs
+     * Retrieves a list of available workspaces within the specified time frame.
+     *
+     * @param startTime the start time for availability check
+     * @param endTime the end time for availability check
+     * @return a list of available Workspace objects
+     * @throws WorkspaceServiceException if the time range is invalid or data access errors occur
+     */
+    /**
+     * Retrieves a list of available workspaces within the specified time frame.
+     *
+     * @param startTime the start time for availability check
+     * @param endTime the end time for availability check
+     * @return a list of available Workspace objects
+     * @throws WorkspaceServiceException if the time range is invalid or data access errors occur
      */
     @Override
-    public List<Workspace> getAvailableWorkspaces( LocalDateTime startTime,
-                                                   LocalDateTime endTime) throws WorkspaceServiceException {
-        String operation = "Get Available Workspaces";
-        OutputLogger.log(String.format("%s - Checking availability for %s from %s to %s", operation, startTime, endTime));
-
+    public List<Workspace> getAvailableWorkspaces(LocalDateTime startTime,
+                                                  LocalDateTime endTime) throws WorkspaceServiceException {
         try {
-            List<Workspace> availableWorkspaces = workspaceRepository.getAvailableWorkspaces(startTime, endTime);
-            OutputLogger.log(operation + " - Found " + availableWorkspaces.size() + " available workspaces");
-            return availableWorkspaces;
-        } catch (Exception e) {
-            String errorMsg = operation + " - Failed to get available workspaces";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg, e);
-            throw new WorkspaceServiceException(errorMsg, e);
+            validateTimeParameters(startTime, endTime);
+            return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
+        } catch (DataAccessException e) {
+            ConsoleLogger.log("Available workspaces retrieval failed: " + e.getMessage());
+            throw new WorkspaceServiceException("Failed to find available workspaces: " + e.getMessage());
         }
     }
-    /**
-     * Validates all required properties of a workspace.
-     *
-     * @param workspace the workspace to validate
-     * @throws WorkspaceServiceException if any validation fails:
-     *         <ul>
-     *           <li>Workspace is null</li>
-     *           <li>Name is null or empty</li>
-     *           <li>Price per hour is not positive</li>
-     *           <li>Capacity is not positive</li>
-     *         </ul>
-     */
 
+    /**
+     * Validates the details of the provided workspace object.
+     *
+     * @param workspace the Workspace object to validate
+     * @throws WorkspaceServiceException if the workspace details are invalid
+     */
     private void validateWorkspace(Workspace workspace) throws WorkspaceServiceException {
         if (workspace == null) {
-            String errorMsg = "Workspace validation failed - Workspace cannot be null";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+            throw new WorkspaceServiceException("Workspace cannot be null");
         }
         if (workspace.getName() == null || workspace.getName().trim().isEmpty()) {
-            String errorMsg = "Workspace validation failed - Name is required";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+            throw new WorkspaceServiceException("Workspace name is required");
         }
         if (workspace.getPricePerHour() <= 0) {
-            String errorMsg = "Workspace validation failed - Price must be positive";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+            throw new WorkspaceServiceException("Price must be positive");
         }
         if (workspace.getCapacity() <= 0) {
-            String errorMsg = "Workspace validation failed - Capacity must be positive";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+            throw new WorkspaceServiceException("Capacity must be positive");
+        }
+        if (workspace.getType() == null) {
+            throw new WorkspaceServiceException("Workspace type is required");
         }
     }
+
     /**
-     * Validates time parameters for availability checks.
+     * Validates the provided time parameters for checking workspace availability.
      *
-     * @param date the date to validate
      * @param startTime the start time to validate
      * @param endTime the end time to validate
-     * @throws WorkspaceServiceException if:
-     *         <ul>
-     *           <li>Any parameter is null</li>
-     *           <li>Start time is after end time</li>
-     *           <li>Date is in the past</li>
-     *         </ul>
+     * @throws WorkspaceServiceException if the time parameters are invalid
      */
-    private void validateTimeParameters(LocalDate date, LocalTime startTime,
-                                        LocalTime endTime) throws WorkspaceServiceException {
-        if (date == null || startTime == null || endTime == null) {
-            String errorMsg = "Time validation failed - Date and time parameters cannot be null";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+    private void validateTimeParameters(LocalDateTime startTime,
+                                        LocalDateTime endTime) throws WorkspaceServiceException {
+        if (startTime == null || endTime == null) {
+            throw new WorkspaceServiceException("Both start and end times must be specified");
         }
-        if (startTime.isAfter(endTime)) {
-            String errorMsg = "Time validation failed - Start time must be before end time";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+        if (endTime.isBefore(startTime)) {
+            throw new WorkspaceServiceException("End time must be after start time");
         }
-        if (date.isBefore(LocalDate.now())) {
-            String errorMsg = "Time validation failed - Cannot check availability for past dates";
-            ConsoleLogger.getLogger(WorkspaceServiceImpl.class).error(errorMsg);
-            throw new WorkspaceServiceException(errorMsg);
+        if (startTime.isBefore(LocalDateTime.now())) {
+            throw new WorkspaceServiceException("Cannot check availability for past dates");
         }
     }
-
-
 }

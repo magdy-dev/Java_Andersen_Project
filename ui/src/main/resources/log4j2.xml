@@ -7,7 +7,7 @@
     </Appenders>
     <Loggers>
         <!-- Logger for BookingRepositoryImpl -->
-        <Logger name="com.andersen.repository_criteria_API.booking.BookingRepositoryImpl" level="info" additivity="false">
+        <Logger name="com.andersen.repository.booking.BookingRepositoryImpl" level="info" additivity="false">
             <AppenderRef ref="Console"/>
         </Logger>
 

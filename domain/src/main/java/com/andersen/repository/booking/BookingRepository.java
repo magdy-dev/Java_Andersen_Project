@@ -1,4 +1,4 @@
-package com.andersen.repository_criteria_API.booking;
+package com.andersen.repository.booking;
 
 import com.andersen.entity.booking.Booking;
 import com.andersen.exception.DataAccessException;

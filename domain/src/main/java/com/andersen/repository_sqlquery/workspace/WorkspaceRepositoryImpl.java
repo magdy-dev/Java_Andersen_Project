@@ -203,12 +203,12 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
         try {
             if (rs != null) rs.close();
         } catch (SQLException e) {
-            throw new DataAccessException("Error closing ResultSet: " + e.getMessage(),ErrorCode.WS_007);
+            throw new DataAccessException("Error closing ResultSet: " + e.getMessage(),ErrorCode.WS_005);
         }
         try {
             if (stmt != null) stmt.close();
         } catch (SQLException e) {
-            throw new DataAccessException("Error closing Statement: " + e.getMessage(), ErrorCode.WS_007);
+            throw new DataAccessException("Error closing Statement: " + e.getMessage(), ErrorCode.WS_005);
         }
         DatabaseConnection.closeConnection(conn);
     }

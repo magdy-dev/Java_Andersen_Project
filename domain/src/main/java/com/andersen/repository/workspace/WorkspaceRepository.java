@@ -1,4 +1,4 @@
-package com.andersen.repository_criteria_API.workspace;
+package com.andersen.repository.workspace;
 
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;

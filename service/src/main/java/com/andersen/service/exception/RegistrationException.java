@@ -1,4 +1,4 @@
-package com.andersen.service.excption;
+package com.andersen.service.exception;
 
 public class RegistrationException extends Exception {
     public RegistrationException(String message) {

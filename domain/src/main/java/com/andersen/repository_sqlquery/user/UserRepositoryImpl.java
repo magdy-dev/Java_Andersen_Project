@@ -83,7 +83,7 @@ public class UserRepositoryImpl implements UserRepository {
             }
             return Optional.empty();
         } catch (SQLException e) {
-            throw new DataAccessException("Error retrieving user by username: " + username + e,  ErrorCode.US_008);
+            throw new DataAccessException("Error retrieving user by username: " + username + e,  ErrorCode.US_003);
         } finally {
             closeResources(conn, stmt, rs);
         }
