@@ -1,51 +1,65 @@
--- Roles table (good as is)
-CREATE TABLE user_roles (
-    id SERIAL PRIMARY KEY,
-    role_name VARCHAR(20) UNIQUE NOT NULL
-);
+-- Database schema for workspace booking system
 
--- Insert roles (good as is)
-INSERT INTO user_roles (role_name) VALUES ('ADMIN'), ('CUSTOMER');
+-- Create enum types
+CREATE TYPE booking_status AS ENUM ('CONFIRMED', 'CANCELLED', 'COMPLETED');
+CREATE TYPE user_role AS ENUM ('CUSTOMER', 'ADMIN', 'MANAGER');
+CREATE TYPE workspace_type AS ENUM ('MEETING_ROOM', 'PRIVATE_OFFICE', 'COWORKING_SPACE', 'EVENT_SPACE');
 
--- Improved users table
+-- Users table
 CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    username VARCHAR(50) UNIQUE NOT NULL,
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    role_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (role_id) REFERENCES user_roles(id)
+    email VARCHAR(255) NOT NULL UNIQUE,
+    full_name VARCHAR(255) NOT NULL,
+    role user_role NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE
 );
 
--- Improved workspaces table
+-- Workspaces table
 CREATE TABLE workspaces (
-    id SERIAL PRIMARY KEY,
+    id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    description TEXT NOT NULL,
-    type VARCHAR(50) NOT NULL CHECK (type IN ('OPEN_SPACE', 'PRIVATE_ROOM', 'MEETING_ROOM', 'DESK')),
-    price_per_hour DECIMAL(10, 2) NOT NULL,
-    capacity INT NOT NULL,
-    is_active BOOLEAN DEFAULT TRUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    description VARCHAR(500),
+    type workspace_type NOT NULL,
+    price_per_hour DECIMAL(10,2) NOT NULL,
+    capacity INTEGER NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    CONSTRAINT positive_price CHECK (price_per_hour > 0),
+    CONSTRAINT positive_capacity CHECK (capacity > 0)
 );
 
--- Improved bookings table
+-- Bookings table
 CREATE TABLE bookings (
-    id SERIAL PRIMARY KEY,
-    customer_id INT NOT NULL,
-    workspace_id INT NOT NULL,
-    booking_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    status VARCHAR(20) NOT NULL DEFAULT 'CONFIRMED' CHECK (status IN ('CONFIRMED', 'CANCELLED', 'COMPLETED')),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    total_price DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (customer_id) REFERENCES users(id),
-    FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
-    CONSTRAINT valid_booking_time CHECK (end_time > start_time)
+    id BIGSERIAL PRIMARY KEY,
+    customer_id BIGINT NOT NULL,
+    workspace_id BIGINT NOT NULL,
+    start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_time TIMESTAMP WITH TIME ZONE NOT NULL,
+    status booking_status NOT NULL,
+    total_price DECIMAL(10,2),
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES users(id),
+    CONSTRAINT fk_workspace FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
+    CONSTRAINT valid_booking_time CHECK (end_time > start_time),
+    CONSTRAINT future_booking CHECK (start_time > CURRENT_TIMESTAMP),
+    CONSTRAINT positive_price CHECK (total_price IS NULL OR total_price >= 0)
 );
 
--- Removed availabilities table as it's not needed in this simple implementation
+-- Create indexes for better performance
+CREATE INDEX idx_users_active ON users(is_active);
+CREATE INDEX idx_users_username ON users(username);
+CREATE INDEX idx_users_email ON users(email);
+
+CREATE INDEX idx_workspaces_active ON workspaces(is_active);
+CREATE INDEX idx_workspaces_type ON workspaces(type);
+CREATE INDEX idx_workspaces_price ON workspaces(price_per_hour);
+
+CREATE INDEX idx_bookings_active ON bookings(is_active);
+CREATE INDEX idx_bookings_customer ON bookings(customer_id);
+CREATE INDEX idx_bookings_workspace ON bookings(workspace_id);
+CREATE INDEX idx_bookings_time_range ON bookings(start_time, end_time);
+CREATE INDEX idx_bookings_status ON bookings(status);
+
