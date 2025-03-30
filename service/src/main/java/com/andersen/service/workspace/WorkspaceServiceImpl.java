@@ -3,7 +3,7 @@ package com.andersen.service.workspace;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
 import com.andersen.service.exception.WorkspaceServiceException;
-import com.andersen.repository.workspace.WorkspaceRepository;
+import com.andersen.repository_Criteria.workspace.WorkspaceRepository;
 import com.andersen.logger.ConsoleLogger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

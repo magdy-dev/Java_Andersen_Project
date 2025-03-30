@@ -1,4 +1,4 @@
-package com.andersen.service.excption;
+package com.andersen.service.exception;
 
 public class BookingServiceException extends Exception {
     public BookingServiceException(String message) {

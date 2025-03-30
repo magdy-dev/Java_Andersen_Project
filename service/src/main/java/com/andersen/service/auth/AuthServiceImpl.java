@@ -3,7 +3,7 @@ package com.andersen.service.auth;
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
 import com.andersen.exception.DataAccessException;
-import com.andersen.repository.user.UserRepository;
+import com.andersen.repository_Criteria.user.UserRepository;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
 import com.andersen.logger.ConsoleLogger;
@@ -167,7 +167,7 @@ public class AuthServiceImpl implements AuthService {
      * @return the hashed password as a Base64-encoded string
      * @throws AuthenticationException if hashing fails due to an unsupported algorithm
      */
-    private String hashPassword(String password) throws AuthenticationException {
+    String hashPassword(String password) throws AuthenticationException {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(password.getBytes());
