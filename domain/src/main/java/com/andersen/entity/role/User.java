@@ -1,6 +1,7 @@
 package com.andersen.entity.role;
 
 import jakarta.persistence.*;
+
 import java.util.Objects;
 
 /**
@@ -32,6 +33,9 @@ public class User {
     @Column(name = "full_name", nullable = false)
     private String fullName;
 
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private boolean isActive = true;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private UserRole role;
@@ -56,6 +60,23 @@ public class User {
     }
 
     // Getters and Setters
+    /**
+     * Retrieves the active status of the object.
+     *
+     * @return true if the object is active, false otherwise.
+     */
+    public boolean isActive() {
+        return isActive;
+    }
+
+    /**
+     * Sets the active status of the object.
+     *
+     * @param active true to set the object as active, false to set it as inactive.
+     */
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 
     public Long getId() {
         return id;
