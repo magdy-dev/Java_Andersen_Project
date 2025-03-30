@@ -35,9 +35,8 @@ public class Workspace {
     @Column(nullable = false)
     private int capacity; // Maximum number of people that can use the workspace
 
-    @Column(name = "is_active", nullable = false)
-    private boolean isActive; // Indicates whether the workspace is currently active for bookings
-
+    @Column(name = "is_active", nullable = false, columnDefinition = "boolean default true")
+    private boolean isActive = true;
     @OneToMany(mappedBy = "workspace", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Booking> bookings = new ArrayList<>(); // List of bookings associated with the workspace
 
