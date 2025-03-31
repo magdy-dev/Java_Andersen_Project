@@ -1,8 +1,8 @@
-package com.andersen.service.auth;
+package com.andersen.service.Security;
 
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
-
+import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -12,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * create, and invalidate sessions. It uses concurrent maps to ensure thread safety
  * when handling multiple simultaneous sessions.
  */
+@Component
 public class SessionManager {
     private final Map<String, User> activeSessions = new ConcurrentHashMap<>();
     private final Map<String, String> userTokens = new ConcurrentHashMap<>();

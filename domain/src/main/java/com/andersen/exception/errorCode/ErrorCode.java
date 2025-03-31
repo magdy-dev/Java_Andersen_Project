@@ -1,4 +1,4 @@
-package com.andersen.exception;
+package com.andersen.exception.errorCode;
 
 /**
  * Standardized error codes for the booking system

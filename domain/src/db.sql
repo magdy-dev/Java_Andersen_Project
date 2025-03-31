@@ -39,8 +39,6 @@ CREATE TABLE bookings (
     status booking_status NOT NULL,
     total_price DECIMAL(10,2),
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_customer FOREIGN KEY (customer_id) REFERENCES users(id),
     CONSTRAINT fk_workspace FOREIGN KEY (workspace_id) REFERENCES workspaces(id),
     CONSTRAINT valid_booking_time CHECK (end_time > start_time),

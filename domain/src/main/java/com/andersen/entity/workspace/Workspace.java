@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
 /**
  * Represents a workspace that can be booked by customers.
  * This class contains details about the workspace, including its name, description,
@@ -244,27 +243,6 @@ public class Workspace {
         this.bookings = bookings;
     }
 
-    /**
-     * Adds a booking to the workspace.
-     * This method ensures the relationship is maintained in both directions.
-     *
-     * @param booking the booking to be added
-     */
-    public void addBooking(Booking booking) {
-        bookings.add(booking);
-        booking.setWorkspace(this);
-    }
-
-    /**
-     * Removes a booking from the workspace.
-     * This method ensures the relationship is maintained in both directions.
-     *
-     * @param booking the booking to be removed
-     */
-    public void removeBooking(Booking booking) {
-        bookings.remove(booking);
-        booking.setWorkspace(null);
-    }
 
     // equals, hashCode, and toString
 

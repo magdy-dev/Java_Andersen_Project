@@ -1,9 +1,9 @@
 package com.andersen.controller;
 
-import com.andersen.service.auth.SessionManager;
+import com.andersen.service.Security.SessionManager;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.workspace.WorkspaceService;
-import com.andersen.logger.OutputLogger; // Import the OutputLogger
+import com.andersen.logger.logger.Out_put_Logger; // Import the OutputLogger
 
 import java.util.Scanner;
 
@@ -30,7 +30,7 @@ public class Customer {
 
     public void start() {
         if (!verifyCustomerSession()) {
-            OutputLogger.error("Customer session expired or invalid"); // Logging error
+            Out_put_Logger.error("Customer session expired or invalid"); // Logging error
             return;
         }
 
@@ -45,11 +45,11 @@ public class Customer {
                     viewMyBookings();
                     break;
                 case "3":
-                    OutputLogger.log("Logging out..."); // Logging action
+                    Out_put_Logger.log("Logging out..."); // Logging action
                     sessionManager.invalidateSession(currentToken);
                     return;
                 default:
-                    OutputLogger.warn("Invalid choice. Please try again."); // Logging warning
+                    Out_put_Logger.warn("Invalid choice. Please try again."); // Logging warning
             }
         }
     }
@@ -60,11 +60,11 @@ public class Customer {
 
     private void bookWorkspace() {
         // Implement booking logic
-        OutputLogger.log("Booking a workspace..."); // Logging action
+        Out_put_Logger.log("Booking a workspace..."); // Logging action
     }
 
     private void viewMyBookings() {
         // Implement view bookings logic
-        OutputLogger.log("Viewing my bookings..."); // Logging action
+        Out_put_Logger.log("Viewing my bookings..."); // Logging action
     }
 }

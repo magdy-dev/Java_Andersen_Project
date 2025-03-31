@@ -2,8 +2,8 @@ package com.andersen.repository_Criteria.user;
 
 import com.andersen.entity.role.User;
 import com.andersen.exception.DataAccessException;
-import com.andersen.exception.ErrorCode;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.exception.errorCode.ErrorCode;
+import com.andersen.logger.logger.Console_Logger;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
@@ -23,10 +23,10 @@ public class UserRepositoryImpl implements UserRepository {
         try {
             // No need to set isActive here if it's already defaulted in the User entity
             entityManager.persist(user);
-            ConsoleLogger.log("Created user: " + user);
+            Console_Logger.log("Created user: " + user);
             return user;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to create user: " + e.getMessage());
+            Console_Logger.log("Failed to create user: " + e.getMessage());
             throw new DataAccessException("Failed to create user", ErrorCode.US_002);
         }
     }
@@ -43,10 +43,10 @@ public class UserRepositoryImpl implements UserRepository {
             query.where(cb.and(idPredicate, activePredicate));
 
             User user = entityManager.createQuery(query).getSingleResult();
-            ConsoleLogger.log("Retrieved user by id: " + id);
+            Console_Logger.log("Retrieved user by id: " + id);
             return Optional.ofNullable(user);
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to get user by id: " + id);
+            Console_Logger.log("Failed to get user by id: " + id);
             throw new DataAccessException("Failed to get user by id", ErrorCode.US_007);
         }
     }
@@ -66,7 +66,7 @@ public class UserRepositoryImpl implements UserRepository {
             TypedQuery<User> typedQuery = entityManager.createQuery(query);
             return typedQuery.getResultStream().findFirst();
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to get user by username: " + username);
+            Console_Logger.log("Failed to get user by username: " + username);
             throw new DataAccessException("Failed to get user by username", ErrorCode.US_007);
         }
     }
@@ -92,10 +92,10 @@ public class UserRepositoryImpl implements UserRepository {
             // isActive remains unchanged
 
             // No merge needed since we're working with the managed entity
-            ConsoleLogger.log("Updated user: " + user.getId());
+            Console_Logger.log("Updated user: " + user.getId());
             return true;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to update user: " + e.getMessage());
+            Console_Logger.log("Failed to update user: " + e.getMessage());
             throw new DataAccessException("Failed to update user", ErrorCode.US_003);
         }
     }
@@ -114,7 +114,7 @@ public class UserRepositoryImpl implements UserRepository {
             int updated = entityManager.createQuery(update).executeUpdate();
             return updated > 0;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to delete user: " + id + ", Error: " + e.getMessage());
+            Console_Logger.log("Failed to delete user: " + id + ", Error: " + e.getMessage());
             throw new DataAccessException("Failed to delete user", ErrorCode.US_004);
         }
     }

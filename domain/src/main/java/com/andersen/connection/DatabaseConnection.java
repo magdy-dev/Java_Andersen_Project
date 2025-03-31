@@ -3,7 +3,6 @@ package com.andersen.connection;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-
 /**
  * This class handles the database connection for the application.
  * It provides methods to establish a connection to the PostgreSQL database

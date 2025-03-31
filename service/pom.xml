@@ -14,7 +14,7 @@
     <properties>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <logback.version>1.4.12</logback.version> <!-- Define Logback version as a property -->
+        <logback.version>1.4.12</logback.version>
     </properties>
 
     <dependencies>
@@ -28,7 +28,6 @@
             <artifactId>logger</artifactId>
             <version>${project.version}</version>
         </dependency>
-
         <!-- JUnit 4 for testing -->
         <dependency>
             <groupId>junit</groupId>
@@ -36,7 +35,6 @@
             <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
-
         <!-- JUnit Jupiter for testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -44,7 +42,6 @@
             <version>5.12.0</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
@@ -52,7 +49,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -64,7 +60,6 @@
                     <target>${maven.compiler.target}</target>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>

@@ -2,15 +2,15 @@ package com.andersen.service.auth;
 
 import com.andersen.entity.role.User;
 import com.andersen.entity.role.UserRole;
-import com.andersen.exception.DataAccessException;
-import com.andersen.repository_Criteria.user.UserRepository;
+import com.andersen.repository_JPA.user.UserRepository;
+import com.andersen.service.Security.PasswordEncoder;
+import com.andersen.service.Security.SessionManager;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.logger.logger.Console_Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
@@ -25,6 +25,7 @@ public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final SessionManager sessionManager;
+    private final PasswordEncoder passwordEncoder;
 
     /**
      * Constructs a new AuthServiceImpl with the specified userRepository
@@ -34,9 +35,10 @@ public class AuthServiceImpl implements AuthService {
      * @param sessionManager the session manager for handling user sessions
      */
     @Autowired
-    public AuthServiceImpl(UserRepository userRepository, SessionManager sessionManager) {
+    public AuthServiceImpl(UserRepository userRepository, SessionManager sessionManager, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.sessionManager = sessionManager;
+        this.passwordEncoder = passwordEncoder;
     }
 
     /**
@@ -49,24 +51,21 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public User login(String username, String password) throws AuthenticationException {
-        try {
-            validateCredentials(username, password);
+        validateCredentials(username, password);
 
-            User user = userRepository.getUserByUsername(username)
-                    .orElseThrow(() -> new AuthenticationException("Invalid credentials"));
-
-            String hashedInput = hashPassword(password);
-            if (!user.getPassword().equals(hashedInput)) {
-                throw new AuthenticationException("Invalid credentials");
-            }
-
-            sessionManager.createSession(user);
-            ConsoleLogger.log("User logged in: " + username);
-            return user;
-        } catch (DataAccessException e) {
-            ConsoleLogger.log("Login failed: " + e.getMessage());
-            throw new AuthenticationException("Authentication service unavailable");
+        User user = userRepository.getUserByUsername(username);
+        if (user == null) {
+            throw new AuthenticationException("Invalid credentials");
         }
+
+        String hashedInput = hashPassword(password);
+        if (!user.getPassword().equals(hashedInput)) {
+            throw new AuthenticationException("Invalid credentials");
+        }
+
+        sessionManager.createSession(user);
+        Console_Logger.log("User  logged in: " + username);
+        return user;
     }
 
     /**
@@ -77,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public void logout(String token) {
         sessionManager.invalidateSession(token);
-        ConsoleLogger.log("User logged out");
+        Console_Logger.log("User  logged out");
     }
 
     /**
@@ -92,28 +91,23 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public User registerCustomer(String username, String password, String email, String fullName)
-            throws RegistrationException {
-        try {
-            validateRegistration(username, password, email, fullName);
+            throws RegistrationException, AuthenticationException {
+        validateRegistration(username, password, email, fullName);
 
-            if (userRepository.getUserByUsername(username).isPresent()) {
-                throw new RegistrationException("Username already exists");
-            }
-
-            User newUser = new User();
-            newUser.setUsername(username);
-            newUser.setPassword(hashPassword(password));
-            newUser.setEmail(email);
-            newUser.setFullName(fullName);
-            newUser.setRole(UserRole.CUSTOMER);
-
-            User createdUser = userRepository.createUser(newUser);
-            ConsoleLogger.log("New customer registered: " + username);
-            return createdUser;
-        } catch (DataAccessException | AuthenticationException e) {
-            ConsoleLogger.log("Registration failed: " + e.getMessage());
-            throw new RegistrationException("Registration service unavailable");
+        if (userRepository.getUserByUsername(username) != null) {
+            throw new RegistrationException("Username already exists");
         }
+
+        User newUser  = new User();
+        newUser .setUsername(username);
+        newUser .setPassword(hashPassword(password));
+        newUser .setEmail(email);
+        newUser .setFullName(fullName);
+        newUser .setRole(UserRole.CUSTOMER);
+
+        User createdUser  = userRepository.save(newUser );
+        Console_Logger.log("New customer registered: " + username);
+        return createdUser ;
     }
 
     /**
@@ -173,7 +167,7 @@ public class AuthServiceImpl implements AuthService {
             byte[] hash = digest.digest(password.getBytes());
             return Base64.getEncoder().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
-            ConsoleLogger.log("Password hashing failed");
+            Console_Logger.log("Password hashing failed");
             throw new AuthenticationException("Authentication system error");
         }
     }

@@ -1,9 +1,9 @@
 package com.andersen.controller;
 
-import com.andersen.service.auth.SessionManager;
+import com.andersen.service.Security.SessionManager;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.booking.BookingService;
-import com.andersen.logger.OutputLogger; // Import OutputLogger
+import com.andersen.logger.logger.Out_put_Logger; // Import OutputLogger
 import java.util.Scanner;
 
 public class Admin {
@@ -29,7 +29,7 @@ public class Admin {
 
     public void start() {
         if (!verifyAdminSession()) {
-            OutputLogger.error("Admin session expired or invalid"); // Logging error
+            Out_put_Logger.error("Admin session expired or invalid"); // Logging error
             return;
         }
 
@@ -48,17 +48,17 @@ public class Admin {
                     viewAllReservations();
                     break;
                 case "4":
-                    OutputLogger.log("Returning to main menu..."); // Logging action
+                    Out_put_Logger.log("Returning to main menu..."); // Logging action
                     return;
                 default:
-                    OutputLogger.warn("Invalid choice. Please try again."); // Logging warning
+                    Out_put_Logger.warn("Invalid choice. Please try again."); // Logging warning
             }
         }
     }
 
     private boolean verifyAdminSession() {
         if (currentToken == null || !sessionManager.isAdmin(currentToken)) {
-            OutputLogger.error("Access denied. Valid admin session required."); // Logging error
+            Out_put_Logger.error("Access denied. Valid admin session required."); // Logging error
             return false;
         }
         return true;
@@ -67,24 +67,24 @@ public class Admin {
     private void addWorkspace() {
         if (!verifyAdminSession()) return;
 
-        OutputLogger.log("\n--- Add New Workspace ---");
+        Out_put_Logger.log("\n--- Add New Workspace ---");
         // Implementation for adding workspace
-        OutputLogger.log("Workspace added successfully!\n"); // Logging action
+        Out_put_Logger.log("Workspace added successfully!\n"); // Logging action
     }
 
     private void removeWorkspace() {
         if (!verifyAdminSession()) return;
 
-        OutputLogger.log("\n--- Remove Workspace ---");
+        Out_put_Logger.log("\n--- Remove Workspace ---");
         // Implementation for removing workspace
-        OutputLogger.log("Workspace removed successfully!\n"); // Logging action
+        Out_put_Logger.log("Workspace removed successfully!\n"); // Logging action
     }
 
     private void viewAllReservations() {
         if (!verifyAdminSession()) return;
 
-        OutputLogger.log("\n--- All Reservations ---");
+        Out_put_Logger.log("\n--- All Reservations ---");
         // Implementation to view reservations
-        OutputLogger.log(""); // Logging empty line for formatting
+        Out_put_Logger.log(""); // Logging empty line for formatting
     }
 }

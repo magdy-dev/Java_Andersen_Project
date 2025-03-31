@@ -15,21 +15,20 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
-    <dependencies>
 
+    <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.20</version> <!-- Replace with a valid version -->
+            <version>1.18.36</version> <!-- Replace with a valid version -->
             <scope>provided</scope>
         </dependency>
         <!-- Spring Data JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>3.4.3</version> <!-- replace with the correct version -->
+            <version>3.4.1</version>
         </dependency>
-
         <!-- Jakarta Persistence API (for jakarta.persistence.*) -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
@@ -41,7 +40,6 @@
             <artifactId>HikariCP</artifactId>
             <version>5.0.1</version> <!-- Check for the latest version -->
         </dependency>
-
         <!-- PostgreSQL JDBC Driver Dependency -->
         <dependency>
             <groupId>org.postgresql</groupId>

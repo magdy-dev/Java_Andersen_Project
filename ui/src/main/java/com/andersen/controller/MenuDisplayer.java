@@ -1,6 +1,6 @@
 package com.andersen.controller;
 
-import com.andersen.logger.OutputLogger;
+import com.andersen.logger.logger.Out_put_Logger;
 
 public class MenuDisplayer {
     private static final String MAIN_MENU = """
@@ -31,18 +31,18 @@ public class MenuDisplayer {
             5. Logout""";
 
     public static void showMainMenu() {
-        OutputLogger.log(MAIN_MENU);
+        Out_put_Logger.log(MAIN_MENU);
     }
 
     public static void showCustomerAuthMenu() {
-        OutputLogger.log(CUSTOMER_AUTH_MENU);
+        Out_put_Logger.log(CUSTOMER_AUTH_MENU);
     }
 
     public static void showAdminMenu() {
-        OutputLogger.log(ADMIN_MENU);
+        Out_put_Logger.log(ADMIN_MENU);
     }
 
     public static void showCustomerMenu() {
-        OutputLogger.log(CUSTOMER_MENU);
+        Out_put_Logger.log(CUSTOMER_MENU);
     }
 }

@@ -2,9 +2,9 @@ package com.andersen.controller;
 
 import com.andersen.service.auth.AuthService;
 import com.andersen.entity.role.User;
-import com.andersen.service.auth.SessionManager;
+import com.andersen.service.Security.SessionManager;
 import com.andersen.service.exception.AuthenticationException;
-import com.andersen.logger.OutputLogger; // Import the OutputLogger
+import com.andersen.logger.logger.Out_put_Logger; // Import the OutputLogger
 import java.util.Scanner;
 
 public class Application {
@@ -41,18 +41,18 @@ public class Application {
                     break;
                 case "3":
                     running = false;
-                    OutputLogger.log("Exiting application..."); // Logging exit
+                    Out_put_Logger.log("Exiting application..."); // Logging exit
                     break;
                 default:
-                    OutputLogger.warn("Invalid choice, please try again."); // Logging warning
+                    Out_put_Logger.warn("Invalid choice, please try again."); // Logging warning
             }
         }
     }
 
     private void handleAdminLogin() {
-        OutputLogger.log("Enter admin username: ");
+        Out_put_Logger.log("Enter admin username: ");
         String username = scanner.nextLine();
-        OutputLogger.log("Enter password: ");
+        Out_put_Logger.log("Enter password: ");
         String password = scanner.nextLine();
 
         try {
@@ -61,31 +61,31 @@ public class Application {
             admin.setCurrentToken(token);
 
             if (sessionManager.isAdmin(token)) {
-                OutputLogger.log("Admin login successful!");
+                Out_put_Logger.log("Admin login successful!");
                 admin.start();
             } else {
-                OutputLogger.warn("Access denied. Admin privileges required.");
+                Out_put_Logger.warn("Access denied. Admin privileges required.");
                 sessionManager.invalidateSession(token);
             }
         } catch (AuthenticationException e) {
-            OutputLogger.error("Login failed: " + e.getMessage()); // Logging error
+            Out_put_Logger.error("Login failed: " + e.getMessage()); // Logging error
         }
     }
 
     private void handleCustomerLogin() {
-        OutputLogger.log("Enter username: ");
+        Out_put_Logger.log("Enter username: ");
         String username = scanner.nextLine();
-        OutputLogger.log("Enter password: ");
+        Out_put_Logger.log("Enter password: ");
         String password = scanner.nextLine();
 
         try {
             User user = authService.login(username, password);
             String token = sessionManager.createSession(user);
             customer.setCurrentToken(token);
-            OutputLogger.log("Login successful!");
+            Out_put_Logger.log("Login successful!");
             customer.start();
         } catch (AuthenticationException e) {
-            OutputLogger.error("Login failed: " + e.getMessage()); // Logging error
+            Out_put_Logger.error("Login failed: " + e.getMessage()); // Logging error
         }
     }
 }

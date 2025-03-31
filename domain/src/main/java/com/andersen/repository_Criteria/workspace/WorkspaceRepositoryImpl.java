@@ -4,8 +4,8 @@ import com.andersen.entity.booking.Booking;
 import com.andersen.entity.booking.BookingStatus;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.exception.DataAccessException;
-import com.andersen.exception.ErrorCode;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.exception.errorCode.ErrorCode;
+import com.andersen.logger.logger.Console_Logger;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -25,10 +25,10 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
         try {
             workspace.setActive(true); // Ensure new workspaces are active
             entityManager.persist(workspace);
-            ConsoleLogger.log("Created workspace: " + workspace);
+            Console_Logger.log("Created workspace: " + workspace);
             return workspace;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to create workspace: " + e.getMessage());
+            Console_Logger.log("Failed to create workspace: " + e.getMessage());
             throw new DataAccessException("Failed to create workspace", ErrorCode.WS_001);
         }
     }
@@ -45,7 +45,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             return entityManager.createQuery(query).getResultList();
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to get all workspaces: " + e.getMessage());
+            Console_Logger.log("Failed to get all workspaces: " + e.getMessage());
             throw new DataAccessException("Failed to get all workspaces", ErrorCode.WS_002);
         }
     }
@@ -68,7 +68,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             }
             return workspace;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to get workspace by id: " + id + ", Error: " + e.getMessage());
+            Console_Logger.log("Failed to get workspace by id: " + id + ", Error: " + e.getMessage());
             throw new DataAccessException("Failed to get workspace", ErrorCode.WS_002);
         }
     }
@@ -82,7 +82,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             entityManager.merge(workspace);
             return true;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to update workspace: " + e.getMessage());
+            Console_Logger.log("Failed to update workspace: " + e.getMessage());
             throw new DataAccessException("Failed to update workspace", ErrorCode.WS_004);
         }
     }
@@ -101,7 +101,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
             int updated = entityManager.createQuery(update).executeUpdate();
             return updated > 0;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to delete workspace: " + e.getMessage());
+            Console_Logger.log("Failed to delete workspace: " + e.getMessage());
             throw new DataAccessException("Failed to delete workspace", ErrorCode.WS_005);
         }
     }
@@ -131,7 +131,7 @@ public class WorkspaceRepositoryImpl implements WorkspaceRepository {
 
             return entityManager.createQuery(query).getResultList();
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to get available workspaces: " + e.getMessage());
+            Console_Logger.log("Failed to get available workspaces: " + e.getMessage());
             throw new DataAccessException("Failed to get available workspaces", ErrorCode.WS_006);
         }
     }

@@ -1,7 +1,6 @@
 package com.andersen.entity.role;
 
 import jakarta.persistence.*;
-
 import java.util.Objects;
 
 /**
@@ -67,6 +66,7 @@ public class User {
     }
 
     // Getters and Setters
+
     /**
      * Retrieves the active status of the object.
      *

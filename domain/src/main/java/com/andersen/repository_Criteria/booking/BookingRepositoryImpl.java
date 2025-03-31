@@ -2,8 +2,8 @@ package com.andersen.repository_Criteria.booking;
 
 import com.andersen.entity.booking.Booking;
 import com.andersen.exception.DataAccessException;
-import com.andersen.exception.ErrorCode;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.exception.errorCode.ErrorCode;
+import com.andersen.logger.logger.Console_Logger;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
@@ -21,10 +21,10 @@ public class BookingRepositoryImpl implements BookingRepository {
     public Booking create(Booking booking) throws DataAccessException {
         try {
             entityManager.persist(booking);
-            ConsoleLogger.log("Created booking with ID: " + booking.getId());
+            Console_Logger.log("Created booking with ID: " + booking.getId());
             return booking;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to create booking: " + e.getMessage());
+            Console_Logger.log("Failed to create booking: " + e.getMessage());
             throw new DataAccessException("Booking creation failed", ErrorCode.BK_001);
         }
     }
@@ -39,10 +39,10 @@ public class BookingRepositoryImpl implements BookingRepository {
             query.where(cb.equal(root.get("id"), id));
 
             Booking booking = entityManager.createQuery(query).getSingleResult();
-            ConsoleLogger.log("Retrieved booking by ID: " + id);
+            Console_Logger.log("Retrieved booking by ID: " + id);
             return booking;
         } catch (Exception e) {
-            ConsoleLogger.log("Booking not found for ID: " + id);
+            Console_Logger.log("Booking not found for ID: " + id);
             throw new DataAccessException("Booking not found", ErrorCode.BK_002);
         }
     }
@@ -58,10 +58,10 @@ public class BookingRepositoryImpl implements BookingRepository {
             managedBooking.setStartTime(booking.getStartTime());
             managedBooking.setEndTime(booking.getEndTime());
 
-            ConsoleLogger.log("Updated booking with ID: " + booking.getId());
+            Console_Logger.log("Updated booking with ID: " + booking.getId());
             return managedBooking; // No merge needed as it's already managed
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to update booking: " + e.getMessage());
+            Console_Logger.log("Failed to update booking: " + e.getMessage());
             throw new DataAccessException("Booking update failed", ErrorCode.BK_003);
         }
     }
@@ -82,9 +82,9 @@ public class BookingRepositoryImpl implements BookingRepository {
             delete.where(cb.equal(root.get("id"), id));
 
             entityManager.createQuery(delete).executeUpdate();
-            ConsoleLogger.log("Deleted booking with ID: " + id);
+            Console_Logger.log("Deleted booking with ID: " + id);
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to delete booking: " + e.getMessage());
+            Console_Logger.log("Failed to delete booking: " + e.getMessage());
             throw new DataAccessException("Booking deletion failed", ErrorCode.BK_004);
         }
     }
@@ -102,10 +102,10 @@ public class BookingRepositoryImpl implements BookingRepository {
             query.orderBy(cb.desc(root.get("startTime")));
 
             List<Booking> result = entityManager.createQuery(query).getResultList();
-            ConsoleLogger.log("Found " + result.size() + " bookings for customer ID: " + customerId);
+            Console_Logger.log("Found " + result.size() + " bookings for customer ID: " + customerId);
             return result;
         } catch (Exception e) {
-            ConsoleLogger.log("Failed to get bookings for customer: " + customerId);
+            Console_Logger.log("Failed to get bookings for customer: " + customerId);
             throw new DataAccessException("Customer bookings retrieval failed", ErrorCode.BK_008);
         }
     }
