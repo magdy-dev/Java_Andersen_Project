@@ -5,26 +5,20 @@ import com.andersen.entity.role.User;
 import com.andersen.entity.workspace.Workspace;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.exception.BookingServiceException;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 /**
- * Controller for managing bookings within the workspace application.
- * This controller handles requests related to bookings, including:
- * <ul>
- *     <li>Retrieving bookings for a specific customer</li>
- *     <li>Displaying the booking creation form</li>
- *     <li>Creating a new booking</li>
- *     <li>Cancelling existing bookings</li>
- *     <li>Retrieving available workspaces for specified time slots</li>
- * </ul>
- * Each method manages user interactions and communicates with the BookingService
- * to perform operations related to booking management.
+ * Controller for handling booking operations related to users.
+ * This class provides endpoints for viewing customer bookings,
+ * creating new bookings, cancelling bookings, and retrieving available workspaces.
  */
 @Controller
 @RequestMapping("/bookings")
@@ -32,110 +26,159 @@ public class BookingController {
 
     private final BookingService bookingService;
 
+    /**
+     * Constructs a BookingController with the specified BookingService.
+     *
+     * @param bookingService the BookingService used for managing bookings.
+     */
     @Autowired
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 
     /**
-     * Retrieves the list of bookings for a specific customer.
+     * Retrieves a list of bookings for a specified customer.
      *
-     * @param customerId the ID of the customer for whom to retrieve bookings.
-     * @param model the model to add attributes for the view.
-     * @return the name of the view that displays the list of bookings, or an error view if an exception occurs.
+     * @param customerId the ID of the customer whose bookings are to be retrieved.
+     * @param model the model to hold attributes for the view.
+     * @param session the HttpSession to access the current user information.
+     * @return the view name for displaying the list of bookings.
      */
     @GetMapping
-    public String getCustomerBookings(@RequestParam Long customerId, Model model) {
+    public String getCustomerBookings(
+            @RequestParam Long customerId,
+            Model model,
+            HttpSession session) {
+
         try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null || !currentUser.getId().equals(customerId)) {
+                model.addAttribute("error", "Unauthorized access");
+                return "error";
+            }
+
             List<Booking> bookings = bookingService.getCustomerBookings(customerId);
             model.addAttribute("bookings", bookings);
-            return "bookingList"; // Return the view for listing bookings
+            return "bookings/list";
         } catch (BookingServiceException e) {
             model.addAttribute("error", e.getMessage());
-            return "error"; // Return to an error view
+            return "error";
         }
     }
 
     /**
      * Displays the form for creating a new booking.
      *
-     * @param model the model to add attributes for the view.
-     * @return the name of the view to display the booking creation form.
+     * @param workspaceId the ID of the workspace to be booked.
+     * @param model the model to hold attributes for the view.
+     * @param session the HttpSession to access the current user information.
+     * @return the view name for the create booking page.
      */
     @GetMapping("/create")
-    public String showCreateBookingForm(Model model) {
-        model.addAttribute("booking", new Booking()); // Prepare a new Booking object for the form
-        return "createBooking"; // Return the view for creating a booking
+    public String showCreateBookingForm(
+            @RequestParam Long workspaceId,
+            Model model,
+            HttpSession session) {
+
+        User currentUser = (User) session.getAttribute("currentUser");
+        if (currentUser == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("booking", new Booking());
+        model.addAttribute("workspaceId", workspaceId);
+        return "bookings/create";
     }
 
     /**
-     * Handles the creation of a new booking.
+     * Processes the creation of a new booking.
      *
-     * @param booking the booking details provided by the user.
-     * @param workspaceId the ID of the workspace to be booked.
-     * @param model the model to add attributes for the view.
-     * @return a redirect to the list of bookings if the creation is successful;
-     *         otherwise returns to the booking creation form with an error message.
+     * @param booking the Booking object containing booking details.
+     * @param workspaceId the ID of the workspace being booked.
+     * @param session the HttpSession to access the current user information.
+     * @param redirectAttributes attributes to pass for redirection.
+     * @return a redirect URL depending on the outcome of the booking creation.
      */
     @PostMapping("/create")
-    public String createBooking(@ModelAttribute Booking booking, @RequestParam Long workspaceId, Model model) {
+    public String createBooking(
+            @ModelAttribute Booking booking,
+            @RequestParam Long workspaceId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
         try {
-            User currentUser = getCurrentUser(); // Implement this method to get the logged-in user
-            bookingService.createBooking(currentUser, workspaceId, booking.getStartTime(), booking.getEndTime());
-            return "redirect:/bookings?customerId=" + currentUser.getId(); // Redirect to the list of bookings
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null) {
+                return "redirect:/login";
+            }
+
+            bookingService.createBooking(currentUser, workspaceId,
+                    booking.getStartTime(), booking.getEndTime());
+
+            redirectAttributes.addFlashAttribute("success", "Booking created successfully!");
+            return "redirect:/bookings?customerId=" + currentUser.getId();
         } catch (BookingServiceException e) {
-            model.addAttribute("error", e.getMessage());
-            return "createBooking"; // Return to the form with an error message
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            redirectAttributes.addAttribute("workspaceId", workspaceId);
+            return "redirect:/bookings/create";
         }
     }
 
     /**
-     * Cancels an existing booking.
+     * Processes the cancellation of a booking.
      *
-     * @param bookingId the ID of the booking to cancel.
-     * @param userId the ID of the user canceling the booking.
-     * @param model the model to add attributes for the view.
-     * @return a redirect to the list of bookings if the cancellation is successful;
-     *         otherwise returns to an error view with an error message.
+     * @param bookingId the ID of the booking to be cancelled.
+     * @param userId the ID of the user requesting the cancellation.
+     * @param session the HttpSession to access the current user information.
+     * @param redirectAttributes attributes to pass for redirection.
+     * @return a redirect URL depending on the outcome of the booking cancellation.
      */
     @PostMapping("/cancel/{bookingId}")
-    public String cancelBooking(@PathVariable Long bookingId, @RequestParam Long userId, Model model) {
+    public String cancelBooking(
+            @PathVariable Long bookingId,
+            @RequestParam Long userId,
+            HttpSession session,
+            RedirectAttributes redirectAttributes) {
+
         try {
+            User currentUser = (User) session.getAttribute("currentUser");
+            if (currentUser == null || !currentUser.getId().equals(userId)) {
+                redirectAttributes.addFlashAttribute("error", "Unauthorized action");
+                return "redirect:/login";
+            }
+
             bookingService.cancelBooking(bookingId, userId);
-            return "redirect:/bookings?customerId=" + userId; // Redirect to the list of bookings
+            redirectAttributes.addFlashAttribute("success", "Booking cancelled successfully!");
+            return "redirect:/bookings?customerId=" + userId;
         } catch (BookingServiceException e) {
-            model.addAttribute("error", e.getMessage());
-            return "error"; // Return to an error view
+            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            return "redirect:/bookings?customerId=" + userId;
         }
     }
+
     /**
-     * Retrieves available workspaces within a specified time range.
+     * Retrieves a list of available workspaces for a given time period.
      *
-     * @param startTime the start time of the booking period.
-     * @param endTime the end time of the booking period.
-     * @param model the model to add attributes for the view.
-     * @return the name of the view that displays available workspaces, or an error view if an exception occurs.
+     * @param startTime the start time of the desired booking period.
+     * @param endTime the end time of the desired booking period.
+     * @param model the model to hold attributes for the view.
+     * @return the view name for displaying available workspaces.
      */
     @GetMapping("/available")
-    public String getAvailableWorkspaces(@RequestParam LocalDateTime startTime, @RequestParam LocalDateTime endTime, Model model) {
+    public String getAvailableWorkspaces(
+            @RequestParam LocalDateTime startTime,
+            @RequestParam LocalDateTime endTime,
+            Model model) {
+
         try {
             List<Workspace> availableWorkspaces = bookingService.getAvailableWorkspaces(startTime, endTime);
             model.addAttribute("availableWorkspaces", availableWorkspaces);
-            return "availableWorkspaces"; // Return the view for displaying available workspaces
+            model.addAttribute("startTime", startTime);
+            model.addAttribute("endTime", endTime);
+            return "bookings/available";
         } catch (BookingServiceException e) {
             model.addAttribute("error", e.getMessage());
-            return "error"; // Return to an error view
+            return "error";
         }
-    }
-
-    /**
-     * A placeholder method to retrieve the currently logged-in user.
-     * This needs to be implemented to get the actual user information.
-     *
-     * @return the currently logged-in user.
-     */
-    private User getCurrentUser () {
-        // Implement logic to retrieve the currently logged-in user
-        return new User(); // Replace with actual user retrieval logic
     }
 }

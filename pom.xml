@@ -23,7 +23,10 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Boot BOM to manage all Spring Boot dependencies -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-actuator</artifactId>
+            </dependency>            <!-- Spring Boot BOM to manage all Spring Boot dependencies -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -100,7 +103,7 @@
                             <transformers>
                                 <transformer
                                         implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.andersen.Main</mainClass>
+                                    <mainClass>com.andersen.UiApplication</mainClass>
                                 </transformer>
                             </transformers>
                         </configuration>
