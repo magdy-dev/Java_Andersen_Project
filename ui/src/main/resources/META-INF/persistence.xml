@@ -4,7 +4,7 @@
         <class>com.andersen.domain.entity.workspace.Workspace</class>
         <class>com.andersen.domain.entity.booking.Booking</class>
         <class>com.andersen.domain.entity.role.User</class>
-        <!-- more entities -->
+        <!-- Add more entity classes here as needed -->
 
         <properties>
             <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
@@ -12,8 +12,10 @@
             <property name="javax.persistence.jdbc.user" value="postgres"/>
             <property name="javax.persistence.jdbc.password" value="magdy"/>
 
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
-            <property name="hibernate.show_sql" value="true"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/> <!-- Change to validate or none for production -->
+            <property name="hibernate.show_sql" value="true"/>       <!-- Disable in production -->
+            <property name="hibernate.format_sql" value="true"/>     <!-- Optional, for better formatting -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect"/> <!-- Specify dialect -->
         </properties>
     </persistence-unit>
 </persistence>
