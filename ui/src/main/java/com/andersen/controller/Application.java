@@ -4,7 +4,7 @@ import com.andersen.domain.exception.DataAccessException;
 import com.andersen.domain.exception.WorkspaceNotFoundException;
 import com.andersen.service.auth.AuthService;
 import com.andersen.domain.entity.role.User;
-import com.andersen.service.Security.SessionManager;
+import com.andersen.service.security.SessionManager;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.logger.logger.OutputLogger; // Import the OutputLogger
 import com.andersen.service.exception.BookingServiceException;

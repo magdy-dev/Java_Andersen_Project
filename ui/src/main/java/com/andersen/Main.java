@@ -6,7 +6,7 @@ import com.andersen.controller.Application;
 import com.andersen.controller.Customer;
 import com.andersen.domain.exception.WorkspaceNotFoundException;
 import com.andersen.logger.logger.OutputLogger;
-import com.andersen.service.Security.SessionManager;
+import com.andersen.service.security.SessionManager;
 import com.andersen.service.auth.AuthService;
 
 import java.util.Scanner;

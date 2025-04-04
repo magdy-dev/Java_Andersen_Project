@@ -5,7 +5,7 @@ import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.workspace.Workspace;
 import com.andersen.domain.exception.DataAccessException;
 import com.andersen.domain.exception.WorkspaceNotFoundException;
-import com.andersen.service.Security.SessionManager;
+import com.andersen.service.security.SessionManager;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.exception.BookingServiceException;
 import com.andersen.service.exception.WorkspaceServiceException;
