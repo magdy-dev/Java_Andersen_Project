@@ -1,4 +1,4 @@
-package com.andersen.service.Security;
+package com.andersen.service.security;
 
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;

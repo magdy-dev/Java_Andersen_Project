@@ -1,4 +1,4 @@
-package com.andersen.service.Security;
+package com.andersen.service.security;
 
 import org.springframework.stereotype.Component;
 
