@@ -1,6 +1,7 @@
 package com.andersen.service.workspace;
 
-import com.andersen.entity.workspace.Workspace;
+import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.exception.WorkspaceServiceException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,7 +20,7 @@ public interface WorkspaceService {
      * @return the created Workspace object
      * @throws WorkspaceServiceException if there is an error while creating the workspace
      */
-    Workspace createWorkspace(Workspace workspace) throws WorkspaceServiceException;
+    Workspace createWorkspace(Workspace workspace) throws WorkspaceServiceException, DataAccessException;
 
     /**
      * Retrieves a list of all available workspaces.
@@ -27,7 +28,7 @@ public interface WorkspaceService {
      * @return a list of Workspace objects
      * @throws WorkspaceServiceException if there is an error while retrieving workspaces
      */
-    List<Workspace> getAllWorkspaces() throws WorkspaceServiceException;
+    List<Workspace> getAllWorkspaces() throws WorkspaceServiceException, com.andersen.service.exception.DataAccessException;
 
     /**
      * Retrieves a workspace by its ID.

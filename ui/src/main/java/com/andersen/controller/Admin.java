@@ -1,9 +1,13 @@
 package com.andersen.controller;
 
+import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.Security.SessionManager;
+import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.booking.BookingService;
-import com.andersen.logger.logger.Out_put_Logger; // Import OutputLogger
+import com.andersen.logger.logger.OutputLogger;
+
 import java.util.Scanner;
 
 public class Admin {
@@ -13,10 +17,8 @@ public class Admin {
     private final SessionManager sessionManager;
     private String currentToken;
 
-    public Admin(Scanner scanner,
-                 WorkspaceService workspaceService,
-                 BookingService bookingService,
-                 SessionManager sessionManager) {
+    public Admin(Scanner scanner, WorkspaceService workspaceService,
+                 BookingService bookingService, SessionManager sessionManager) {
         this.scanner = scanner;
         this.workspaceService = workspaceService;
         this.bookingService = bookingService;
@@ -29,62 +31,100 @@ public class Admin {
 
     public void start() {
         if (!verifyAdminSession()) {
-            Out_put_Logger.error("Admin session expired or invalid"); // Logging error
+            OutputLogger.error("Admin session expired or invalid");
             return;
         }
 
         while (true) {
             MenuDisplayer.showAdminMenu();
             String choice = scanner.nextLine();
-
             switch (choice) {
-                case "1":
-                    addWorkspace();
-                    break;
-                case "2":
-                    removeWorkspace();
-                    break;
-                case "3":
-                    viewAllReservations();
-                    break;
-                case "4":
-                    Out_put_Logger.log("Returning to main menu..."); // Logging action
+                case "1" -> addWorkspace();
+                case "2" -> removeWorkspace();
+                case "3" -> viewAllReservations();
+                case "4" -> {
+                    OutputLogger.log("Returning to main menu...");
                     return;
-                default:
-                    Out_put_Logger.warn("Invalid choice. Please try again."); // Logging warning
+                }
+                default -> OutputLogger.warn("Invalid choice. Please try again.");
             }
         }
     }
 
     private boolean verifyAdminSession() {
-        if (currentToken == null || !sessionManager.isAdmin(currentToken)) {
-            Out_put_Logger.error("Access denied. Valid admin session required."); // Logging error
-            return false;
-        }
-        return true;
+        return currentToken != null && sessionManager.isAdmin(currentToken);
     }
 
     private void addWorkspace() {
         if (!verifyAdminSession()) return;
 
-        Out_put_Logger.log("\n--- Add New Workspace ---");
-        // Implementation for adding workspace
-        Out_put_Logger.log("Workspace added successfully!\n"); // Logging action
+        OutputLogger.log("\n--- Add New Workspace ---");
+        OutputLogger.log("Enter workspace name: ");
+        String name = scanner.nextLine();
+        OutputLogger.log("Enter workspace description: ");
+        String description = scanner.nextLine();
+        OutputLogger.log("Enter workspace capacity: ");
+
+        int capacity;
+        try {
+            capacity = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            OutputLogger.error("Invalid capacity input. Please enter a valid number.");
+            return;
+        }
+
+        Workspace workspace = new Workspace();
+        workspace.setName(name);
+        workspace.setDescription(description);
+        workspace.setCapacity(capacity);
+
+        try {
+            workspaceService.createWorkspace(workspace);
+            OutputLogger.log("Workspace added successfully!\n");
+        } catch (WorkspaceServiceException | DataAccessException e) {
+            OutputLogger.error("Failed to add workspace: " + e.getMessage());
+        }
     }
 
     private void removeWorkspace() {
         if (!verifyAdminSession()) return;
 
-        Out_put_Logger.log("\n--- Remove Workspace ---");
-        // Implementation for removing workspace
-        Out_put_Logger.log("Workspace removed successfully!\n"); // Logging action
+        OutputLogger.log("\n--- Remove Workspace ---");
+        OutputLogger.log("Enter workspace ID to remove: ");
+        Long id;
+        try {
+            id = Long.parseLong(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            OutputLogger.error("Invalid ID input. Please enter a valid number.");
+            return;
+        }
+
+        try {
+            if (workspaceService.deleteWorkspace(id)) {
+                OutputLogger.log("Workspace removed successfully!\n");
+            } else {
+                OutputLogger.warn("Workspace could not be found or is already inactive.");
+            }
+        } catch (WorkspaceServiceException e) {
+            OutputLogger.error("Failed to remove workspace: " + e.getMessage());
+        }
     }
 
     private void viewAllReservations() {
         if (!verifyAdminSession()) return;
 
-        Out_put_Logger.log("\n--- All Reservations ---");
-        // Implementation to view reservations
-        Out_put_Logger.log(""); // Logging empty line for formatting
+        OutputLogger.log("\n--- All Reservations ---");
+        try {
+            var reservations = bookingService.getAllBookings();
+            if (reservations.isEmpty()) {
+                OutputLogger.log("No reservations found.\n");
+            } else {
+                reservations.forEach(r -> OutputLogger.log(r.toString()));
+            }
+        } catch (DataAccessException e) {
+            OutputLogger.error("Failed to fetch reservations: " + e.getMessage());
+        } catch (com.andersen.service.exception.DataAccessException e) {
+            OutputLogger.error("Error while fetching reservations: " + e.getMessage());
+        }
     }
 }

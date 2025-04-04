@@ -12,6 +12,8 @@
     <artifactId>domain</artifactId>
 
     <properties>
+        <org.springframework.version>3.0.5.RELEASE</org.springframework.version>
+
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
     </properties>
@@ -25,9 +27,9 @@
         </dependency>
         <!-- Spring Data JPA -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>3.4.1</version>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${org.springframework.version}</version>
         </dependency>
         <!-- Jakarta Persistence API (for jakarta.persistence.*) -->
         <dependency>

@@ -1,8 +1,9 @@
 package com.andersen.service.booking;
 
-import com.andersen.entity.booking.Booking;
-import com.andersen.entity.role.User;
-import com.andersen.entity.workspace.Workspace;
+import com.andersen.domain.entity.booking.Booking;
+import com.andersen.domain.entity.role.User;
+import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.exception.BookingServiceException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,7 +26,7 @@ public interface BookingService {
      * @throws BookingServiceException if there is an error while creating the booking
      */
     Booking createBooking(User customer, Long workspaceId,
-                          LocalDateTime startTime, LocalDateTime endTime) throws BookingServiceException;
+                          LocalDateTime startTime, LocalDateTime endTime) throws BookingServiceException, DataAccessException;
 
     /**
      * Retrieves a list of bookings for a specific customer.
@@ -34,7 +35,7 @@ public interface BookingService {
      * @return a list of Booking objects associated with the customer
      * @throws BookingServiceException if there is an error while retrieving bookings
      */
-    List<Booking> getCustomerBookings(Long customerId) throws BookingServiceException;
+    List<Booking> getCustomerBookings(Long customerId) throws BookingServiceException, DataAccessException;
 
     /**
      * Cancels a specified booking.
@@ -44,7 +45,7 @@ public interface BookingService {
      * @return true if the booking was successfully cancelled, false otherwise
      * @throws BookingServiceException if there is an error while cancelling the booking
      */
-    boolean cancelBooking(Long bookingId, Long userId) throws BookingServiceException;
+    boolean cancelBooking(Long bookingId, Long userId) throws BookingServiceException, DataAccessException;
 
     /**
      * Retrieves a list of available workspaces for the given time range.
@@ -55,6 +56,7 @@ public interface BookingService {
      * @throws BookingServiceException if there is an error while retrieving available workspaces
      */
     List<Workspace> getAvailableWorkspaces(LocalDateTime startTime,
-                                           LocalDateTime endTime) throws BookingServiceException;
+                                           LocalDateTime endTime) throws BookingServiceException, DataAccessException;
 
+    List<Booking> getAllBookings() throws DataAccessException, com.andersen.service.exception.DataAccessException;
 }

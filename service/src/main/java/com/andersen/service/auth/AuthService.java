@@ -1,6 +1,7 @@
 package com.andersen.service.auth;
 
-import com.andersen.entity.role.User;
+import com.andersen.domain.entity.role.User;
+import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
 
@@ -18,7 +19,7 @@ public interface AuthService {
      * @return the authenticated User object
      * @throws AuthenticationException if the username or password is invalid
      */
-    User login(String username, String password) throws AuthenticationException;
+    User login(String username, String password) throws AuthenticationException, DataAccessException;
 
     /**
      * Logs out a user based on the provided token.
@@ -39,5 +40,5 @@ public interface AuthService {
      * @return the registered User object
      */
     User registerCustomer(String username, String password, String email, String fullName)
-            throws RegistrationException, AuthenticationException;
+            throws RegistrationException, AuthenticationException, DataAccessException;
 }

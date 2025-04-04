@@ -1,13 +1,13 @@
 package com.andersen.service.auth;
 
-import com.andersen.entity.role.User;
-import com.andersen.entity.role.UserRole;
+import com.andersen.domain.entity.role.User;
+import com.andersen.domain.entity.role.UserRole;
 
-import com.andersen.exception.DataAccessException;
-import com.andersen.logger.logger.Out_put_Logger;
+import com.andersen.domain.exception.DataAccessException;
+import com.andersen.logger.logger.OutputLogger;
 
 
-import com.andersen.repository_JPA.user.UserRepository;
+import com.andersen.domain.repository_Criteria.user.UserRepository;
 import com.andersen.service.Security.PasswordEncoder;
 import com.andersen.service.Security.SessionManager;
 import com.andersen.service.exception.AuthenticationException;
@@ -29,7 +29,7 @@ public class AuthServiceImplTest {
     public void setUp() {
         userRepository = Mockito.mock(UserRepository.class);
         sessionManager = Mockito.mock(SessionManager.class);
-        authService = new AuthServiceImpl(userRepository, sessionManager,passwordEncoder);
+        authService = new AuthServiceImpl((UserRepository) userRepository, sessionManager,passwordEncoder);
     }
 
     @Test
@@ -48,7 +48,7 @@ public class AuthServiceImplTest {
         assertNotNull(loggedInUser);
         assertEquals(username, loggedInUser.getUsername());
         verify(sessionManager, times(1)).createSession(user);
-        Out_put_Logger.log("Login test passed.");
+        OutputLogger.log("Login test passed.");
     }
 
     @Test
@@ -101,7 +101,7 @@ public class AuthServiceImplTest {
         newUser.setFullName(fullName);
         newUser.setRole(UserRole.CUSTOMER);
 
-        when(userRepository.save(any(User.class))).thenReturn(newUser);
+        when(userRepository.createUser(any(User.class))).thenReturn(newUser);
 
         // Call the registerCustomer method
         User registeredUser = authService.registerCustomer(username, password, email, fullName);
@@ -115,8 +115,8 @@ public class AuthServiceImplTest {
 
         // Verify that the repository methods were called as expected
         verify(userRepository, times(1)).getUserByUsername(username);
-        verify(userRepository, times(1)).save(any(User.class));
-        Out_put_Logger.log("Register customer test passed.");
+        verify(userRepository, times(1)).createUser(any(User.class));
+        OutputLogger.log("Register customer test passed.");
     }}
 
 // Additional tests could be added here to cover more scenarios, such as registration failures

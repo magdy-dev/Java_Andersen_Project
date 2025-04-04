@@ -1,7 +1,7 @@
 package com.andersen.service.Security;
 
-import com.andersen.entity.role.User;
-import com.andersen.entity.role.UserRole;
+import com.andersen.domain.entity.role.User;
+import com.andersen.domain.entity.role.UserRole;
 import org.springframework.stereotype.Component;
 import java.util.Map;
 import java.util.UUID;
