@@ -1,18 +1,20 @@
 package com.andersen.config;
 
-import com.andersen.repository_JPA.booking.BookingRepository;
-import com.andersen.repository_JPA.user.UserRepository;
-import com.andersen.repository_JPA.workspace.WorkspaceRepository;
+
+import com.andersen.domain.repository_Criteria.booking.BookingRepository;
+import com.andersen.domain.repository_Criteria.user.UserRepository;
+import com.andersen.domain.repository_Criteria.workspace.WorkspaceRepository;
 import com.andersen.service.auth.AuthService;
 import com.andersen.service.auth.AuthServiceImpl;
-import com.andersen.service.Security.PasswordEncoder;
-import com.andersen.service.Security.SessionManager;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
+import com.andersen.service.security.PasswordEncoder;
+import com.andersen.service.security.SessionManager;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.workspace.WorkspaceServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * Configuration class for the Spring application, providing bean definitions
@@ -23,6 +25,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AppConfig {
 
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new PasswordEncoder(); // Choose your preferred PasswordEncoder
+    }
     /**
      * Defines a bean for the AuthService implementation.
      *

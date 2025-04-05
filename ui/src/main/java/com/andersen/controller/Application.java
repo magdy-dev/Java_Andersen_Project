@@ -8,6 +8,7 @@ import com.andersen.service.security.SessionManager;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.logger.logger.OutputLogger; // Import the OutputLogger
 import com.andersen.service.exception.BookingServiceException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Scanner;
 
@@ -31,6 +32,7 @@ public class Application {
      * @param customer the customer controller
      * @param sessionManager service for managing user sessions
      */
+    @Autowired
     public Application(Scanner scanner,
                        AuthService authService,
                        Admin admin,

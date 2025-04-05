@@ -12,6 +12,7 @@
     <artifactId>ui</artifactId>
 
     <dependencies>
+
         <dependency>
             <groupId>com.andersen</groupId>
             <artifactId>service</artifactId>

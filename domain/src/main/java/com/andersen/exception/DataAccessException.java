@@ -1,6 +1,7 @@
 package com.andersen.exception;
 
-import com.andersen.exception.errorCode.ErrorCode;
+
+import com.andersen.domain.exception.errorCode.ErrorCodeRepo;
 
 /**
  * Custom exception class to handle errors related to data access operations.
@@ -18,7 +19,7 @@ public class DataAccessException extends Exception {
      * @param errorCode the specific error code representing the type of failure
      *                  (e.g., workspace creation failure)
      */
-    public DataAccessException(String message, ErrorCode errorCode) {
+    public DataAccessException(String message, ErrorCodeRepo errorCode) {
         super(message);
     }
 }

@@ -26,7 +26,21 @@
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
             </dependency>
-
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-context</artifactId>
+                <version>5.3.9</version> <!-- Replace with the desired version -->
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-orm</artifactId>
+                <version>5.3.9</version> <!-- Replace with the desired version -->
+            </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-tx</artifactId>
+                <version>5.3.9</version> <!-- Replace with the desired version -->
+            </dependency>
 
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
