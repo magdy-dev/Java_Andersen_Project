@@ -12,6 +12,7 @@ import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.exception.errorcode.ErrorCode;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.logger.logger.OutputLogger;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.Scanner;
  * Provides functionalities for browsing workspaces, booking, viewing,
  * and canceling reservations.
  */
+@Component
 public class Customer {
     private final Scanner scanner;
     private final WorkspaceService workspaceService;

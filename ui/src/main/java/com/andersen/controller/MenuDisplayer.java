@@ -5,6 +5,7 @@ import com.andersen.logger.logger.OutputLogger;
 /**
  * Class responsible for displaying menus in the application.
  */
+
 public class MenuDisplayer {
     private static final String MAIN_MENU = """
             \n=== Coworking Space Reservation ===

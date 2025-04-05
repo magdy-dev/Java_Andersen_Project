@@ -9,6 +9,7 @@ import com.andersen.service.exception.AuthenticationException;
 import com.andersen.logger.logger.OutputLogger; // Import the OutputLogger
 import com.andersen.service.exception.BookingServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
 
@@ -16,6 +17,7 @@ import java.util.Scanner;
  * Main application class that handles user login processes
  * for both admin and customer roles.
  */
+@Component
 public class Application {
     private final AuthService authService;
     private final SessionManager sessionManager;

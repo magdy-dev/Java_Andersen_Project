@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
  * Configuration class for the user interface layer of the application.
  * This class scans for components in the 'com.andersen.controller' and 'com.andersen.domain.repository_Criteria' packages.
  */
+@ComponentScan
 @Configuration
 @ComponentScan(basePackages = {
         "com.andersen.controller",

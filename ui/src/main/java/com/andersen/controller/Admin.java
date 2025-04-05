@@ -7,9 +7,10 @@ import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.workspace.WorkspaceService;
 import com.andersen.service.booking.BookingService;
 import com.andersen.logger.logger.OutputLogger;
+import org.springframework.stereotype.Component;
 
 import java.util.Scanner;
-
+@Component
 public class Admin {
     private final Scanner scanner;
     private final WorkspaceService workspaceService;
