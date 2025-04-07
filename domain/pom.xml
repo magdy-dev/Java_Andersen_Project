@@ -25,22 +25,23 @@
             <version>1.18.36</version> <!-- Replace with a valid version -->
             <scope>provided</scope>
         </dependency>
-        <!-- Spring Data JPA -->
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>${org.springframework.version}</version>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
+            <version>2.7.13</version> <!-- Or compatible with your Spring version -->
         </dependency>
-        <!-- Jakarta Persistence API (for jakarta.persistence.*) -->
+        <!-- JPA API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
+
+        <!-- Hibernate (JPA Implementation) -->
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.0.1</version> <!-- Check for the latest version -->
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-core</artifactId>
+            <version>6.2.7.Final</version>
         </dependency>
         <!-- PostgreSQL JDBC Driver Dependency -->
         <dependency>

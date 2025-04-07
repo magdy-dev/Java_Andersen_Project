@@ -1,6 +1,7 @@
-package com.andersen.repository_JPA.user;
+package com.andersen.domain.repository.user;
 
-import com.andersen.entity.role.User;
+
+import com.andersen.domain.entity.role.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

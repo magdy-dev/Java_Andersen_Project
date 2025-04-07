@@ -2,9 +2,9 @@ package com.andersen.service.workspace;
 
 import com.andersen.domain.entity.booking.BookingStatus;
 import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.domain.repository.workspace.WorkspaceRepository;
 import com.andersen.service.exception.DataAccessException;
 import com.andersen.service.exception.WorkspaceServiceException;
-import com.andersen.domain.repository_Criteria.workspace.WorkspaceRepository;
 import com.andersen.service.exception.errorcode.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,97 +12,129 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-
 /**
- * Implementation of WorkspaceService that provides functionality to manage workspaces,
- * including creation, updates, retrieval, and availability checks.
+ * Implementation of the WorkspaceService interface.
+ * Handles workspace creation, retrieval, updating, deletion, and availability checks.
  */
+
 @Service
 @Transactional
 public class WorkspaceServiceImpl implements WorkspaceService {
-
+    /**
+     * Repository for performing workspace-related database operations.
+     */
     private final WorkspaceRepository workspaceRepository;
 
     @Autowired
     public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository) {
         this.workspaceRepository = workspaceRepository;
     }
-
     /**
-     * Creates a new workspace after validating the provided workspace information.
+     * Creates a new workspace.
      *
-     * @param workspace the Workspace object to be created
-     * @return the created Workspace object
-     * @throws WorkspaceServiceException if the workspace fails validation
-     * @throws DataAccessException       if there is an error accessing the workspace data
+     * @param workspace the workspace to create
+     * @return the saved workspace
+     * @throws WorkspaceServiceException if validation fails
+     * @throws com.andersen.domain.exception.DataAccessException if a data access error occurs
      */
     @Override
     public Workspace createWorkspace(Workspace workspace)
             throws WorkspaceServiceException, com.andersen.domain.exception.DataAccessException {
         validateWorkspace(workspace);
-        return workspaceRepository.createWorkspace(workspace);
+        return workspaceRepository.save(workspace);
     }
-
     /**
-     * Retrieves all workspaces from the repository.
+     * Retrieves all workspaces.
      *
-     * @return a list of all Workspace objects
-     * @throws DataAccessException if there is an error accessing the workspace data
+     * @return a list of all workspaces
+     * @throws DataAccessException if data retrieval fails
      */
     @Override
     public List<Workspace> getAllWorkspaces() throws DataAccessException {
         try {
-            return workspaceRepository.getAllWorkspaces();
+            return workspaceRepository.findAll();
         } catch (Exception e) {
-            throw new DataAccessException("Failed to retrieve workspaces: " + e.getMessage(), ErrorCode.WS_001);
+            throw new DataAccessException("Failed to retrieve workspaces", ErrorCode.WS_001);
         }
     }
-
     /**
-     * Retrieves a workspace by its ID.
+     * Retrieves a workspace by its ID if it's active.
      *
-     * @param id the ID of the workspace to retrieve
-     * @return the Workspace object associated with the given ID
-     * @throws WorkspaceServiceException if the workspace is not found or is inactive
+     * @param id the ID of the workspace
+     * @return an Optional containing the workspace if found and active
+     * @throws WorkspaceServiceException if not found or an error occurs
      */
     @Override
-    public Workspace getWorkspaceById(Long id) throws WorkspaceServiceException {
+    public Optional<Workspace> getWorkspaceById(Long id) throws WorkspaceServiceException {
         try {
-            Workspace workspace = workspaceRepository.getWorkspaceById(id);
-            if (workspace == null || !workspace.isActive()) {
-                throw new WorkspaceServiceException("Workspace not found with ID: " + id, ErrorCode.WS_001);
+            Optional<Workspace> workspaceOpt = workspaceRepository.findById(id);
+            if (workspaceOpt.isEmpty() || !workspaceOpt.get().isActive()) {
+                throw new WorkspaceServiceException("Workspace not found or inactive with ID: " + id, ErrorCode.WS_001);
             }
-            return workspace;
+            return workspaceOpt;
         } catch (Exception e) {
-            throw new WorkspaceServiceException("Failed to retrieve workspace: " + e.getMessage(), e);
+            throw new WorkspaceServiceException("Failed to retrieve workspace with ID: " + id, e);
         }
     }
-
     /**
-     * Updates an existing workspace after validation.
+     * Updates an existing workspace.
      *
-     * @param workspace the Workspace object with updated information
-     * @return true if the workspace was updated successfully, false otherwise
-     * @throws WorkspaceServiceException if the workspace fails validation
+     * @param workspace the workspace to update
+     * @return true if the update was successful
+     * @throws WorkspaceServiceException if validation or update fails
      */
     @Override
     public boolean updateWorkspace(Workspace workspace) throws WorkspaceServiceException {
         validateWorkspace(workspace);
         try {
-            return workspaceRepository.updateWorkspace(workspace);
+            Optional<Workspace> existingOpt = workspaceRepository.findById(workspace.getId());
+            if (existingOpt.isEmpty()) {
+                throw new WorkspaceServiceException("Workspace not found with ID: " + workspace.getId(), ErrorCode.WS_002);
+            }
+            Workspace existing = existingOpt.get();
+            existing.setName(workspace.getName());
+            existing.setDescription(workspace.getDescription());
+            existing.setCapacity(workspace.getCapacity());
+            existing.setPricePerHour(workspace.getPricePerHour());
+            existing.setType(workspace.getType());
+            existing.setActive(workspace.isActive());
+            workspaceRepository.save(existing);
+            return true;
         } catch (Exception e) {
-            throw new WorkspaceServiceException("Failed to update workspace: " + e.getMessage(), e);
+            throw new WorkspaceServiceException("Failed to update workspace with ID: " + workspace.getId(), e);
         }
     }
-
     /**
-     * Retrieves a list of available workspaces during the specified time period.
+     * Deactivates a workspace by its ID.
      *
-     * @param startTime the starting time for availability check
-     * @param endTime   the ending time for availability check
-     * @return a list of available Workspace objects
-     * @throws WorkspaceServiceException if the time parameters are invalid
+     * @param id the ID of the workspace
+     * @return true if deactivation was successful
+     * @throws WorkspaceServiceException if not found or an error occurs
+     */
+    @Override
+    public boolean deleteWorkspace(Long id) throws WorkspaceServiceException {
+        try {
+            Optional<Workspace> workspaceOpt = workspaceRepository.findById(id);
+            if (workspaceOpt.isEmpty() || !workspaceOpt.get().isActive()) {
+                throw new WorkspaceServiceException("Workspace not found or already inactive with ID: " + id, ErrorCode.WS_002);
+            }
+            Workspace workspace = workspaceOpt.get();
+            workspace.setActive(false);
+            workspaceRepository.save(workspace);
+            return true;
+        } catch (Exception e) {
+            throw new WorkspaceServiceException("Failed to deactivate workspace with ID: " + id, e);
+        }
+    }
+    /**
+     * Finds all available workspaces within a specific time range.
+     *
+     * @param startTime the desired start time
+     * @param endTime   the desired end time
+     * @return a list of available workspaces
+     * @throws WorkspaceServiceException if validation or query fails
      */
     @Override
     public List<Workspace> getAvailableWorkspaces(LocalDateTime startTime, LocalDateTime endTime)
@@ -121,45 +153,26 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     /**
      * Retrieves all active workspaces.
      *
-     * @return a list of active Workspace objects
-     * @throws WorkspaceServiceException if there is an error during retrieval
+     * @return a list of active workspaces
+     * @throws WorkspaceServiceException if an error occurs
      */
     @Override
     public List<Workspace> findAllActiveWorkspaces() throws WorkspaceServiceException {
         try {
-            return workspaceRepository.getAllWorkspaces(); // Assume it already filters inactive workspaces
+            return workspaceRepository.findAll().stream()
+                    .filter(Workspace::isActive)
+                    .collect(Collectors.toList());
         } catch (Exception e) {
             throw new WorkspaceServiceException("Failed to retrieve active workspaces", e);
         }
     }
-
     /**
-     * Deletes a workspace by its ID, making it inactive.
+     * Checks if a workspace is available within the given time range.
      *
-     * @param id the ID of the workspace to delete
-     * @return true if the workspace was successfully deleted; false otherwise
-     * @throws WorkspaceServiceException if the workspace is not found or is inactive
-     */
-    @Override
-    public boolean deleteWorkspace(Long id) throws WorkspaceServiceException {
-        try {
-            Workspace workspace = workspaceRepository.getWorkspaceById(id);
-            if (workspace == null || !workspace.isActive()) {
-                throw new WorkspaceServiceException("Workspace not found with ID: " + id, ErrorCode.WS_002);
-            }
-            return workspaceRepository.deleteWorkspace(id);
-        } catch (Exception e) {
-            throw new WorkspaceServiceException("Failed to deactivate workspace", e);
-        }
-    }
-
-    /**
-     * Checks if a specific workspace is available during the specified time period.
-     *
-     * @param workspace the Workspace object to check
-     * @param startTime the starting time of the booking request
-     * @param endTime   the ending time of the booking request
-     * @return true if the workspace is available; false otherwise
+     * @param workspace  the workspace to check
+     * @param startTime  the desired start time
+     * @param endTime    the desired end time
+     * @return true if the workspace is available
      */
     @Override
     public boolean isWorkspaceAvailable(Workspace workspace, LocalDateTime startTime, LocalDateTime endTime) {
@@ -168,29 +181,26 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                         booking.getStatus() == BookingStatus.CONFIRMED &&
                                 isTimeOverlapping(booking.getStartTime(), booking.getEndTime(), startTime, endTime));
     }
-
     /**
-     * Checks if the specified time intervals overlap.
+     * Determines if the given time ranges overlap.
      *
-     * @param bookingStart   the start time of the existing booking
-     * @param bookingEnd     the end time of the existing booking
-     * @param requestedStart the start time of the requested booking
-     * @param requestedEnd   the end time of the requested booking
-     * @return true if the time periods overlap; false otherwise
+     * @param bookingStart   start time of existing booking
+     * @param bookingEnd     end time of existing booking
+     * @param requestedStart start time of requested booking
+     * @param requestedEnd   end time of requested booking
+     * @return true if the time ranges overlap
      */
     private boolean isTimeOverlapping(LocalDateTime bookingStart,
                                       LocalDateTime bookingEnd,
                                       LocalDateTime requestedStart,
                                       LocalDateTime requestedEnd) {
-        return bookingStart.isBefore(requestedEnd) &&
-                bookingEnd.isAfter(requestedStart);
+        return bookingStart.isBefore(requestedEnd) && bookingEnd.isAfter(requestedStart);
     }
-
     /**
-     * Validates the provided workspace information before creating or updating.
+     * Validates the workspace's properties.
      *
-     * @param workspace the Workspace object to validate
-     * @throws WorkspaceServiceException if validation fails
+     * @param workspace the workspace to validate
+     * @throws WorkspaceServiceException if any field is invalid
      */
     private void validateWorkspace(Workspace workspace) throws WorkspaceServiceException {
         if (workspace == null) {
@@ -200,22 +210,21 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("Workspace name is required");
         }
         if (workspace.getPricePerHour() <= 0) {
-            throw new WorkspaceServiceException("Price must be positive");
+            throw new WorkspaceServiceException("Workspace price must be greater than 0");
         }
         if (workspace.getCapacity() <= 0) {
-            throw new WorkspaceServiceException("Capacity must be positive");
+            throw new WorkspaceServiceException("Workspace capacity must be greater than 0");
         }
         if (workspace.getType() == null) {
-            throw new WorkspaceServiceException("Workspace type is required");
+            throw new WorkspaceServiceException("Workspace type must be specified");
         }
     }
-
     /**
-     * Validates the start and end time parameters for scheduling bookings.
+     * Validates the time range for workspace availability.
      *
-     * @param startTime the starting time to validate
-     * @param endTime   the ending time to validate
-     * @throws WorkspaceServiceException if validation fails
+     * @param startTime the desired start time
+     * @param endTime   the desired end time
+     * @throws WorkspaceServiceException if times are null, in the past, or invalid
      */
     private void validateTimeParameters(LocalDateTime startTime, LocalDateTime endTime)
             throws WorkspaceServiceException {
@@ -226,7 +235,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("End time must be after start time");
         }
         if (startTime.isBefore(LocalDateTime.now())) {
-            throw new WorkspaceServiceException("Cannot check availability for past dates");
+            throw new WorkspaceServiceException("Start time cannot be in the past");
         }
     }
 }

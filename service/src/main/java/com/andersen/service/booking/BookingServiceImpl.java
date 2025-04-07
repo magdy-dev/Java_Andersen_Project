@@ -5,8 +5,8 @@ import com.andersen.domain.entity.booking.BookingStatus;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.workspace.Workspace;
 import com.andersen.domain.exception.DataAccessException;
-import com.andersen.domain.repository_Criteria.booking.BookingRepository;
-import com.andersen.domain.repository_Criteria.workspace.WorkspaceRepository;
+import com.andersen.domain.repository.booking.BookingRepository;
+import com.andersen.domain.repository.workspace.WorkspaceRepository;
 import com.andersen.service.exception.BookingServiceException;
 import com.andersen.service.exception.errorcode.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
+import java.util.Optional;
 /**
- * Implementation of BookingService that provides functionality to create,
- * retrieve, and cancel bookings for workspaces.
+ * Service implementation for managing bookings in a coworking space system.
+ * Handles booking creation, cancellation, retrieval, and workspace availability queries.
  */
 @Service
 @Transactional
 public class BookingServiceImpl implements BookingService {
-
+    /**
+     * Repository for performing booking-related database operations.
+     *  Repository for performing workspace-related database operations.
+     *
+     */
     private final BookingRepository bookingRepository;
     private final WorkspaceRepository workspaceRepository;
 
@@ -33,45 +37,43 @@ public class BookingServiceImpl implements BookingService {
         this.bookingRepository = bookingRepository;
         this.workspaceRepository = workspaceRepository;
     }
-
     /**
-     * Creates a booking for a specified workspace during the defined time period.
+     * Creates a new booking for a workspace by a customer.
      *
-     * @param customer    the user who is making the booking
-     * @param workspaceId the ID of the workspace being booked
-     * @param startTime   the starting time of the booking
-     * @param endTime     the ending time of the booking
-     * @return the created Booking object
-     * @throws BookingServiceException if any validation fails or if the workspace is not found
-     * @throws DataAccessException     if there is an error accessing the data
+     * @param customer   the user who is booking
+     * @param workspaceId the ID of the workspace to book
+     * @param startTime  the start time of the booking
+     * @param endTime    the end time of the booking
+     * @return the created booking
+     * @throws BookingServiceException if validation fails or workspace not found
+     * @throws DataAccessException     if a data access error occurs
      */
     @Override
     public Booking createBooking(User customer, Long workspaceId, LocalDateTime startTime, LocalDateTime endTime)
             throws BookingServiceException, DataAccessException {
         validateParameters(customer, workspaceId, startTime, endTime);
 
-        Workspace workspace = workspaceRepository.getWorkspaceById(workspaceId);
-        if (workspace == null) {
+        Optional<Workspace> workspace = workspaceRepository.findById(workspaceId);
+        if (workspace.isEmpty()) {
             throw new BookingServiceException("Workspace not found", ErrorCode.WS_001);
         }
 
         Booking booking = new Booking();
         booking.setCustomer(customer);
-        booking.setWorkspace(workspace);
+        booking.setWorkspace(workspace.orElse(null));
         booking.setStartTime(startTime);
         booking.setEndTime(endTime);
         booking.setStatus(BookingStatus.CONFIRMED);
 
-        return bookingRepository.create(booking);
+        return bookingRepository.save(booking);
     }
-
     /**
-     * Retrieves all bookings made by a specified customer.
+     * Retrieves all bookings made by a specific customer.
      *
-     * @param customerId the ID of the customer whose bookings are to be retrieved
-     * @return a list of Booking objects for the specified customer
+     * @param customerId the ID of the customer
+     * @return list of bookings
      * @throws BookingServiceException if the customer ID is null
-     * @throws DataAccessException     if there is an error accessing the data
+     * @throws DataAccessException     if a data access error occurs
      */
     @Override
     public List<Booking> getCustomerBookings(Long customerId)
@@ -79,20 +81,20 @@ public class BookingServiceImpl implements BookingService {
         if (customerId == null) {
             throw new BookingServiceException("Customer ID cannot be null", ErrorCode.BK_001);
         }
-        return bookingRepository.getByCustomer(customerId);
+        return bookingRepository.getByCustomerId(customerId);
     }
-
     /**
-     * Cancels a specified booking if the user requesting the cancellation is the original customer.
+     * Cancels a booking made by a user if it's still active and belongs to the user.
      *
      * @param bookingId the ID of the booking to cancel
-     * @param userId    the ID of the user requesting the cancellation
-     * @return true if the booking was successfully cancelled; false if it was already cancelled
-     * @throws BookingServiceException if invalid parameters are provided or if the booking is not found
-     * @throws DataAccessException     if there is an error accessing the data
+     * @param userId    the ID of the user attempting the cancellation
+     * @return true if cancelled, false if already cancelled
+     * @throws BookingServiceException if validation fails or unauthorized
+     * @throws DataAccessException     if a data access error occurs
      */
     @Override
-    public boolean cancelBooking(Long bookingId, Long userId) throws BookingServiceException, DataAccessException {
+    public boolean cancelBooking(Long bookingId, Long userId)
+            throws BookingServiceException, DataAccessException {
         if (bookingId == null || userId == null) {
             throw new BookingServiceException("Invalid parameters", ErrorCode.BK_004);
         }
@@ -107,21 +109,21 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (booking.getStatus() == BookingStatus.CANCELLED) {
-            return false; // Booking is already cancelled
+            return false;
         }
 
-        bookingRepository.update(booking);
+        booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
         return true;
     }
-
     /**
-     * Retrieves a list of available workspaces during the specified time period.
+     * Retrieves a list of available workspaces for a given time range.
      *
-     * @param startTime the starting time for availability check
-     * @param endTime   the ending time for availability check
-     * @return a list of available Workspace objects
-     * @throws BookingServiceException if the time parameters are invalid
-     * @throws DataAccessException     if there is an error accessing the data
+     * @param startTime the desired start time
+     * @param endTime   the desired end time
+     * @return list of available workspaces
+     * @throws BookingServiceException if time parameters are invalid
+     * @throws DataAccessException     if a data access error occurs
      */
     @Override
     public List<Workspace> getAvailableWorkspaces(LocalDateTime startTime, LocalDateTime endTime)
@@ -129,27 +131,26 @@ public class BookingServiceImpl implements BookingService {
         validateTimeParameters(startTime, endTime);
         return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
     }
-
     /**
      * Retrieves all bookings in the system.
      *
-     * @return a list of all Booking objects
-     * @throws DataAccessException if there is an error accessing the data
+     * @return list of all bookings
+     * @throws DataAccessException if a data access error occurs
      */
     @Override
     public List<Booking> getAllBookings() throws DataAccessException {
-        return bookingRepository.getAllBookings();
+        return bookingRepository.findAll();
     }
-
     /**
-     * Validates the parameters for creating a booking.
+     * Validates booking parameters before creation.
      *
-     * @param customer    the user making the booking
-     * @param workspaceId the ID of the workspace being booked
-     * @param startTime   the starting time of the booking
-     * @param endTime     the ending time of the booking
-     * @throws BookingServiceException if any validation fails
+     * @param customer    the customer making the booking
+     * @param workspaceId the ID of the workspace
+     * @param startTime   the start time of the booking
+     * @param endTime     the end time of the booking
+     * @throws BookingServiceException if any parameter is invalid
      */
+
     private void validateParameters(User customer, Long workspaceId, LocalDateTime startTime, LocalDateTime endTime)
             throws BookingServiceException {
         if (customer == null || workspaceId == null) {
@@ -157,13 +158,12 @@ public class BookingServiceImpl implements BookingService {
         }
         validateTimeParameters(startTime, endTime);
     }
-
     /**
-     * Validates the time parameters for a booking.
+     * Validates start and end times for bookings.
      *
-     * @param startTime the starting time
-     * @param endTime   the ending time
-     * @throws BookingServiceException if the time parameters are invalid
+     * @param startTime the start time
+     * @param endTime   the end time
+     * @throws BookingServiceException if time parameters are invalid
      */
     private void validateTimeParameters(LocalDateTime startTime, LocalDateTime endTime)
             throws BookingServiceException {

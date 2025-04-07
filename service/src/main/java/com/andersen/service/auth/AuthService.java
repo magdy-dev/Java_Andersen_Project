@@ -41,4 +41,6 @@ public interface AuthService {
      */
     User registerCustomer(String username, String password, String email, String fullName)
             throws RegistrationException, AuthenticationException, DataAccessException;
+
+    User findById(Long id) throws DataAccessException;
 }

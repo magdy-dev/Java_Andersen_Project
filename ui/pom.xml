@@ -10,8 +10,27 @@
     </parent>
 
     <artifactId>ui</artifactId>
+    <packaging>war</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.0.0</version> <!-- or whatever version you're using -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>4.0.1</version> <!-- or 3.1.0 if you're using an older servlet container -->
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.3.30</version>
+        </dependency>
         <dependency>
             <groupId>com.andersen</groupId>
             <artifactId>service</artifactId>

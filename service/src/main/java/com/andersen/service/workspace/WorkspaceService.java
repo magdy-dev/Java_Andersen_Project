@@ -5,6 +5,7 @@ import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.exception.WorkspaceServiceException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Interface for managing workspaces within the application.
@@ -37,7 +38,7 @@ public interface WorkspaceService {
      * @return the corresponding Workspace object
      * @throws WorkspaceServiceException if there is an error while retrieving the workspace
      */
-    Workspace getWorkspaceById(Long id) throws WorkspaceServiceException;
+    Optional<Workspace> getWorkspaceById(Long id) throws WorkspaceServiceException;
 
     /**
      * Updates an existing workspace.

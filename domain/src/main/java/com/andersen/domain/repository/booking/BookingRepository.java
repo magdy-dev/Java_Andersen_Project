@@ -1,6 +1,7 @@
-package com.andersen.repository_JPA.booking;
+package com.andersen.domain.repository.booking;
 
-import com.andersen.entity.booking.Booking;
+
+import com.andersen.domain.entity.booking.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

@@ -9,15 +9,14 @@ import com.andersen.domain.exception.errorCode.ErrorCodeRepo;
  */
 public class DataAccessException extends Exception {
 
-    private final ErrorCodeRepo errorCode;
+    private ErrorCodeRepo errorCode = null;
 
     /**
      * Constructs a new DataAccessException with a specified message and error code.
      *
      * @param message the detail message for this exception
-     * @param errorCode the error code associated with this exception
      */
-    public DataAccessException(String message, ErrorCodeRepo errorCode) {
+    public DataAccessException(String message) {
         super(message); // Call the constructor of the superclass
         this.errorCode = errorCode; // Store the error code
     }

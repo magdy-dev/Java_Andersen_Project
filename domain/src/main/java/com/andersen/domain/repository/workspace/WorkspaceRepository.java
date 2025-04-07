@@ -1,6 +1,7 @@
-package com.andersen.repository_JPA.workspace;
+package com.andersen.domain.repository.workspace;
 
-import com.andersen.entity.workspace.Workspace;
+
+import com.andersen.domain.entity.workspace.Workspace;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

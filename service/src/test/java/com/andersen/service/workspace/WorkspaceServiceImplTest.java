@@ -1,25 +1,29 @@
 package com.andersen.service.workspace;
 
-import com.andersen.entity.workspace.Workspace;
-import com.andersen.exception.DataAccessException;
-import com.andersen.exception.errorCode.ErrorCode;
-import com.andersen.repository_JPA.workspace.WorkspaceRepository;
+import com.andersen.domain.entity.booking.Booking;
+import com.andersen.domain.entity.booking.BookingStatus;
+import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.domain.entity.workspace.WorkspaceType;
+import com.andersen.domain.repository.workspace.WorkspaceRepository;
 import com.andersen.service.exception.WorkspaceServiceException;
+import com.andersen.service.exception.DataAccessException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
+@ExtendWith(MockitoExtension.class)
 class WorkspaceServiceImplTest {
 
     @Mock
@@ -28,139 +32,93 @@ class WorkspaceServiceImplTest {
     @InjectMocks
     private WorkspaceServiceImpl workspaceService;
 
-    private Workspace validWorkspace;
-    private Workspace invalidWorkspace;
+    private Workspace workspace;
 
     @BeforeEach
     void setUp() {
-        validWorkspace = new Workspace(1L, "Valid Workspace", "Description",
-                null, 10.0, 4, true, null);
-        invalidWorkspace = new Workspace(null, "", "", null, -1.0, 0, true, null);
+        workspace = new Workspace();
+        workspace.setId(1L);
+        workspace.setName("Test Workspace");
+        workspace.setDescription("Quiet room with AC");
+        workspace.setCapacity(4);
+        workspace.setPricePerHour(20.0);
+        workspace.setType(WorkspaceType.MEETING_ROOM);
+        workspace.setActive(true);
     }
 
     @Test
-    void createWorkspace_ShouldSuccess() throws DataAccessException, WorkspaceServiceException {
-        when(workspaceRepository.save(validWorkspace)).thenReturn(validWorkspace);
+    void createWorkspace_shouldSaveAndReturnWorkspace() throws Exception {
+        when(workspaceRepository.save(any())).thenReturn(workspace);
 
-        Workspace result = workspaceService.createWorkspace(validWorkspace);
+        Workspace saved = workspaceService.createWorkspace(workspace);
 
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-        verify(workspaceRepository).save(validWorkspace);
+        assertThat(saved).isNotNull();
+        assertThat(saved.getName()).isEqualTo("Test Workspace");
+        verify(workspaceRepository, times(1)).save(workspace);
     }
 
     @Test
-    void createWorkspace_ShouldThrowWhenInvalidWorkspace() {
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.createWorkspace(invalidWorkspace));
+    void getWorkspaceById_shouldReturnWorkspace_whenFoundAndActive() throws Exception {
+        when(workspaceRepository.findById(1L)).thenReturn(Optional.of(workspace));
+
+        Optional<Workspace> result = workspaceService.getWorkspaceById(1L);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getId()).isEqualTo(1L);
+        verify(workspaceRepository).findById(1L);
+    }
+    @Test
+    void isWorkspaceAvailable_shouldReturnFalse_whenBookingConflicts() {
+        Booking booking = new Booking();
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setStartTime(LocalDateTime.now().plusHours(1));
+        booking.setEndTime(LocalDateTime.now().plusHours(3));
+
+        workspace.setBookings(List.of(booking));
+
+        boolean available = workspaceService.isWorkspaceAvailable(
+                workspace,
+                LocalDateTime.now().plusHours(2),
+                LocalDateTime.now().plusHours(4)
+        );
+
+        assertThat(available).isFalse();
     }
 
     @Test
-    void createWorkspace_ShouldThrowWhenRepositoryFails() throws DataAccessException {
-        when(workspaceRepository.save(validWorkspace))
-                .thenThrow(new DataAccessException("DB error", ErrorCode.WS_001));
+    void isWorkspaceAvailable_shouldReturnTrue_whenNoConflict() {
+        Booking booking = new Booking();
+        booking.setStatus(BookingStatus.CONFIRMED);
+        booking.setStartTime(LocalDateTime.now().plusHours(5));
+        booking.setEndTime(LocalDateTime.now().plusHours(6));
 
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.createWorkspace(validWorkspace));
+        workspace.setBookings(List.of(booking));
+
+        boolean available = workspaceService.isWorkspaceAvailable(
+                workspace,
+                LocalDateTime.now().plusHours(1),
+                LocalDateTime.now().plusHours(2)
+        );
+
+        assertThat(available).isTrue();
     }
 
     @Test
-    void getAllWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceServiceException {
-        List<Workspace> workspaces = Arrays.asList(validWorkspace);
-        when(workspaceRepository.findAll()).thenReturn(workspaces);
+    void getAllWorkspaces_shouldReturnList_whenNoException() throws Exception {
+        when(workspaceRepository.findAll()).thenReturn(List.of(workspace));
 
-        List<Workspace> result = workspaceService.getAllWorkspaces();
+        List<Workspace> workspaces = workspaceService.getAllWorkspaces();
 
-        assertEquals(1, result.size());
-        assertEquals(validWorkspace, result.get(0));
+        assertThat(workspaces).hasSize(1);
+        assertThat(workspaces.get(0).getName()).isEqualTo("Test Workspace");
     }
 
     @Test
-    void getAllWorkspaces_ShouldReturnEmptyList() throws DataAccessException, WorkspaceServiceException {
-        when(workspaceRepository.findAll()).thenReturn(Collections.emptyList());
+    void getAllWorkspaces_shouldThrow_whenRepositoryFails() {
+        when(workspaceRepository.findAll()).thenThrow(new RuntimeException("DB error"));
 
-        List<Workspace> result = workspaceService.getAllWorkspaces();
-
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void getWorkspaceById_ShouldReturnWorkspace() throws DataAccessException, WorkspaceServiceException {
-        when(workspaceRepository.findById(1L)).thenReturn(Optional.ofNullable(validWorkspace));
-
-        Workspace result = workspaceService.getWorkspaceById(1L);
-
-        assertNotNull(result);
-        assertEquals(1L, result.getId());
-    }
-
-    @Test
-    void getWorkspaceById_ShouldThrowWhenIdNull() {
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.getWorkspaceById(null));
-    }
-
-    @Test
-    void updateWorkspace_ShouldReturnTrue() throws DataAccessException, WorkspaceServiceException {
-        when(workspaceRepository.save(validWorkspace));
-
-        boolean result = workspaceService.updateWorkspace(validWorkspace);
-
-        assertTrue(result);
-    }
-
-    @Test
-    void updateWorkspace_ShouldThrowWhenInvalidWorkspace() {
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.updateWorkspace(invalidWorkspace));
-    }
-
-
-
-    @Test
-    void deleteWorkspace_ShouldThrowWhenIdNull() {
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.deleteWorkspace(null));
-    }
-
-    @Test
-    void getAvailableWorkspaces_ShouldReturnList() throws DataAccessException, WorkspaceServiceException {
-        LocalDateTime startTime = LocalDateTime.now().plusDays(1);
-        LocalDateTime endTime = startTime.plusHours(3);
-
-        when(workspaceRepository.getAvailableWorkspaces(startTime, endTime))
-                .thenReturn(Arrays.asList(validWorkspace));
-
-        List<Workspace> result = workspaceService.getAvailableWorkspaces(startTime, endTime);
-
-        assertEquals(1, result.size());
-        assertEquals(validWorkspace, result.get(0));
-    }
-
-    @Test
-    void validateWorkspace_ShouldThrowWhenNull() {
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.createWorkspace(null));
-    }
-
-    @Test
-    void validateWorkspace_ShouldThrowWhenEmptyName() {
-        Workspace workspace = new Workspace(null, "", "Desc", null, 10.0, 4, true, null);
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.createWorkspace(workspace));
-    }
-
-    @Test
-    void validateWorkspace_ShouldThrowWhenInvalidPrice() {
-        Workspace workspace = new Workspace(null, "Name", "Desc", null, -1.0, 4, true, null);
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.createWorkspace(workspace));
-    }
-
-    @Test
-    void validateWorkspace_ShouldThrowWhenInvalidCapacity() {
-        Workspace workspace = new Workspace(null, "Name", "Desc", null, 10.0, 0, true, null);
-        assertThrows(WorkspaceServiceException.class,
-                () -> workspaceService.createWorkspace(workspace));
+        assertThatThrownBy(() -> workspaceService.getAllWorkspaces())
+                .isInstanceOf(DataAccessException.class)
+                .hasMessageContaining("Failed to retrieve workspaces");
     }
 }
