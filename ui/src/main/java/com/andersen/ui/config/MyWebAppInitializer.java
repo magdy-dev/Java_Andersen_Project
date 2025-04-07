@@ -1,17 +1,20 @@
 package com.andersen.ui.config;
 
+import com.andersen.service.config.ServiceConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return null; // No root configuration for this example
+        return new Class<?>[] {
+                ServiceConfig.class
+        };
     }
 
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class[]{AppConfig.class}; // Specify your configuration class
+        return new Class[]{AppConfig.class}; // Web MVC config
     }
 
     @Override

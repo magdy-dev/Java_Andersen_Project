@@ -4,7 +4,7 @@ import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 import com.andersen.domain.exception.DataAccessException;
 import com.andersen.domain.repository.user.UserRepository;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.logger.logger.ConsoleLogger;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
 import com.andersen.service.security.PasswordEncoder;

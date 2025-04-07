@@ -4,7 +4,6 @@ import com.andersen.domain.repository.booking.BookingRepository;
 import com.andersen.domain.repository.user.UserRepository;
 import com.andersen.domain.repository.workspace.WorkspaceRepository;
 import com.andersen.service.auth.AuthService;
-
 import com.andersen.service.auth.AuthServiceImpl;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.booking.BookingServiceImpl;
@@ -16,11 +15,17 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan(basePackages = "com.andersen.ui.controller")
-public class AppConfig {
+@ComponentScan(basePackages = {
+        "com.andersen.ui.controller",
+        "com.andersen.service",
+        "com.andersen.domain.repository" ,
+        "com.andersen.domain.logger"
+})
+public class AppConfig implements WebMvcConfigurer {
 
     @Bean
     public AuthService authService(UserRepository userRepository,

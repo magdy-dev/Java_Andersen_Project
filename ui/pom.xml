@@ -12,35 +12,51 @@
     <artifactId>ui</artifactId>
     <packaging>war</packaging>
 
+    <properties>
+        <spring.version>5.3.30</spring.version>
+    </properties>
+
     <dependencies>
+        <!-- JSON processing -->
         <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>6.0.0</version> <!-- or whatever version you're using -->
-            <scope>provided</scope>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
+
+        <!-- Servlet API (provided by container like Tomcat) -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version> <!-- or 3.1.0 if you're using an older servlet container -->
+            <version>4.0.1</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Spring Framework dependencies -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
-            <version>5.3.30</version>
+            <version>${spring.version}</version>
         </dependency>
+
+        <!-- Internal modules -->
         <dependency>
             <groupId>com.andersen</groupId>
             <artifactId>service</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>com.andersen</groupId>
             <artifactId>logger</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <!-- Additional UI-specific dependencies can be added here -->
     </dependencies>
 </project>
