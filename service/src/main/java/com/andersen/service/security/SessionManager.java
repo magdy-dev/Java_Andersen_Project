@@ -63,7 +63,7 @@ public class SessionManager {
         return activeSessions.containsKey(token);
     }
     /**
-     * Checks if the user associated with the given token has ADMIN role.
+     * Checks if the user associated with the given token has ADMIN userrole.
      *
      * @param token the session token to check
      * @return true if the session is valid and the user is an ADMIN, false otherwise

@@ -1,6 +1,6 @@
 package com.andersen.domain.mapper;
 
-import com.andersen.domain.dto.role.UserDto;
+import com.andersen.domain.dto.userrole.UserDto;
 import com.andersen.domain.entity.role.User;
 
 public class UserMapper {
@@ -28,6 +28,7 @@ public class UserMapper {
         user.setFullName(dto.getFullName());
         user.setActive(dto.isActive());
         user.setRole(dto.getRole());
+        // password is intentionally excluded here (handled separately)
         return user;
     }
 }

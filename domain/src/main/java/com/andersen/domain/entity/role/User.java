@@ -4,9 +4,9 @@ import jakarta.persistence.*;
 import java.util.Objects;
 
 /**
- * Represents a user in the system, including their credentials and role.
+ * Represents a user in the system, including their credentials and userrole.
  * This class contains information about the user's ID, username, password, email,
- * full name, and the role assigned to the user (e.g., customer, admin).
+ * full name, and the userrole assigned to the user (e.g., customer, admin).
  */
 @Entity
 @Table(name = "users",
@@ -53,7 +53,7 @@ public class User {
      * @param password the password for the user
      * @param email    the email address for the user
      * @param fullName the full name of the user
-     * @param role     the role assigned to the user
+     * @param role     the userrole assigned to the user
      */
     public User(Long id, String username, String password, String email,
                 String fullName, UserRole role) {
@@ -176,18 +176,18 @@ public class User {
     }
 
     /**
-     * Returns the role assigned to the user.
+     * Returns the userrole assigned to the user.
      *
-     * @return the user's role
+     * @return the user's userrole
      */
     public UserRole getRole() {
         return role;
     }
 
     /**
-     * Sets the role assigned to the user.
+     * Sets the userrole assigned to the user.
      *
-     * @param role the role to set for the user
+     * @param role the userrole to set for the user
      */
     public void setRole(UserRole role) {
         this.role = role;
@@ -226,7 +226,7 @@ public class User {
      * Returns a string representation of the user.
      *
      * @return a string representation of this user, including its ID, username,
-     * email, full name, and role
+     * email, full name, and userrole
      */
     @Override
     public String toString() {
@@ -235,7 +235,7 @@ public class User {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", fullName='" + fullName + '\'' +
-                ", role=" + role +
+                ", userrole=" + role +
                 '}';
     }
 }

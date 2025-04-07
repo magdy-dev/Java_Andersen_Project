@@ -1,5 +1,6 @@
-package com.andersen.domain.dto.role;
+package com.andersen.domain.dto.userrole;
 
+import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 
 public class UserDto {
@@ -11,8 +12,7 @@ public class UserDto {
     private boolean isActive;
     private UserRole role;
 
-    public UserDto() {
-    }
+    public UserDto() {}
 
     public UserDto(Long id, String username, String email, String fullName, boolean isActive, UserRole role) {
         this.id = id;
@@ -23,6 +23,18 @@ public class UserDto {
         this.role = role;
     }
 
+    public static UserDto toDto(User user) {
+        if (user == null) return null;
+
+        return new UserDto(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getFullName(),
+                user.isActive(),
+                user.getRole()
+        );
+    }
 
     public Long getId() {
         return id;

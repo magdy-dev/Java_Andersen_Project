@@ -1,5 +1,6 @@
 package com.andersen.domain.dto.workspace;
 
+import com.andersen.domain.entity.workspace.Workspace;
 import com.andersen.domain.entity.workspace.WorkspaceType;
 
 public class WorkspaceDto {
@@ -12,8 +13,7 @@ public class WorkspaceDto {
     private int capacity;
     private boolean isActive;
 
-    public WorkspaceDto() {
-    }
+    public WorkspaceDto() {}
 
     public WorkspaceDto(Long id, String name, String description, WorkspaceType type, double pricePerHour, int capacity, boolean isActive) {
         this.id = id;
@@ -25,7 +25,19 @@ public class WorkspaceDto {
         this.isActive = isActive;
     }
 
+    public static WorkspaceDto toDto(Workspace workspace) {
+        if (workspace == null) return null;
 
+        return new WorkspaceDto(
+                workspace.getId(),
+                workspace.getName(),
+                workspace.getDescription(),
+                workspace.getType(),
+                workspace.getPricePerHour(),
+                workspace.getCapacity(),
+                workspace.isActive()
+        );
+    }
 
     public Long getId() {
         return id;

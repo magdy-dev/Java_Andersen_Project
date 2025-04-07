@@ -1,13 +1,15 @@
 package com.andersen.domain.dto.booking;
 
+import com.andersen.domain.dto.userrole.UserDto;
+import com.andersen.domain.dto.workspace.WorkspaceDto;
 import com.andersen.domain.entity.booking.BookingStatus;
 import java.time.LocalDateTime;
 
 public class BookingDto {
 
     private Long id;
-    private Long customerId;
-    private Long workspaceId;
+    private UserDto customerId;
+    private WorkspaceDto workspaceId;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private BookingStatus status;
@@ -16,20 +18,18 @@ public class BookingDto {
 
     public BookingDto() {}
 
-    public BookingDto(Long id, Long customerId, Long workspaceId,
+    public BookingDto(Long id, UserDto customer, WorkspaceDto workspace,
                       LocalDateTime startTime, LocalDateTime endTime,
                       BookingStatus status, boolean isActive, double totalPrice) {
         this.id = id;
-        this.customerId = customerId;
-        this.workspaceId = workspaceId;
+        this.customerId = customer;
+        this.workspaceId = workspace;
         this.startTime = startTime;
         this.endTime = endTime;
         this.status = status;
         this.isActive = isActive;
         this.totalPrice = totalPrice;
     }
-
-    // Getters and setters
 
     public Long getId() {
         return id;
@@ -39,19 +39,19 @@ public class BookingDto {
         this.id = id;
     }
 
-    public Long getCustomerId() {
+    public UserDto getCustomerId() {
         return customerId;
     }
 
-    public void setCustomerId(Long customerId) {
+    public void setCustomerId(UserDto customerId) {
         this.customerId = customerId;
     }
 
-    public Long getWorkspaceId() {
+    public WorkspaceDto getWorkspaceId() {
         return workspaceId;
     }
 
-    public void setWorkspaceId(Long workspaceId) {
+    public void setWorkspaceId(WorkspaceDto workspaceId) {
         this.workspaceId = workspaceId;
     }
 

@@ -1,6 +1,8 @@
 package com.andersen.domain.mapper;
 
 import com.andersen.domain.dto.booking.BookingDto;
+import com.andersen.domain.dto.userrole.UserDto;
+import com.andersen.domain.dto.workspace.WorkspaceDto;
 import com.andersen.domain.entity.booking.Booking;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.workspace.Workspace;
@@ -12,8 +14,8 @@ public class BookingMapper {
 
         return new BookingDto(
                 booking.getId(),
-                booking.getCustomer() != null ? booking.getCustomer().getId() : null,
-                booking.getWorkspace() != null ? booking.getWorkspace().getId() : null,
+                UserDto.toDto(booking.getCustomer()),
+                WorkspaceDto.toDto(booking.getWorkspace()),
                 booking.getStartTime(),
                 booking.getEndTime(),
                 booking.getStatus(),

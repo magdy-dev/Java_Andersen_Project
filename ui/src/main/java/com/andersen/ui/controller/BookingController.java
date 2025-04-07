@@ -42,8 +42,8 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<Void> createBooking(@RequestBody BookingDto dto) {
         try {
-            User customer = userService.findById(dto.getCustomerId());
-            Optional<Workspace> workspace = workspaceService.getWorkspaceById(dto.getWorkspaceId());
+            User customer = userService.findById(dto.getId());
+            Optional<Workspace> workspace = workspaceService.getWorkspaceById(dto.getId());
 
             bookingService.createBooking(customer, workspace.get().getId(), dto.getStartTime(), dto.getEndTime());
             return ResponseEntity.status(HttpStatus.CREATED).build();
