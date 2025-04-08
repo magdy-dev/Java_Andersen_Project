@@ -58,12 +58,22 @@ public class BookingController {
     public ResponseEntity<Void> createBooking(@RequestBody BookingDto dto) {
         try {
             User customer = userService.findById(dto.getId());
-            Optional<Workspace> workspace = workspaceService.getWorkspaceById(dto.getId());
+            Optional<Workspace> workspaceOpt = workspaceService.getWorkspaceById(dto.getId());
 
-            bookingService.createBooking(customer, workspace.get().getId(), dto.getStartTime(), dto.getEndTime());
+            if (workspaceOpt.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            }
+
+            bookingService.createBooking(customer, workspaceOpt.get().getId(), dto.getStartTime(), dto.getEndTime());
             return ResponseEntity.status(HttpStatus.CREATED).build();
-        } catch (BookingServiceException | DataAccessException | WorkspaceServiceException e) {
+
+        } catch (BookingServiceException | WorkspaceServiceException e) {
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+
+        } catch (DataAccessException | RuntimeException e) {
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
