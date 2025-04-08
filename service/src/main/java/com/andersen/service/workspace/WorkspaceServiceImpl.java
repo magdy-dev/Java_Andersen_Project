@@ -8,19 +8,18 @@ import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.exception.errorcode.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 /**
  * Implementation of the WorkspaceService interface.
  * Handles workspace creation, retrieval, updating, deletion, and availability checks.
  */
 
 @Service
-@Transactional
 public class WorkspaceServiceImpl implements WorkspaceService {
     /**
      * Repository for performing workspace-related database operations.
@@ -31,12 +30,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
     public WorkspaceServiceImpl(WorkspaceRepository workspaceRepository) {
         this.workspaceRepository = workspaceRepository;
     }
+
     /**
      * Creates a new workspace.
      *
      * @param workspace the workspace to create
      * @return the saved workspace
-     * @throws WorkspaceServiceException if validation fails
+     * @throws WorkspaceServiceException                         if validation fails
      * @throws com.andersen.domain.exception.DataAccessException if a data access error occurs
      */
     @Override
@@ -45,6 +45,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
         validateWorkspace(workspace);
         return workspaceRepository.save(workspace);
     }
+
     /**
      * Retrieves all workspaces.
      *
@@ -59,6 +60,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new DataAccessException("Failed to retrieve workspaces", ErrorCode.WS_001);
         }
     }
+
     /**
      * Retrieves a workspace by its ID if it's active.
      *
@@ -78,6 +80,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("Failed to retrieve workspace with ID: " + id, e);
         }
     }
+
     /**
      * Updates an existing workspace.
      *
@@ -106,6 +109,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("Failed to update workspace with ID: " + workspace.getId(), e);
         }
     }
+
     /**
      * Deactivates a workspace by its ID.
      *
@@ -128,6 +132,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("Failed to deactivate workspace with ID: " + id, e);
         }
     }
+
     /**
      * Finds all available workspaces within a specific time range.
      *
@@ -166,12 +171,13 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("Failed to retrieve active workspaces", e);
         }
     }
+
     /**
      * Checks if a workspace is available within the given time range.
      *
-     * @param workspace  the workspace to check
-     * @param startTime  the desired start time
-     * @param endTime    the desired end time
+     * @param workspace the workspace to check
+     * @param startTime the desired start time
+     * @param endTime   the desired end time
      * @return true if the workspace is available
      */
     @Override
@@ -181,6 +187,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                         booking.getStatus() == BookingStatus.CONFIRMED &&
                                 isTimeOverlapping(booking.getStartTime(), booking.getEndTime(), startTime, endTime));
     }
+
     /**
      * Determines if the given time ranges overlap.
      *
@@ -196,6 +203,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
                                       LocalDateTime requestedEnd) {
         return bookingStart.isBefore(requestedEnd) && bookingEnd.isAfter(requestedStart);
     }
+
     /**
      * Validates the workspace's properties.
      *
@@ -219,6 +227,7 @@ public class WorkspaceServiceImpl implements WorkspaceService {
             throw new WorkspaceServiceException("Workspace type must be specified");
         }
     }
+
     /**
      * Validates the time range for workspace availability.
      *

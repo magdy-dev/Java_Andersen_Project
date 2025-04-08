@@ -53,16 +53,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
      * @param endTime   the end time of the requested range
      * @return a list of available Workspace objects
      */
-    @Query("SELECT DISTINCT w FROM Workspace w " +
-            "WHERE w.isActive = true " +
-            "AND NOT EXISTS (" +
-            "  SELECT b FROM Booking b " +
-            "  WHERE b.workspace = w " +
-            "    AND b.status = com.andersen.entity.booking.BookingStatus.CONFIRMED " +
-            "    AND (" +
-            "      (b.startTime < :endTime AND b.endTime > :startTime)" +
-            "    )" +
-            ")")
+    @Query("SELECT DISTINCT w FROM Workspace w ")
     List<Workspace> getAvailableWorkspaces(@Param("startTime") LocalDateTime startTime,
                                            @Param("endTime") LocalDateTime endTime);
 }

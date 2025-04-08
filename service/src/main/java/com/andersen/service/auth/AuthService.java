@@ -31,13 +31,13 @@ public interface AuthService {
     /**
      * Registers a new customer with the provided details.
      *
-     * @param username  the username of the new customer
-     * @param password  the password for the new customer
-     * @param email     the email address of the new customer
-     * @param fullName  the full name of the new customer
-     * @throws RegistrationException if there is an error during registration
-     * @throws AuthenticationException if the username is already taken or if the password is invalid
+     * @param username the username of the new customer
+     * @param password the password for the new customer
+     * @param email    the email address of the new customer
+     * @param fullName the full name of the new customer
      * @return the registered User object
+     * @throws RegistrationException   if there is an error during registration
+     * @throws AuthenticationException if the username is already taken or if the password is invalid
      */
     User registerCustomer(String username, String password, String email, String fullName)
             throws RegistrationException, AuthenticationException, DataAccessException;

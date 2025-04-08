@@ -4,12 +4,11 @@ import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 import com.andersen.domain.exception.DataAccessException;
 import com.andersen.domain.repository.user.UserRepository;
-import com.andersen.logger.logger.ConsoleLogger;
+import com.andersen.logger.ConsoleLogger;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
 import com.andersen.service.security.PasswordEncoder;
 import com.andersen.service.security.SessionManager;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +22,6 @@ import java.util.Base64;
  * This service handles user login, logout, and registration of new customers.
  */
 @Service
-@Transactional
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -87,7 +85,7 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param username the desired username of the new customer
      * @param password the desired password of the new customer
-     * @param email the email address of the new customer
+     * @param email    the email address of the new customer
      * @param fullName the full name of the new customer
      * @return the created User object
      * @throws RegistrationException if registration fails due to validation errors or if the username already exists
@@ -101,16 +99,16 @@ public class AuthServiceImpl implements AuthService {
             throw new RegistrationException("Username already exists");
         }
 
-        User newUser  = new User();
-        newUser .setUsername(username);
-        newUser .setPassword(hashPassword(password));
-        newUser .setEmail(email);
-        newUser .setFullName(fullName);
-        newUser .setRole(UserRole.CUSTOMER);
+        User newUser = new User();
+        newUser.setUsername(username);
+        newUser.setPassword(hashPassword(password));
+        newUser.setEmail(email);
+        newUser.setFullName(fullName);
+        newUser.setRole(UserRole.CUSTOMER);
 
-        User createdUser  = userRepository.save(newUser );
+        User createdUser = userRepository.save(newUser);
         ConsoleLogger.log("New customer registered: " + username);
-        return createdUser ;
+        return createdUser;
     }
 
     @Override
@@ -141,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
      *
      * @param username the desired username to validate
      * @param password the desired password to validate
-     * @param email the email address to validate
+     * @param email    the email address to validate
      * @param fullName the full name to validate
      * @throws RegistrationException if any of the validation checks fail
      */

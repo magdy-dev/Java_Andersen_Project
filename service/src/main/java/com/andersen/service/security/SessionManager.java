@@ -3,9 +3,11 @@ package com.andersen.service.security;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 import org.springframework.stereotype.Component;
+
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * Manages user sessions and authentication tokens in a thread-safe manner.
  * This class maintains active user sessions and provides methods to validate,
@@ -30,6 +32,7 @@ public class SessionManager {
         userTokens.put(user.getUsername(), token);
         return token;
     }
+
     /**
      * Invalidates the session associated with the given token.
      * Removes both the token-based session and the user-token mapping.
@@ -43,6 +46,7 @@ public class SessionManager {
             userTokens.remove(user.getUsername());
         }
     }
+
     /**
      * Invalidates the session associated with the given token.
      * Removes both the token-based session and the user-token mapping.
@@ -52,6 +56,7 @@ public class SessionManager {
     public User getUser(String token) {
         return activeSessions.get(token);
     }
+
     /**
      * Checks if a session token is valid (exists in active sessions).
      *
@@ -62,6 +67,7 @@ public class SessionManager {
     public boolean isValidSession(String token) {
         return activeSessions.containsKey(token);
     }
+
     /**
      * Checks if the user associated with the given token has ADMIN userrole.
      *

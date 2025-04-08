@@ -11,22 +11,20 @@ import com.andersen.service.exception.BookingServiceException;
 import com.andersen.service.exception.errorcode.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+
 /**
  * Service implementation for managing bookings in a coworking space system.
  * Handles booking creation, cancellation, retrieval, and workspace availability queries.
  */
 @Service
-@Transactional
 public class BookingServiceImpl implements BookingService {
     /**
      * Repository for performing booking-related database operations.
-     *  Repository for performing workspace-related database operations.
-     *
+     * Repository for performing workspace-related database operations.
      */
     private final BookingRepository bookingRepository;
     private final WorkspaceRepository workspaceRepository;
@@ -37,13 +35,14 @@ public class BookingServiceImpl implements BookingService {
         this.bookingRepository = bookingRepository;
         this.workspaceRepository = workspaceRepository;
     }
+
     /**
      * Creates a new booking for a workspace by a customer.
      *
-     * @param customer   the user who is booking
+     * @param customer    the user who is booking
      * @param workspaceId the ID of the workspace to book
-     * @param startTime  the start time of the booking
-     * @param endTime    the end time of the booking
+     * @param startTime   the start time of the booking
+     * @param endTime     the end time of the booking
      * @return the created booking
      * @throws BookingServiceException if validation fails or workspace not found
      * @throws DataAccessException     if a data access error occurs
@@ -67,6 +66,7 @@ public class BookingServiceImpl implements BookingService {
 
         return bookingRepository.save(booking);
     }
+
     /**
      * Retrieves all bookings made by a specific customer.
      *
@@ -83,6 +83,7 @@ public class BookingServiceImpl implements BookingService {
         }
         return bookingRepository.getByCustomerId(customerId);
     }
+
     /**
      * Cancels a booking made by a user if it's still active and belongs to the user.
      *
@@ -116,6 +117,7 @@ public class BookingServiceImpl implements BookingService {
         bookingRepository.save(booking);
         return true;
     }
+
     /**
      * Retrieves a list of available workspaces for a given time range.
      *
@@ -131,6 +133,7 @@ public class BookingServiceImpl implements BookingService {
         validateTimeParameters(startTime, endTime);
         return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
     }
+
     /**
      * Retrieves all bookings in the system.
      *
@@ -141,6 +144,7 @@ public class BookingServiceImpl implements BookingService {
     public List<Booking> getAllBookings() throws DataAccessException {
         return bookingRepository.findAll();
     }
+
     /**
      * Validates booking parameters before creation.
      *
@@ -158,6 +162,7 @@ public class BookingServiceImpl implements BookingService {
         }
         validateTimeParameters(startTime, endTime);
     }
+
     /**
      * Validates start and end times for bookings.
      *

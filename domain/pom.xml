@@ -12,48 +12,51 @@
     <artifactId>domain</artifactId>
 
     <properties>
-        <org.springframework.version>3.0.5.RELEASE</org.springframework.version>
-
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version> <!-- Replace with a valid version -->
+            <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Spring Boot Starter Data JPA -->
         <dependency>
-            <groupId>org.springframework.data</groupId>
-            <artifactId>spring-data-jpa</artifactId>
-            <version>2.7.13</version> <!-- Or compatible with your Spring version -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>3.2.4</version>
         </dependency>
-        <!-- JPA API -->
+
+        <!-- Jakarta Persistence API -->
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
 
-        <!-- Hibernate (JPA Implementation) -->
+        <!-- Hibernate Core -->
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-core</artifactId>
             <version>6.2.7.Final</version>
         </dependency>
-        <!-- PostgreSQL JDBC Driver Dependency -->
+
+        <!-- PostgreSQL Driver -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
-            <version>42.3.1</version> <!-- Check for the latest version -->
+            <version>42.7.2</version>
         </dependency>
+
+        <!-- Logger Module -->
         <dependency>
             <groupId>com.andersen</groupId>
             <artifactId>logger</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>

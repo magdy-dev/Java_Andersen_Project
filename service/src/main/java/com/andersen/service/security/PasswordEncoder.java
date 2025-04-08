@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
+
 /**
  * A component for encoding and verifying passwords.
  * This class provides methods to encode a raw password using the SHA-256 hashing algorithm
@@ -36,7 +37,7 @@ public class PasswordEncoder {
     /**
      * Verifies if the raw password matches the encoded password.
      *
-     * @param rawPassword    the raw password to check
+     * @param rawPassword     the raw password to check
      * @param encodedPassword the previously encoded password to compare against
      * @return true if the raw password matches the encoded password, false otherwise
      */

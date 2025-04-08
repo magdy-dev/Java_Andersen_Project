@@ -1,4 +1,4 @@
-package com.andersen.logger.logger;
+package com.andersen.logger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
