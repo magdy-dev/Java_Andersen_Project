@@ -27,6 +27,9 @@ public class SessionManager {
      * @throws IllegalArgumentException if the user parameter is null
      */
     public String createSession(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("User cannot be null");
+        }
         String token = UUID.randomUUID().toString();
         activeSessions.put(token, user);
         userTokens.put(user.getUsername(), token);
@@ -48,10 +51,10 @@ public class SessionManager {
     }
 
     /**
-     * Invalidates the session associated with the given token.
-     * Removes both the token-based session and the user-token mapping.
+     * Retrieves the user associated with the given session token.
      *
-     * @param token the session token to invalidate
+     * @param token the session token to retrieve the user for
+     * @return the User associated with the token, or null if no user is found
      */
     public User getUser(String token) {
         return activeSessions.get(token);
@@ -63,13 +66,12 @@ public class SessionManager {
      * @param token the session token to validate
      * @return true if the token corresponds to an active session, false otherwise
      */
-
     public boolean isValidSession(String token) {
         return activeSessions.containsKey(token);
     }
 
     /**
-     * Checks if the user associated with the given token has ADMIN userrole.
+     * Checks if the user associated with the given token has ADMIN user role.
      *
      * @param token the session token to check
      * @return true if the session is valid and the user is an ADMIN, false otherwise

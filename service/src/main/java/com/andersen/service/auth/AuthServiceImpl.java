@@ -7,92 +7,88 @@ import com.andersen.domain.repository.user.UserRepository;
 import com.andersen.logger.ConsoleLogger;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
-import com.andersen.service.security.PasswordEncoder;
+import com.andersen.service.security.CustomPasswordEncoder;
 import com.andersen.service.security.SessionManager;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-
 /**
- * Provides implementation for user authentication and registration services.
- * This service handles user login, logout, and registration of new customers.
+ * Implementation of the AuthService interface, providing authentication and
+ * registration functionalities for users in the system.
  */
 @Service
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final SessionManager sessionManager;
-    private final PasswordEncoder passwordEncoder;
+    private final CustomPasswordEncoder customPasswordEncoder;
+    private final AuthenticationManager authenticationManager;
 
     /**
-     * Constructs a new AuthServiceImpl with the specified userRepository
-     * and sessionManager.
+     * Constructs an AuthServiceImpl with the provided dependencies.
      *
-     * @param userRepository the repository for user data access
-     * @param sessionManager the session manager for handling user sessions
+     * @param userRepository        The repository that manages user data.
+     * @param sessionManager        The session manager for handling user sessions.
+     * @param customPasswordEncoder The password encoder for encoding passwords.
+     * @param authenticationManager The authentication manager for authenticating users.
      */
-    @Autowired
-    public AuthServiceImpl(UserRepository userRepository, SessionManager sessionManager, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UserRepository userRepository,
+                           SessionManager sessionManager,
+                           CustomPasswordEncoder customPasswordEncoder,
+                           AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.sessionManager = sessionManager;
-        this.passwordEncoder = passwordEncoder;
+        this.customPasswordEncoder = customPasswordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     /**
-     * Authenticates a user using the provided username and password.
+     * Authenticates a user based on username and password.
      *
-     * @param username the username of the user trying to log in
-     * @param password the password of the user trying to log in
-     * @return the authenticated User object
-     * @throws AuthenticationException if authentication fails due to invalid credentials or if the service is unavailable
+     * @param username The username of the user trying to log in.
+     * @param password The password of the user trying to log in.
+     * @return The authenticated User object.
+     * @throws AuthenticationException If the authentication fails due to invalid credentials.
      */
     @Override
     public User login(String username, String password) throws AuthenticationException {
-        validateCredentials(username, password);
-
-        User user = userRepository.getUserByUsername(username);
-        if (user == null) {
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+            return userRepository.getUserByUsername(username);
+        } catch (BadCredentialsException e) {
             throw new AuthenticationException("Invalid credentials");
         }
-
-        String hashedInput = hashPassword(password);
-        if (!user.getPassword().equals(hashedInput)) {
-            throw new AuthenticationException("Invalid credentials");
-        }
-
-        sessionManager.createSession(user);
-        ConsoleLogger.log("User  logged in: " + username);
-        return user;
     }
 
     /**
-     * Logs out the user associated with the given session token.
+     * Logs out a user by invalidating their session.
      *
-     * @param token the session token of the user to log out
+     * @param token The session token of the user to log out.
      */
     @Override
     public void logout(String token) {
         sessionManager.invalidateSession(token);
-        ConsoleLogger.log("User  logged out");
+        ConsoleLogger.log("User logged out");
     }
 
     /**
-     * Registers a new customer with the specified user details.
+     * Registers a new customer in the system.
      *
-     * @param username the desired username of the new customer
-     * @param password the desired password of the new customer
-     * @param email    the email address of the new customer
-     * @param fullName the full name of the new customer
-     * @return the created User object
-     * @throws RegistrationException if registration fails due to validation errors or if the username already exists
+     * @param username The username of the new customer.
+     * @param password The password of the new customer.
+     * @param email    The email of the new customer.
+     * @param fullName The full name of the new customer.
+     * @return The created User object.
+     * @throws RegistrationException If registration fails due to invalid data or existing username.
      */
     @Override
     public User registerCustomer(String username, String password, String email, String fullName)
-            throws RegistrationException, AuthenticationException {
+            throws RegistrationException {
         validateRegistration(username, password, email, fullName);
 
         if (userRepository.getUserByUsername(username) != null) {
@@ -101,7 +97,7 @@ public class AuthServiceImpl implements AuthService {
 
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPassword(hashPassword(password));
+        newUser.setPassword(customPasswordEncoder.encode(password));
         newUser.setEmail(email);
         newUser.setFullName(fullName);
         newUser.setRole(UserRole.CUSTOMER);
@@ -111,37 +107,27 @@ public class AuthServiceImpl implements AuthService {
         return createdUser;
     }
 
+    /**
+     * Finds a user by their ID.
+     *
+     * @param id The ID of the user to find.
+     * @return The User object.
+     * @throws DataAccessException If the user is not found.
+     */
     @Override
     public User findById(Long id) throws DataAccessException {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DataAccessException("User not found with id: " + id));
     }
 
-
     /**
-     * Validates the provided username and password for login.
+     * Validates the registration data for a new user.
      *
-     * @param username the username to validate
-     * @param password the password to validate
-     * @throws AuthenticationException if validation fails
-     */
-    private void validateCredentials(String username, String password) throws AuthenticationException {
-        if (username == null || username.trim().isEmpty()) {
-            throw new AuthenticationException("Username is required");
-        }
-        if (password == null || password.trim().isEmpty()) {
-            throw new AuthenticationException("Password is required");
-        }
-    }
-
-    /**
-     * Validates the provided details for user registration.
-     *
-     * @param username the desired username to validate
-     * @param password the desired password to validate
-     * @param email    the email address to validate
-     * @param fullName the full name to validate
-     * @throws RegistrationException if any of the validation checks fail
+     * @param username The username to validate.
+     * @param password The password to validate.
+     * @param email    The email to validate.
+     * @param fullName The full name to validate.
+     * @throws RegistrationException If any validation rules are violated.
      */
     private void validateRegistration(String username, String password,
                                       String email, String fullName) throws RegistrationException {
@@ -159,24 +145,6 @@ public class AuthServiceImpl implements AuthService {
         }
         if (password.length() < 8) {
             throw new RegistrationException("Password must be at least 8 characters");
-        }
-    }
-
-    /**
-     * Hashes the provided password using SHA-256 algorithm and encodes it in Base64.
-     *
-     * @param password the plain text password to hash
-     * @return the hashed password as a Base64-encoded string
-     * @throws AuthenticationException if hashing fails due to an unsupported algorithm
-     */
-    String hashPassword(String password) throws AuthenticationException {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hash = digest.digest(password.getBytes());
-            return Base64.getEncoder().encodeToString(hash);
-        } catch (NoSuchAlgorithmException e) {
-            ConsoleLogger.log("Password hashing failed");
-            throw new AuthenticationException("Authentication system error");
         }
     }
 }
