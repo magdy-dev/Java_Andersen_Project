@@ -4,20 +4,24 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
  * SecurityConfig is a configuration class that sets up Spring Security for the application.
- * It defines the security filter chain and authentication manager for handling security filters and authentication.
+ * It defines the security filter chain, authentication manager, and method security for handling
+ * security filters and authentication throughout the application.
  */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     /**
      * Defines a SecurityFilterChain that configures the security settings for HTTP requests.
+     * It specifies which endpoints are publicly accessible and which require authentication.
      *
      * @param http The HttpSecurity object used to configure security interceptors.
      * @return The configured SecurityFilterChain.
@@ -31,7 +35,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Allow unauthenticated access to login and register endpoints
                         .anyRequest().authenticated() // All other requests require authentication
                 )
-                .formLogin().disable() // Disables form login as we will use JSON-based authentication
+                .formLogin().disable() // Disables form login as JSON-based authentication will be used
                 .httpBasic().disable() // Disables HTTP Basic Authentication
                 .logout().logoutUrl("/api/auth/logout"); // Defines the logout URL
 

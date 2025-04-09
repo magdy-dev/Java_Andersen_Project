@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * CustomUserDetailsService is an implementation of the UserDetailsService interface,
- * which loads user-specific data during the authentication process.
+ * which is used to load user-specific data during the authentication process.
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -19,10 +19,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     /**
      * Constructs a CustomUserDetailsService with the provided user repository.
      *
-     * @param repo The repository that manages user data.
+     * @param userRepository The repository that manages user data.
      */
-    public CustomUserDetailsService(UserRepository repo) {
-        this.userRepository = repo;
+    public CustomUserDetailsService(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 
     /**
@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
      *
      * @param username The username of the user to retrieve.
      * @return UserDetails containing the user's data.
-     * @throws UsernameNotFoundException If the user is not found.
+     * @throws UsernameNotFoundException If the user is not found in the repository.
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -40,10 +40,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        return org.springframework.security.core.userdetails.User
-                .withUsername(user.getUsername())
-                .password(user.getPassword())
-                .roles(user.getRole().name()) // CUSTOMER, ADMIN
-                .build();
+        return new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole());
     }
+
 }

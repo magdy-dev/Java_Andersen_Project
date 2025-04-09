@@ -12,13 +12,8 @@ import com.andersen.service.security.SessionManager;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
-/**
- * Implementation of the AuthService interface, providing authentication and
- * registration functionalities for users in the system.
- */
 @Service
 public class AuthServiceImpl implements AuthService {
 
@@ -27,14 +22,6 @@ public class AuthServiceImpl implements AuthService {
     private final CustomPasswordEncoder customPasswordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    /**
-     * Constructs an AuthServiceImpl with the provided dependencies.
-     *
-     * @param userRepository        The repository that manages user data.
-     * @param sessionManager        The session manager for handling user sessions.
-     * @param customPasswordEncoder The password encoder for encoding passwords.
-     * @param authenticationManager The authentication manager for authenticating users.
-     */
     public AuthServiceImpl(UserRepository userRepository,
                            SessionManager sessionManager,
                            CustomPasswordEncoder customPasswordEncoder,
@@ -45,47 +32,24 @@ public class AuthServiceImpl implements AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    /**
-     * Authenticates a user based on username and password.
-     *
-     * @param username The username of the user trying to log in.
-     * @param password The password of the user trying to log in.
-     * @return The authenticated User object.
-     * @throws AuthenticationException If the authentication fails due to invalid credentials.
-     */
     @Override
     public User login(String username, String password) throws AuthenticationException {
         try {
-            Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(username, password)
-            );
-            return userRepository.getUserByUsername(username);
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+            User user = userRepository.getUserByUsername(username);
+            sessionManager.createSession(user); // Create token for tracking if needed
+            return user;
         } catch (BadCredentialsException e) {
             throw new AuthenticationException("Invalid credentials");
         }
     }
 
-    /**
-     * Logs out a user by invalidating their session.
-     *
-     * @param token The session token of the user to log out.
-     */
     @Override
     public void logout(String token) {
         sessionManager.invalidateSession(token);
-        ConsoleLogger.log("User logged out");
+        ConsoleLogger.log("User logged out with token: " + token);
     }
 
-    /**
-     * Registers a new customer in the system.
-     *
-     * @param username The username of the new customer.
-     * @param password The password of the new customer.
-     * @param email    The email of the new customer.
-     * @param fullName The full name of the new customer.
-     * @return The created User object.
-     * @throws RegistrationException If registration fails due to invalid data or existing username.
-     */
     @Override
     public User registerCustomer(String username, String password, String email, String fullName)
             throws RegistrationException {
@@ -107,28 +71,12 @@ public class AuthServiceImpl implements AuthService {
         return createdUser;
     }
 
-    /**
-     * Finds a user by their ID.
-     *
-     * @param id The ID of the user to find.
-     * @return The User object.
-     * @throws DataAccessException If the user is not found.
-     */
     @Override
     public User findById(Long id) throws DataAccessException {
         return userRepository.findById(id)
                 .orElseThrow(() -> new DataAccessException("User not found with id: " + id));
     }
 
-    /**
-     * Validates the registration data for a new user.
-     *
-     * @param username The username to validate.
-     * @param password The password to validate.
-     * @param email    The email to validate.
-     * @param fullName The full name to validate.
-     * @throws RegistrationException If any validation rules are violated.
-     */
     private void validateRegistration(String username, String password,
                                       String email, String fullName) throws RegistrationException {
         if (username == null || username.trim().isEmpty()) {

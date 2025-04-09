@@ -8,6 +8,7 @@ import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.workspace.WorkspaceService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -17,8 +18,6 @@ import java.util.stream.Collectors;
 
 /**
  * RESTful controller for managing workspaces.
- * This class provides endpoints for creating, retrieving, updating, and deleting workspaces,
- * as well as checking available workspaces within a specified time period.
  */
 @RestController
 @RequestMapping("/workspaces")
@@ -26,21 +25,14 @@ public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
 
-    /**
-     * Constructs a WorkspaceController with the specified WorkspaceService.
-     *
-     * @param workspaceService the WorkspaceService to handle workspace operations
-     */
     public WorkspaceController(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
     }
 
     /**
-     * Creates a new workspace.
-     *
-     * @param workspaceDto the WorkspaceDto containing the details of the workspace to be created
-     * @return a ResponseEntity containing the created WorkspaceDto, or BAD_REQUEST if creation fails
+     * ADMIN only: Creates a new workspace.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<WorkspaceDto> create(@RequestBody WorkspaceDto workspaceDto) {
         try {
@@ -55,11 +47,9 @@ public class WorkspaceController {
     }
 
     /**
-     * Retrieves all workspaces.
-     *
-     * @return a ResponseEntity containing a list of WorkspaceDtos representing all available workspaces,
-     * or BAD_REQUEST if retrieval fails
+     * ADMIN or CUSTOMER: Retrieves all workspaces.
      */
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping
     public ResponseEntity<List<WorkspaceDto>> getAll() {
         try {
@@ -75,11 +65,9 @@ public class WorkspaceController {
     }
 
     /**
-     * Retrieves a workspace by its ID.
-     *
-     * @param id the ID of the workspace to retrieve
-     * @return a ResponseEntity containing the WorkspaceDto if found, or NOT_FOUND if the workspace does not exist
+     * ADMIN or CUSTOMER: Retrieves a workspace by its ID.
      */
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/{id}")
     public ResponseEntity<WorkspaceDto> getById(@PathVariable Long id) {
         try {
@@ -93,13 +81,9 @@ public class WorkspaceController {
     }
 
     /**
-     * Updates an existing workspace.
-     *
-     * @param id           the ID of the workspace to update
-     * @param workspaceDto the WorkspaceDto containing the updated details of the workspace
-     * @return a ResponseEntity indicating the result of the update operation: OK if successful,
-     * or NOT_FOUND if the workspace does not exist
+     * ADMIN only: Updates an existing workspace.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<Void> update(@PathVariable Long id, @RequestBody WorkspaceDto workspaceDto) {
         try {
@@ -113,12 +97,9 @@ public class WorkspaceController {
     }
 
     /**
-     * Deletes a workspace by its ID.
-     *
-     * @param id the ID of the workspace to delete
-     * @return a ResponseEntity indicating the result of the delete operation: OK if successful,
-     * or NOT_FOUND if the workspace does not exist
+     * ADMIN only: Deletes a workspace by its ID.
      */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
@@ -130,13 +111,9 @@ public class WorkspaceController {
     }
 
     /**
-     * Retrieves available workspaces within a specified time range.
-     *
-     * @param start the start time in ISO-8601 format
-     * @param end   the end time in ISO-8601 format
-     * @return a ResponseEntity containing a list of WorkspaceDtos representing available workspaces
-     * during the specified time range, or BAD_REQUEST if an error occurs
+     * ADMIN or CUSTOMER: Retrieves available workspaces in a time range.
      */
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/available")
     public ResponseEntity<List<WorkspaceDto>> getAvailable(
             @RequestParam("start") String start,
