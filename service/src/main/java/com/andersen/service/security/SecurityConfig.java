@@ -3,11 +3,14 @@ package com.andersen.service.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
+
+import static javax.management.Query.and;
 
 /**
  * SecurityConfig is a configuration class that sets up Spring Security for the application.
@@ -35,9 +38,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic() // Basic Auth!
-                .and()
-                .logout().logoutUrl("/api/auth/logout");
+                .httpBasic(Customizer.withDefaults());
+
 
 
         return http.build();
@@ -56,4 +58,5 @@ public class SecurityConfig {
             throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
 }

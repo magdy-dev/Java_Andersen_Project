@@ -1,5 +1,6 @@
 package com.andersen.service.security;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.security.MessageDigest;
@@ -11,7 +12,7 @@ import java.util.Base64;
  * to encode passwords and verifies them by comparing the hashed values.
  */
 @Component
-public class CustomPasswordEncoder implements org.springframework.security.crypto.password.PasswordEncoder {
+public class CustomPasswordEncoder implements PasswordEncoder {
 
     /**
      * Encodes the provided raw password using SHA-256 algorithm and returns it as a Base64 encoded string.
