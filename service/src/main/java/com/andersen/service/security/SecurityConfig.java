@@ -30,17 +30,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable() // Disables CSRF protection for API endpoints
+                .csrf().disable()
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Allow unauthenticated access to login and register endpoints
-                        .anyRequest().authenticated() // All other requests require authentication
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .formLogin().disable() // Disables form login as JSON-based authentication will be used
-                .httpBasic().disable() // Disables HTTP Basic Authentication
-                .logout().logoutUrl("/api/auth/logout"); // Defines the logout URL
+                .httpBasic() // Basic Auth!
+                .and()
+                .logout().logoutUrl("/api/auth/logout");
+
 
         return http.build();
     }
+
 
     /**
      * Provides an AuthenticationManager bean for handling authentication.

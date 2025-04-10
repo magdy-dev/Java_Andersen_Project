@@ -25,12 +25,21 @@ public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
 
+    /**
+     * Constructs a WorkspaceController with the specified WorkspaceService.
+     *
+     * @param workspaceService the service used to manage workspaces
+     */
     public WorkspaceController(WorkspaceService workspaceService) {
         this.workspaceService = workspaceService;
     }
 
     /**
      * ADMIN only: Creates a new workspace.
+     *
+     * @param workspaceDto the details of the workspace to be created
+     * @return ResponseEntity containing the created WorkspaceDto if successful,
+     * or a bad request response if an error occurs
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
@@ -48,6 +57,9 @@ public class WorkspaceController {
 
     /**
      * ADMIN or CUSTOMER: Retrieves all workspaces.
+     *
+     * @return ResponseEntity containing a list of WorkspaceDto if successful,
+     * or a bad request response if an error occurs
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping
@@ -66,6 +78,10 @@ public class WorkspaceController {
 
     /**
      * ADMIN or CUSTOMER: Retrieves a workspace by its ID.
+     *
+     * @param id the ID of the workspace to retrieve
+     * @return ResponseEntity containing the WorkspaceDto if found,
+     * or a not found response if the workspace does not exist
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/{id}")
@@ -82,6 +98,10 @@ public class WorkspaceController {
 
     /**
      * ADMIN only: Updates an existing workspace.
+     *
+     * @param id           the ID of the workspace to update
+     * @param workspaceDto the details of the workspace to be updated
+     * @return ResponseEntity indicating the status of the update operation
      */
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
@@ -98,6 +118,9 @@ public class WorkspaceController {
 
     /**
      * ADMIN only: Deletes a workspace by its ID.
+     *
+     * @param id the ID of the workspace to delete
+     * @return ResponseEntity indicating the status of the deletion operation
      */
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
@@ -110,18 +133,22 @@ public class WorkspaceController {
         }
     }
 
+
     /**
-     * ADMIN or CUSTOMER: Retrieves available workspaces in a time range.
+     * ADMIN or CUSTOMER: Retrieves available workspaces within a specified time range.
+     *
+     * @param start the start time of the availability range
+     * @param end   the end time of the availability range
+     * @return ResponseEntity containing a list of available WorkspaceDto if successful,
+     * or a bad request response if an error occurs
      */
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/available")
     public ResponseEntity<List<WorkspaceDto>> getAvailable(
-            @RequestParam("start") String start,
-            @RequestParam("end") String end) {
+            @RequestParam("start") LocalDateTime start,
+            @RequestParam("end") LocalDateTime end) {
         try {
-            LocalDateTime startTime = LocalDateTime.parse(start);
-            LocalDateTime endTime = LocalDateTime.parse(end);
-            List<WorkspaceDto> available = workspaceService.getAvailableWorkspaces(startTime, endTime).stream()
+            List<WorkspaceDto> available = workspaceService.getAvailableWorkspaces(start, end).stream()
                     .map(WorkspaceMapper::toDto)
                     .collect(Collectors.toList());
             return ResponseEntity.ok(available);
@@ -131,4 +158,5 @@ public class WorkspaceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 }

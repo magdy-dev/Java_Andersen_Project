@@ -3,6 +3,7 @@ package com.andersen.service.security;
 import com.andersen.domain.entity.role.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.Collection;
 import java.util.Collections;
 
@@ -20,10 +21,10 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Constructs a CustomUserDetails object with the specified user details.
      *
-     * @param id The unique identifier of the user.
+     * @param id       The unique identifier of the user.
      * @param username The username of the user.
      * @param password The password of the user.
-     * @param role The role of the user.
+     * @param role     The role of the user.
      */
     public CustomUserDetails(Long id, String username, String password, UserRole role) {
         this.id = id;

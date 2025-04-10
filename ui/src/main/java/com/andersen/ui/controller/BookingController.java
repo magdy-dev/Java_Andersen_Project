@@ -1,6 +1,5 @@
 package com.andersen.ui.controller;
 
-
 import com.andersen.domain.dto.booking.BookingDto;
 import com.andersen.domain.entity.booking.Booking;
 import com.andersen.domain.entity.role.User;
@@ -12,7 +11,6 @@ import com.andersen.service.booking.BookingService;
 import com.andersen.service.exception.BookingServiceException;
 import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.security.CustomUserDetails;
-import com.andersen.service.security.CustomUserDetailsService;
 import com.andersen.service.workspace.WorkspaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +23,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * The BookingController class is a Spring REST controller that manages booking-related operations,
+ * including creating bookings, retrieving bookings for users, canceling bookings, and retrieving all bookings.
+ */
 @RestController
 @RequestMapping("/api/bookings")
 public class BookingController {
@@ -33,6 +35,13 @@ public class BookingController {
     private final AuthService userService;
     private final WorkspaceService workspaceService;
 
+    /**
+     * Constructs a BookingController with the specified BookingService, AuthService, and WorkspaceService.
+     *
+     * @param bookingService   the service used to manage bookings
+     * @param userService      the service used to access user information
+     * @param workspaceService the service used to access workspace information
+     */
     @Autowired
     public BookingController(BookingService bookingService,
                              AuthService userService,
@@ -43,7 +52,11 @@ public class BookingController {
     }
 
     /**
-     * Creates a new booking. Only customers can create bookings for themselves.
+     * Creates a new booking. Only users with the CUSTOMER role can create bookings for themselves.
+     *
+     * @param dto         the BookingDto containing booking details
+     * @param userDetails the currently authenticated user's details
+     * @return ResponseEntity indicating the status of the booking creation
      */
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
@@ -51,13 +64,15 @@ public class BookingController {
                                               @AuthenticationPrincipal CustomUserDetails userDetails) {
         try {
             User customer = userService.findById(userDetails.getId());
-            Optional<Workspace> workspaceOpt = workspaceService.getWorkspaceById(dto.getWorkspaceId().getId());
+            Long workspaceId = dto.getWorkspaceId().getId();
+
+            Optional<Workspace> workspaceOpt = workspaceService.getWorkspaceById(workspaceId);
 
             if (workspaceOpt.isEmpty()) {
                 return ResponseEntity.badRequest().build();
             }
 
-            bookingService.createBooking(customer, dto.getWorkspaceId().getId(), dto.getStartTime(), dto.getEndTime());
+            bookingService.createBooking(customer, workspaceId, dto.getStartTime(), dto.getEndTime());
             return ResponseEntity.status(HttpStatus.CREATED).build();
 
         } catch (BookingServiceException | WorkspaceServiceException e) {
@@ -67,9 +82,11 @@ public class BookingController {
         }
     }
 
-
     /**
-     * Customers can retrieve their own bookings. Admins can retrieve anyone's.
+     * Retrieves bookings for a specific user. Customers can retrieve their own bookings, while admins can retrieve any user's bookings.
+     *
+     * @param userId the ID of the user whose bookings are to be retrieved
+     * @return ResponseEntity containing a list of BookingDto if successful, or a bad request response if an error occurs
      */
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     @GetMapping("/user/{userId}")
@@ -86,7 +103,11 @@ public class BookingController {
     }
 
     /**
-     * Cancels a booking. Admins can cancel any booking. Customers can cancel their own.
+     * Cancels a booking. Admins can cancel any booking, and customers can cancel their own bookings.
+     *
+     * @param bookingId the ID of the booking to cancel
+     * @param userId    the ID of the user attempting to cancel the booking
+     * @return ResponseEntity indicating the status of the cancellation operation
      */
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     @DeleteMapping("/{bookingId}/user/{userId}")
@@ -102,7 +123,11 @@ public class BookingController {
     }
 
     /**
-     * Only admins can view all bookings.
+     * Retrieves all bookings. This endpoint is accessible only to users with the ADMIN role.
+     *
+     * @return ResponseEntity containing a list of BookingDto if successful,
+     * or an internal server error response if an error occurs
+     * @throws com.andersen.service.exception.DataAccessException if there is an issue accessing booking data
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
