@@ -1,98 +1,119 @@
 package com.andersen.service.auth;
 
+import com.andersen.domain.dto.userrole.AuthResponseDto;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
-import com.andersen.domain.exception.DataAccessException;
 import com.andersen.domain.repository.user.UserRepository;
-import com.andersen.logger.ConsoleLogger;
+import com.andersen.service.security.JwtTokenProvider;
+import com.andersen.service.security.CustomPasswordEncoder;
+import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
-import com.andersen.service.security.CustomPasswordEncoder;
-import com.andersen.service.security.SessionManager;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of the AuthService for user authentication and registration.
+ * <p>
+ * This service handles user login, registration, and retrieval of user details.
+ * It utilizes JWT for token generation and secures passwords using a custom
+ * password encoder. It interacts with the user repository to perform
+ * data access operations.
+ * </p>
+ */
 @Service
 public class AuthServiceImpl implements AuthService {
 
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CustomPasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final SessionManager sessionManager;
-    private final CustomPasswordEncoder customPasswordEncoder;
-    private final AuthenticationManager authenticationManager;
 
-    public AuthServiceImpl(UserRepository userRepository,
-                           SessionManager sessionManager,
-                           CustomPasswordEncoder customPasswordEncoder,
-                           AuthenticationManager authenticationManager) {
+    /**
+     * Constructs an AuthServiceImpl with the specified JWT token provider,
+     * password encoder, and user repository.
+     *
+     * @param jwtTokenProvider the JWT token provider for generating tokens
+     * @param passwordEncoder  the custom password encoder for encoding passwords
+     * @param userRepository   the user repository for accessing user data
+     */
+    @Autowired
+    public AuthServiceImpl(JwtTokenProvider jwtTokenProvider,
+                           CustomPasswordEncoder passwordEncoder,
+                           UserRepository userRepository) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
         this.userRepository = userRepository;
-        this.sessionManager = sessionManager;
-        this.customPasswordEncoder = customPasswordEncoder;
-        this.authenticationManager = authenticationManager;
     }
 
+    /**
+     * Authenticates a user with the provided username and password.
+     *
+     * @param username the username of the user trying to log in
+     * @param password the password of the user trying to log in
+     * @return an AuthResponseDto containing the authentication token and user role
+     * @throws AuthenticationException if the username or password is invalid
+     * @throws DataAccessException     if there is an error accessing user data
+     */
     @Override
-    public User login(String username, String password) throws AuthenticationException {
-        try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-            User user = userRepository.getUserByUsername(username);
-            sessionManager.createSession(user); // Create token for tracking if needed
-            return user;
-        } catch (BadCredentialsException e) {
-            throw new AuthenticationException("Invalid credentials");
+    public AuthResponseDto login(String username, String password)
+            throws AuthenticationException, DataAccessException {
+        User user = userRepository.getByUsername(username);
+
+        if (user != null && passwordEncoder.matches(password, user.getPassword())) {
+            String token = jwtTokenProvider.createToken(user.getUsername(), user.getRole());
+            return new AuthResponseDto(user.getId(), user.getUsername(), token);
+        } else {
+            throw new AuthenticationException("Invalid username or password");
         }
     }
 
-    @Override
-    public void logout(String token) {
-        sessionManager.invalidateSession(token);
-        ConsoleLogger.log("User logged out with token: " + token);
-    }
-
+    /**
+     * Registers a new customer with the provided details.
+     *
+     * @param username the desired username for the new customer
+     * @param password the desired password for the new customer
+     * @param email    the email address for the new customer
+     * @param fullName the full name of the new customer
+     * @return the newly registered User object
+     * @throws RegistrationException   if the username is already taken
+     * @throws AuthenticationException if the registration fails for some reason
+     * @throws DataAccessException     if there is an error accessing user data
+     */
     @Override
     public User registerCustomer(String username, String password, String email, String fullName)
-            throws RegistrationException {
-        validateRegistration(username, password, email, fullName);
+            throws RegistrationException, AuthenticationException, DataAccessException {
 
-        if (userRepository.getUserByUsername(username) != null) {
-            throw new RegistrationException("Username already exists");
+        User existingUser = userRepository.getByUsername(username);
+        if (existingUser != null) {
+            throw new RegistrationException("Username already taken");
         }
 
         User newUser = new User();
         newUser.setUsername(username);
-        newUser.setPassword(customPasswordEncoder.encode(password));
+        newUser.setPassword(passwordEncoder.encode(password)); // Hash the password
         newUser.setEmail(email);
         newUser.setFullName(fullName);
-        newUser.setRole(UserRole.CUSTOMER);
+        newUser.setRole(UserRole.CUSTOMER); // Default role
 
-        User createdUser = userRepository.save(newUser);
-        ConsoleLogger.log("New customer registered: " + username);
-        return createdUser;
+        try {
+            newUser = userRepository.save(newUser);
+        } catch (Exception e) {
+            throw new DataAccessException("Error saving the user to the database");
+        }
+
+        return newUser; // Return the new User object, consider including token if needed
     }
 
+    /**
+     * Retrieves a user by their unique identifier.
+     *
+     * @param id the unique identifier of the user
+     * @return the User object associated with the given identifier
+     * @throws DataAccessException if the user is not found or there is an error accessing user data
+     */
     @Override
     public User findById(Long id) throws DataAccessException {
         return userRepository.findById(id)
-                .orElseThrow(() -> new DataAccessException("User not found with id: " + id));
-    }
-
-    private void validateRegistration(String username, String password,
-                                      String email, String fullName) throws RegistrationException {
-        if (username == null || username.trim().isEmpty()) {
-            throw new RegistrationException("Username is required");
-        }
-        if (password == null || password.trim().isEmpty()) {
-            throw new RegistrationException("Password is required");
-        }
-        if (email == null || email.trim().isEmpty()) {
-            throw new RegistrationException("Email is required");
-        }
-        if (fullName == null || fullName.trim().isEmpty()) {
-            throw new RegistrationException("Full name is required");
-        }
-        if (password.length() < 8) {
-            throw new RegistrationException("Password must be at least 8 characters");
-        }
+                .orElseThrow(() -> new DataAccessException("User not found"));
     }
 }

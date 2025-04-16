@@ -1,14 +1,14 @@
 package com.andersen.ui.controller;
 
+import com.andersen.domain.dto.userrole.AuthResponseDto;
+import com.andersen.domain.dto.userrole.LoginRequest;
+import com.andersen.domain.dto.userrole.RegisterRequest;
 import com.andersen.domain.dto.userrole.UserDto;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.exception.DataAccessException;
-import com.andersen.domain.mapper.UserMapper;
 import com.andersen.service.auth.AuthService;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,8 +16,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * The AuthController class is a Spring REST controller that handles authentication-related requests,
- * including login, registration, logout, and admin-specific actions.
+ * REST controller for handling authentication-related requests.
+ * <p>
+ * This controller provides endpoints for user login and registration,
+ * along with an admin-only endpoint that demonstrates role-based access control.
+ * </p>
  */
 @RestController
 @RequestMapping("/api/auth")
@@ -28,7 +31,7 @@ public class AuthController {
     /**
      * Constructs an AuthController with the specified AuthService.
      *
-     * @param authService the AuthService to be used for user authentication
+     * @param authService the service for handling authentication logic
      */
     @Autowired
     public AuthController(AuthService authService) {
@@ -36,9 +39,9 @@ public class AuthController {
     }
 
     /**
-     * Endpoint that returns content accessible only to users with an ADMIN role.
+     * Endpoint accessible only to users with the ADMIN role.
      *
-     * @return ResponseEntity containing the admin content
+     * @return a ResponseEntity containing admin content
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin-only")
@@ -47,73 +50,48 @@ public class AuthController {
     }
 
     /**
-     * Login endpoint that authenticates a user based on the provided username and password.
-     * On successful authentication, a session is created, and user data is stored in the session.
+     * Endpoint for user login.
      *
-     * @param username the username of the user trying to log in
-     * @param password the password of the user trying to log in
-     * @param request  the HttpServletRequest used to create the session
-     * @return ResponseEntity containing a UserDto if authentication is successful,
-     * or an unauthorized response if authentication fails
+     * @param loginRequest the login request containing username and password
+     * @return a ResponseEntity containing the authentication response
      */
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestParam String username,
-                                         @RequestParam String password,
-                                         HttpServletRequest request) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginRequest loginRequest) {
         try {
-            User user = authService.login(username, password);
-            UserDto dto = UserMapper.toDto(user);
-            HttpSession session = request.getSession(true);
-            session.setAttribute("user", dto);
-            return ResponseEntity.ok(dto);
+            AuthResponseDto response = authService.login(
+                    loginRequest.getUsername(),
+                    loginRequest.getPassword()
+            );
+            return ResponseEntity.ok(response);
         } catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         } catch (DataAccessException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
-        }
-    }
-
-    /**
-     * Registration endpoint that creates a new user with the provided details.
-     *
-     * @param username the username of the new user
-     * @param password the password of the new user
-     * @param email    the email of the new user
-     * @param fullName the full name of the new user
-     * @return ResponseEntity containing a UserDto if registration is successful,
-     * or a bad request response if registration fails
-     * @throws AuthenticationException if there is an issue with registration
-     */
-    @PostMapping("/register")
-    public ResponseEntity<UserDto> register(@RequestParam String username,
-                                            @RequestParam String password,
-                                            @RequestParam String email,
-                                            @RequestParam String fullName)
-            {
-        try {
-            User user = authService.registerCustomer(username, password, email, fullName);
-            return ResponseEntity.status(HttpStatus.CREATED).body(UserMapper.toDto(user));
-        } catch (AuthenticationException  e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        } catch (DataAccessException | RegistrationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
     /**
-     * Logout endpoint that invalidates the current user session and logs the user out.
+     * Endpoint for user registration.
      *
-     * @param request the HttpServletRequest used to retrieve the session
-     * @return ResponseEntity indicating the logout status
+     * @param registerRequest the registration request containing user details
+     * @return a ResponseEntity containing the newly created user data
+     * @throws AuthenticationException if registration fails for any reason
      */
-    @PostMapping("/logout")
-    public ResponseEntity<String> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            String token = session.getId();
-            authService.logout(token);
-            session.invalidate();
+    @PostMapping("/register")
+    public ResponseEntity<UserDto> register(@RequestBody RegisterRequest registerRequest) throws AuthenticationException {
+        try {
+            User user = authService.registerCustomer(
+                    registerRequest.getUsername(),
+                    registerRequest.getPassword(),
+                    registerRequest.getEmail(),
+                    registerRequest.getFullName()
+            );
+            UserDto userDto = new UserDto();
+            return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
+        } catch (RegistrationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok("Logged out successfully");
     }
 }

@@ -4,17 +4,22 @@ import com.andersen.domain.dto.userrole.UserDto;
 import com.andersen.domain.entity.role.User;
 
 /**
- * Mapper class for converting between User entities and User Data Transfer Objects (DTOs).
- * This class provides methods to translate User data to and from its DTO representation
- * to facilitate data transfer across different layers of the application.
+ * Mapper for converting between User entities and User DTOs.
+ * <p>
+ * This class contains methods to facilitate the conversion between
+ * {@link User} entities and {@link UserDto} data transfer objects.
+ * It provides static methods to handle the mapping, ensuring a
+ * clean separation between the data representation used for
+ * persistence and the one used for transporting data across layers.
+ * </p>
  */
 public class UserMapper {
 
     /**
-     * Converts a User entity to a UserDto.
+     * Converts a {@link User} entity to a {@link UserDto}.
      *
-     * @param user the User entity to be converted
-     * @return a UserDto representing the provided User entity, or null if the user is null
+     * @param user the User entity to convert
+     * @return the converted UserDto, or null if the provided User is null
      */
     public static UserDto toDto(User user) {
         if (user == null) return null;
@@ -30,10 +35,10 @@ public class UserMapper {
     }
 
     /**
-     * Converts a UserDto to a User entity.
+     * Converts a {@link UserDto} to a {@link User} entity.
      *
-     * @param dto the UserDto to be converted
-     * @return a User entity representing the provided UserDto, or null if the dto is null
+     * @param dto the UserDto to convert
+     * @return the converted User entity, or null if the provided UserDto is null
      */
     public static User toEntity(UserDto dto) {
         if (dto == null) return null;
@@ -45,7 +50,6 @@ public class UserMapper {
         user.setFullName(dto.getFullName());
         user.setActive(dto.isActive());
         user.setRole(dto.getRole());
-
         return user;
     }
 }

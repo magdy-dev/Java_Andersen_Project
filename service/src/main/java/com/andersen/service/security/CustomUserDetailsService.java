@@ -8,40 +8,40 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 /**
- * CustomUserDetailsService is an implementation of the UserDetailsService interface,
- * which is used to load user-specific data during the authentication process.
+ * Custom implementation of the Spring {@link UserDetailsService} interface.
+ * <p>
+ * This service loads user-specific data from the database based on username
+ * and provides a {@link UserDetails} implementation for authentication and
+ * authorization purposes.
+ * </p>
  */
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
 
-
     private final UserRepository userRepository;
 
     /**
-     * Constructs a CustomUserDetailsService with the provided user repository.
+     * Constructs a CustomUserDetailsService with the specified user repository.
      *
-     * @param userRepository The repository that manages user data.
+     * @param userRepository the repository for user data access
      */
     public CustomUserDetailsService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     /**
-     * Loads a user by their username. If the user is found, their details are returned.
-     * Otherwise, a UsernameNotFoundException is thrown.
+     * Loads user details by the given username.
      *
-     * @param username The username of the user to retrieve.
-     * @return UserDetails containing the user's data.
-     * @throws UsernameNotFoundException If the user is not found in the repository.
+     * @param username the username of the user to load
+     * @return a UserDetails object containing user information
+     * @throws UsernameNotFoundException if the user is not found in the repository
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.getUserByUsername(username);
+        User user = userRepository.getByUsername(username);
         if (user == null) {
-            throw new UsernameNotFoundException("User not found");
+            throw new UsernameNotFoundException("User  not found");
         }
-
         return new CustomUserDetails(user.getId(), user.getUsername(), user.getPassword(), user.getRole());
     }
-
 }

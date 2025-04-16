@@ -2,9 +2,11 @@ package com.andersen.domain.entity.workspace;
 
 import com.andersen.domain.entity.booking.Booking;
 import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
 /**
  * Represents a workspace that can be booked by customers.
  * This class contains details about the workspace, including its name, description,
@@ -12,6 +14,7 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "workspaces")
+
 public class Workspace {
 
     @Id

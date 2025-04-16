@@ -3,60 +3,59 @@ package com.andersen.service.security;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static javax.management.Query.and;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
- * SecurityConfig is a configuration class that sets up Spring Security for the application.
- * It defines the security filter chain, authentication manager, and method security for handling
- * security filters and authentication throughout the application.
+ * Security configuration class for setting up Spring Security.
+ * <p>
+ * This configuration class defines security settings for the application,
+ * including session management, authorization rules, and JWT authentication.
+ * </p>
  */
 @Configuration
-@EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
+    private final JwtTokenProvider jwtTokenProvider;
+    private final CustomUserDetailsService customUserDetailsService;
+
     /**
-     * Defines a SecurityFilterChain that configures the security settings for HTTP requests.
-     * It specifies which endpoints are publicly accessible and which require authentication.
+     * Constructs a SecurityConfig with the specified JWT token provider
+     * and custom user details service.
      *
-     * @param http The HttpSecurity object used to configure security interceptors.
-     * @return The configured SecurityFilterChain.
-     * @throws Exception If there is an error during configuration.
+     * @param jwtTokenProvider         the JWT token provider
+     * @param customUserDetailsService the service for loading user details
+     */
+    public SecurityConfig(JwtTokenProvider jwtTokenProvider, CustomUserDetailsService customUserDetailsService) {
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.customUserDetailsService = customUserDetailsService;
+    }
+
+    /**
+     * Configures the security filter chain for HTTP requests.
+     *
+     * @param http the HttpSecurity to configure
+     * @return the configured SecurityFilterChain
+     * @throws Exception if an error occurs during configuration
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable()
+        http.csrf().disable()
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll() // Allows unauthenticated access to login and register endpoints
                         .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults());
-
-
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, customUserDetailsService),
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-
-    /**
-     * Provides an AuthenticationManager bean for handling authentication.
-     *
-     * @param authenticationConfiguration The AuthenticationConfiguration object used to retrieve the authentication manager.
-     * @return The configured AuthenticationManager.
-     * @throws Exception If there is an error during authentication manager creation.
-     */
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
-            throws Exception {
-        return authenticationConfiguration.getAuthenticationManager();
-    }
 
 }

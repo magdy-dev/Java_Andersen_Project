@@ -4,17 +4,22 @@ import com.andersen.domain.dto.workspace.WorkspaceDto;
 import com.andersen.domain.entity.workspace.Workspace;
 
 /**
- * Mapper class for converting between Workspace entities and Workspace Data Transfer Objects (DTOs).
- * This class provides methods to translate Workspace data to and from its DTO representation
- * to facilitate data transfer across different layers of the application.
+ * Mapper for converting between Workspace entities and Workspace DTOs.
+ * <p>
+ * This class contains static methods for converting between
+ * {@link Workspace} entities and {@link WorkspaceDto} data transfer
+ * objects. The methods ensure that the mapping is clear and
+ * encapsulated, promoting separation of concerns between the
+ * database layer and the application's data representation layer.
+ * </p>
  */
 public class WorkspaceMapper {
 
     /**
-     * Converts a Workspace entity to a WorkspaceDto.
+     * Converts a {@link Workspace} entity to a {@link WorkspaceDto}.
      *
-     * @param entity the Workspace entity to be converted
-     * @return a WorkspaceDto representing the provided Workspace entity, or null if the entity is null
+     * @param entity the Workspace entity to convert
+     * @return the converted WorkspaceDto, or null if the provided entity is null
      */
     public static WorkspaceDto toDto(Workspace entity) {
         if (entity == null) return null;
@@ -31,10 +36,10 @@ public class WorkspaceMapper {
     }
 
     /**
-     * Converts a WorkspaceDto to a Workspace entity.
+     * Converts a {@link WorkspaceDto} to a {@link Workspace} entity.
      *
-     * @param dto the WorkspaceDto to be converted
-     * @return a Workspace entity representing the provided WorkspaceDto, or null if the dto is null
+     * @param dto the WorkspaceDto to convert
+     * @return the converted Workspace entity, or null if the provided dto is null
      */
     public static Workspace toEntity(WorkspaceDto dto) {
         if (dto == null) return null;

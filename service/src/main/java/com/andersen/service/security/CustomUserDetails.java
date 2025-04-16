@@ -8,8 +8,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 /**
- * CustomUserDetails implements the UserDetails interface from Spring Security,
- * representing the user details required for authentication and authorization.
+ * Custom implementation of the Spring {@link UserDetails} interface.
+ * <p>
+ * This class represents the user details for Spring Security, encapsulating
+ * user-specific information such as ID, username, password, and role.
+ * </p>
  */
 public class CustomUserDetails implements UserDetails {
 
@@ -19,12 +22,12 @@ public class CustomUserDetails implements UserDetails {
     private final UserRole role;
 
     /**
-     * Constructs a CustomUserDetails object with the specified user details.
+     * Constructs a CustomUserDetails object with the provided user information.
      *
-     * @param id       The unique identifier of the user.
-     * @param username The username of the user.
-     * @param password The password of the user.
-     * @param role     The role of the user.
+     * @param id       the unique identifier of the user
+     * @param username the username of the user
+     * @param password the password of the user
+     * @param role     the role of the user
      */
     public CustomUserDetails(Long id, String username, String password, UserRole role) {
         this.id = id;
@@ -36,7 +39,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Retrieves the unique identifier of the user.
      *
-     * @return The user's ID.
+     * @return the user's ID
      */
     public Long getId() {
         return id;
@@ -45,7 +48,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Retrieves the role of the user.
      *
-     * @return The user's role.
+     * @return the user's role
      */
     public UserRole getRole() {
         return role;
@@ -54,7 +57,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Returns the authorities granted to the user.
      *
-     * @return A collection containing the user's authorities.
+     * @return a collection of granted authorities
      */
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -64,7 +67,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Returns the user's password.
      *
-     * @return The password of the user.
+     * @return the user's password
      */
     @Override
     public String getPassword() {
@@ -74,7 +77,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Returns the username of the user.
      *
-     * @return The username of the user.
+     * @return the user's username
      */
     @Override
     public String getUsername() {
@@ -84,7 +87,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Indicates whether the user's account has expired.
      *
-     * @return true if the account is still valid, false otherwise.
+     * @return true if the account is non-expired, false otherwise
      */
     @Override
     public boolean isAccountNonExpired() {
@@ -92,9 +95,9 @@ public class CustomUserDetails implements UserDetails {
     }
 
     /**
-     * Indicates whether the user is locked or unlocked.
+     * Indicates whether the user's account is locked.
      *
-     * @return true if the user is not locked, false otherwise.
+     * @return true if the account is non-locked, false otherwise
      */
     @Override
     public boolean isAccountNonLocked() {
@@ -104,7 +107,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Indicates whether the user's credentials (password) have expired.
      *
-     * @return true if the credentials are valid, false otherwise.
+     * @return true if the credentials are non-expired, false otherwise
      */
     @Override
     public boolean isCredentialsNonExpired() {
@@ -114,7 +117,7 @@ public class CustomUserDetails implements UserDetails {
     /**
      * Indicates whether the user is enabled or disabled.
      *
-     * @return true if the user is enabled, false otherwise.
+     * @return true if the user is enabled, false otherwise
      */
     @Override
     public boolean isEnabled() {

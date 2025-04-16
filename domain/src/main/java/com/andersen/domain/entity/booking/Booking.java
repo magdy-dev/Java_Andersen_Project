@@ -3,12 +3,18 @@ package com.andersen.domain.entity.booking;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.workspace.Workspace;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
  * Represents a booking made by a customer for a workspace at a specific date and time.
  */
+
 @Entity
 @Table(name = "bookings")
 public class Booking {
@@ -251,6 +257,7 @@ public class Booking {
     public int hashCode() {
         return Objects.hash(id, customer, workspace, startTime, endTime, status, isActive, totalPrice);
     }
+
     /**
      * Returns a string representation of the booking.
      *

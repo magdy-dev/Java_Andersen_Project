@@ -6,6 +6,7 @@ import com.andersen.domain.entity.workspace.Workspace;
 import com.andersen.service.exception.DataAccessException;
 import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.workspace.WorkspaceService;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -145,8 +146,8 @@ public class WorkspaceController {
     @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping("/available")
     public ResponseEntity<List<WorkspaceDto>> getAvailable(
-            @RequestParam("start") LocalDateTime start,
-            @RequestParam("end") LocalDateTime end) {
+            @RequestParam("start") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime start,
+            @RequestParam("end") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime end) {
         try {
             List<WorkspaceDto> available = workspaceService.getAvailableWorkspaces(start, end).stream()
                     .map(WorkspaceMapper::toDto)

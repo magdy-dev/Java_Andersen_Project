@@ -1,17 +1,15 @@
 package com.andersen.ui.controller;
 
 import com.andersen.domain.dto.booking.BookingDto;
+import com.andersen.domain.dto.userrole.UserDto;
 import com.andersen.domain.entity.booking.Booking;
 import com.andersen.domain.entity.role.User;
-import com.andersen.domain.entity.workspace.Workspace;
 import com.andersen.domain.exception.DataAccessException;
 import com.andersen.domain.mapper.BookingMapper;
 import com.andersen.service.auth.AuthService;
 import com.andersen.service.booking.BookingService;
 import com.andersen.service.exception.BookingServiceException;
-import com.andersen.service.exception.WorkspaceServiceException;
 import com.andersen.service.security.CustomUserDetails;
-import com.andersen.service.workspace.WorkspaceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +18,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * The BookingController class is a Spring REST controller that manages booking-related operations,
- * including creating bookings, retrieving bookings for users, canceling bookings, and retrieving all bookings.
+ * REST controller for handling booking-related requests.
+ * <p>
+ * This controller provides endpoints for creating, retrieving, and canceling bookings.
+ * Access to these endpoints is restricted based on user roles.
+ * </p>
  */
 @RestController
 @RequestMapping("/api/bookings")
@@ -33,60 +33,69 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final AuthService userService;
-    private final WorkspaceService workspaceService;
 
     /**
-     * Constructs a BookingController with the specified BookingService, AuthService, and WorkspaceService.
+     * Constructs a BookingController with the specified BookingService and AuthService.
      *
-     * @param bookingService   the service used to manage bookings
-     * @param userService      the service used to access user information
-     * @param workspaceService the service used to access workspace information
+     * @param bookingService the service for managing bookings
+     * @param userService    the service for managing user authentication
      */
     @Autowired
-    public BookingController(BookingService bookingService,
-                             AuthService userService,
-                             WorkspaceService workspaceService) {
+    public BookingController(BookingService bookingService, AuthService userService) {
         this.bookingService = bookingService;
         this.userService = userService;
-        this.workspaceService = workspaceService;
     }
 
     /**
-     * Creates a new booking. Only users with the CUSTOMER role can create bookings for themselves.
+     * Creates a new booking for the authenticated customer.
      *
-     * @param dto         the BookingDto containing booking details
-     * @param userDetails the currently authenticated user's details
-     * @return ResponseEntity indicating the status of the booking creation
+     * @param dto         the booking details
+     * @param userDetails the authenticated user's details
+     * @return a ResponseEntity containing the created booking or an error message
      */
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
-    public ResponseEntity<Void> createBooking(@RequestBody BookingDto dto,
-                                              @AuthenticationPrincipal CustomUserDetails userDetails) {
+    public ResponseEntity<?> createBooking(@RequestBody BookingDto dto,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (dto.getWorkspaceId() == null) {
+            return ResponseEntity.badRequest().body("Workspace ID is required.");
+        }
+        if (dto.getStartTime() == null || dto.getEndTime() == null) {
+            return ResponseEntity.badRequest().body("Start time and end time are required.");
+        }
+        if (dto.getStartTime().isAfter(dto.getEndTime())) {
+            return ResponseEntity.badRequest().body("Start time must be before end time.");
+        }
+
         try {
+            // Retrieve authenticated customer (from session/JWT)
             User customer = userService.findById(userDetails.getId());
-            Long workspaceId = dto.getWorkspaceId().getId();
-
-            Optional<Workspace> workspaceOpt = workspaceService.getWorkspaceById(workspaceId);
-
-            if (workspaceOpt.isEmpty()) {
-                return ResponseEntity.badRequest().build();
+            if (customer == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Customer not found.");
             }
 
-            bookingService.createBooking(customer, workspaceId, dto.getStartTime(), dto.getEndTime());
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            Long workspaceId = dto.getWorkspaceId();
+            // Optionally map customer into the dto if needed
+            dto.setCustomer(new UserDto(customer.getId()));
 
-        } catch (BookingServiceException | WorkspaceServiceException e) {
-            return ResponseEntity.badRequest().build();
-        } catch (DataAccessException | RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            // Create booking. If the start time is in the past, this call will throw a BookingServiceException.
+            Booking createdBooking = bookingService.createBooking(customer, workspaceId, dto.getStartTime(), dto.getEndTime());
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
+        } catch (BookingServiceException e) {
+            // Return 409 Conflict with the message from the exception
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Booking conflict: " + e.getMessage());
+        } catch (DataAccessException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Database error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
 
     /**
-     * Retrieves bookings for a specific user. Customers can retrieve their own bookings, while admins can retrieve any user's bookings.
+     * Retrieves bookings for a specific user.
      *
-     * @param userId the ID of the user whose bookings are to be retrieved
-     * @return ResponseEntity containing a list of BookingDto if successful, or a bad request response if an error occurs
+     * @param userId the ID of the user whose bookings to retrieve
+     * @return a ResponseEntity containing a list of BookingDto objects or an error response
      */
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     @GetMapping("/user/{userId}")
@@ -103,11 +112,11 @@ public class BookingController {
     }
 
     /**
-     * Cancels a booking. Admins can cancel any booking, and customers can cancel their own bookings.
+     * Cancels a booking by ID.
      *
-     * @param bookingId the ID of the booking to cancel
+     * @param bookingId the ID of the booking to
      * @param userId    the ID of the user attempting to cancel the booking
-     * @return ResponseEntity indicating the status of the cancellation operation
+     * @return a ResponseEntity indicating the outcome of the cancellation operation
      */
     @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     @DeleteMapping("/{bookingId}/user/{userId}")
@@ -115,7 +124,8 @@ public class BookingController {
                                               @PathVariable Long userId) {
         try {
             boolean cancelled = bookingService.cancelBooking(bookingId, userId);
-            return cancelled ? ResponseEntity.noContent().build()
+            return cancelled
+                    ? ResponseEntity.noContent().build()
                     : ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
         } catch (BookingServiceException | DataAccessException e) {
             return ResponseEntity.badRequest().build();
@@ -123,11 +133,10 @@ public class BookingController {
     }
 
     /**
-     * Retrieves all bookings. This endpoint is accessible only to users with the ADMIN role.
+     * Retrieves all bookings (admin only).
      *
-     * @return ResponseEntity containing a list of BookingDto if successful,
-     * or an internal server error response if an error occurs
-     * @throws com.andersen.service.exception.DataAccessException if there is an issue accessing booking data
+     * @return a ResponseEntity containing a list of BookingDto objects or an error response
+     * @throws com.andersen.service.exception.DataAccessException if there is a database access error
      */
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping

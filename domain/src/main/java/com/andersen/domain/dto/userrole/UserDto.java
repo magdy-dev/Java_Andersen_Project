@@ -4,32 +4,57 @@ import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 
 /**
- * Data Transfer Object for User.
- * This class is used to transfer user data between layers.
+ * Data Transfer Object (DTO) for user data.
+ * This class encapsulates the information about a user, including their
+ * identification, login information, active status, and role within the system.
  */
 public class UserDto {
 
+    /**
+     * Unique identifier for the user.
+     */
     private Long id;
+
+    /**
+     * The username of the user.
+     */
     private String username;
+
+    /**
+     * The email address of the user.
+     */
     private String email;
+
+    /**
+     * The full name of the user.
+     */
     private String fullName;
+
+    /**
+     * Indicates whether the user is active or not.
+     */
     private boolean isActive;
+
+    /**
+     * The role assigned to the user in the system.
+     */
     private UserRole role;
 
     /**
-     * Default constructor.
+     * Default constructor for UserDto.
      */
-    public UserDto() {}
+    public UserDto() {
+    }
 
     /**
-     * Constructs a new UserDto with the specified parameters.
+     * Parameterized constructor for UserDto.
      *
-     * @param id        the unique identifier of the user
-     * @param username  the username of the user
-     * @param email     the email address of the user
-     * @param fullName  the full name of the user
-     * @param isActive  whether the user is active
-     * @param role      the role of the user
+     * @param id       the unique identifier for the user
+     * @param username the username of the user
+     * @param email    the email address of the user
+     * @param fullName the full name of the user
+     * @param isActive indicates whether the user is active
+     * @param role     the role assigned to the user
      */
     public UserDto(Long id, String username, String email, String fullName, boolean isActive, UserRole role) {
         this.id = id;
@@ -41,10 +66,19 @@ public class UserDto {
     }
 
     /**
-     * Converts a User entity to a UserDto.
+     * Constructor for UserDto that only sets the user ID.
+     *
+     * @param id the unique identifier for the user
+     */
+    public UserDto(Long id) {
+        this.id = id;
+    }
+
+    /**
+     * Converts a User entity into a UserDto.
      *
      * @param user the User entity to convert
-     * @return a UserDto that represents the given User, or null if the user is null
+     * @return a UserDto representation of the User entity, or null if the user is null
      */
     public static UserDto toDto(User user) {
         if (user == null) return null;
@@ -60,18 +94,18 @@ public class UserDto {
     }
 
     /**
-     * Gets the unique identifier of the user.
+     * Gets the unique identifier for the user.
      *
-     * @return the unique identifier of the user.
+     * @return the user ID
      */
     public Long getId() {
         return id;
     }
 
     /**
-     * Sets the unique identifier of the user.
+     * Sets the unique identifier for the user.
      *
-     * @param id the unique identifier of the user.
+     * @param id the user ID to set
      */
     public void setId(Long id) {
         this.id = id;
@@ -80,7 +114,7 @@ public class UserDto {
     /**
      * Gets the username of the user.
      *
-     * @return the username of the user.
+     * @return the username
      */
     public String getUsername() {
         return username;
@@ -89,7 +123,7 @@ public class UserDto {
     /**
      * Sets the username of the user.
      *
-     * @param username the username to set.
+     * @param username the username to set
      */
     public void setUsername(String username) {
         this.username = username;
@@ -98,7 +132,7 @@ public class UserDto {
     /**
      * Gets the email address of the user.
      *
-     * @return the email address of the user.
+     * @return the email address
      */
     public String getEmail() {
         return email;
@@ -107,7 +141,7 @@ public class UserDto {
     /**
      * Sets the email address of the user.
      *
-     * @param email the email address to set.
+     * @param email the email address to set
      */
     public void setEmail(String email) {
         this.email = email;
@@ -116,7 +150,7 @@ public class UserDto {
     /**
      * Gets the full name of the user.
      *
-     * @return the full name of the user.
+     * @return the full name
      */
     public String getFullName() {
         return fullName;
@@ -125,7 +159,7 @@ public class UserDto {
     /**
      * Sets the full name of the user.
      *
-     * @param fullName the full name to set.
+     * @param fullName the full name to set
      */
     public void setFullName(String fullName) {
         this.fullName = fullName;
@@ -134,34 +168,34 @@ public class UserDto {
     /**
      * Checks if the user is active.
      *
-     * @return true if the user is active, false otherwise.
+     * @return true if the user is active, false otherwise
      */
     public boolean isActive() {
         return isActive;
     }
 
     /**
-     * Sets whether the user is active.
+     * Sets the active status of the user.
      *
-     * @param active true to set the user as active, false otherwise.
+     * @param active true to set the user as active, false otherwise
      */
     public void setActive(boolean active) {
         isActive = active;
     }
 
     /**
-     * Gets the role of the user.
+     * Gets the role assigned to the user.
      *
-     * @return the role of the user.
+     * @return the user's role
      */
     public UserRole getRole() {
         return role;
     }
 
     /**
-     * Sets the role of the user.
+     * Sets the role assigned to the user.
      *
-     * @param role the role to set.
+     * @param role the UserRole to set
      */
     public void setRole(UserRole role) {
         this.role = role;

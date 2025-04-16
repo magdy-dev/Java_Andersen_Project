@@ -1,6 +1,7 @@
 package com.andersen.domain.entity.role;
 
 import jakarta.persistence.*;
+
 import java.util.Objects;
 
 /**
@@ -14,6 +15,7 @@ import java.util.Objects;
                 @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email")
         })
+
 public class User {
 
     @Id
@@ -37,7 +39,7 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private UserRole role; // Role assigned to the user (e.g., USER, ADMIN)
+    private UserRole role;
 
     /**
      * Default constructor for JPA.
@@ -64,8 +66,6 @@ public class User {
         this.fullName = fullName;
         this.role = role;
     }
-
-    // Getters and Setters
 
     /**
      * Retrieves the active status of the object.

@@ -14,7 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 })
 @EnableJpaRepositories(basePackages = "com.andersen.domain")
 @EntityScan(basePackages = "com.andersen.domain")
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.andersen")
 public class CoworkingSpaceReservationApplication {
     public static void main(String[] args) {
         SpringApplication.run(CoworkingSpaceReservationApplication.class, args);
