@@ -1,4 +1,3 @@
-
 package com.andersen.service.workspace;
 
 import com.andersen.domain.entity.booking.BookingStatus;
@@ -17,11 +16,15 @@ import java.util.stream.Collectors;
 
 /**
  * Implementation of the WorkspaceService interface.
- * Handles workspace creation, retrieval, updating, deletion, and availability checks.
+ * This service handles workspace creation, retrieval, updating, deletion,
+ * and availability checks.
+ *
+ * <p>It interacts with the WorkspaceRepository for database operations
+ * and manages exceptions related to workspace operations.</p>
  */
-
 @Service
 public class WorkspaceServiceImpl implements WorkspaceService {
+
     /**
      * Repository for performing workspace-related database operations.
      */
@@ -37,12 +40,11 @@ public class WorkspaceServiceImpl implements WorkspaceService {
      *
      * @param workspace the workspace to create
      * @return the saved workspace
-     * @throws WorkspaceServiceException                         if validation fails
-     * @throws com.andersen.domain.exception.DataAccessException if a data access error occurs
+     * @throws WorkspaceServiceException if validation fails
      */
     @Override
     public Workspace createWorkspace(Workspace workspace)
-            throws WorkspaceServiceException, com.andersen.domain.exception.DataAccessException {
+            throws WorkspaceServiceException {
         validateWorkspace(workspace);
         return workspaceRepository.save(workspace);
     }

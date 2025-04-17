@@ -86,7 +86,16 @@ public class AuthController {
                     registerRequest.getEmail(),
                     registerRequest.getFullName()
             );
-            UserDto userDto = new UserDto();
+            // Properly map User to UserDto
+            UserDto userDto = new UserDto(
+                    user.getId(),
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getFullName(),
+                    user.isActive(),
+                    user.getRole()
+            );
+
             return ResponseEntity.status(HttpStatus.CREATED).body(userDto);
         } catch (RegistrationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
