@@ -1,6 +1,9 @@
 package com.andersen.ui.controller;
 
 import com.andersen.domain.exception.DataAccessException;
+import com.andersen.service.commend.BookingCommand;
+import com.andersen.service.commend.BookingCommandExecutor;
+import com.andersen.service.commend.CreateBookingCommand;
 import com.andersen.service.exception.BookingServiceException;
 import com.andersen.service.dto.booking.BookingDto;
 import com.andersen.domain.entity.booking.Booking;
@@ -19,6 +22,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -35,7 +39,7 @@ public class BookingController {
 
     private final BookingService bookingService;
     private final AuthService userService;
-
+    private final BookingCommandExecutor commandExecutor;
     /**
      * Constructs a BookingController with the specified BookingService and AuthService.
      *
@@ -43,35 +47,62 @@ public class BookingController {
      * @param userService    the AuthService to manage user authentication
      */
     @Autowired
-    public BookingController(BookingService bookingService, AuthService userService) {
+    public BookingController(BookingService bookingService, AuthService userService, BookingCommandExecutor commandExecutor) {
         this.bookingService = bookingService;
         this.userService = userService;
+        this.commandExecutor = commandExecutor;
     }
 
+
     /**
-     * Creates a new booking for the authenticated user.
+     * Creates a new booking based on the provided BookingDto.
      *
-     * @param dto         the BookingDto containing booking details
-     * @param userDetails the authenticated user's details
-     * @return ResponseEntity containing the created BookingDto
-     * @throws BookingServiceException if there is an error in the booking service
-     * @throws DataAccessException      if there is a database access error
+     * @param dto         the data transfer object containing booking details.
+     * @param userDetails the authenticated user's details.
+     * @return a ResponseEntity containing the created Booking object.
+     *         - Returns 201 CREATED with the booking if successful.
+     *         - Returns 400 BAD REQUEST if there is a data access error.
+     *         - Returns 500 INTERNAL SERVER ERROR for any unexpected errors.
+     * @throws DataAccessException if an error occurs while accessing data.
      */
     @PreAuthorize("hasRole('CUSTOMER')")
     @PostMapping
-    public ResponseEntity<BookingDto> createBooking(@RequestBody BookingDto dto,
-                                                    @AuthenticationPrincipal CustomUserDetails userDetails) throws BookingServiceException, DataAccessException {
-        logger.info("Request to create booking received for user: {}", userDetails.getUsername());
+    public ResponseEntity<?> createBooking(@RequestBody BookingDto dto,
+                                           @AuthenticationPrincipal CustomUserDetails userDetails) throws DataAccessException {
+        logger.info("Start CreateBookingCommand for user {}", userDetails.getUsername());
+        User customer = userService.findById(userDetails.getId());
+        BookingCommand<Booking> command = new CreateBookingCommand(
+                bookingService,
+                customer,
+                dto.getWorkspaceId(),
+                dto.getStartTime(),
+                dto.getEndTime()
+        );
+
         try {
-            User customer = userService.findById(userDetails.getId());
-            Booking created = bookingService.createBooking(customer, dto.getWorkspaceId(), dto.getStartTime(), dto.getEndTime());
-            logger.info("Booking created successfully for user: {}", userDetails.getUsername());
-            return ResponseEntity.status(HttpStatus.CREATED).body(BookingMapper.toDto(created));
-        } catch (Exception e) {
-            logger.error("Error occurred while creating booking for user: {}", userDetails.getUsername(), e);
-            throw e;
+            Booking booking = commandExecutor.execute(command);
+            BookingDto result = BookingMapper.toDto(booking);
+            logger.info("Booking created successfully: id={} for user={}",
+                    booking.getId(), userDetails.getUsername());
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+
+        } catch (DataAccessException dae) {
+            logger.error("DataAccessException while creating booking for user {}: {}",
+                    userDetails.getUsername(), dae.getMessage(), dae);
+            // You can return a structured error object or just the message
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", dae.getMessage()));
+
+        } catch (Exception ex) {
+            logger.error("Unexpected error while creating booking for user {}: {}",
+                    userDetails.getUsername(), ex.getMessage(), ex);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Unexpected error: " + ex.getMessage()));
         }
     }
+
 
     /**
      * Retrieves all bookings for a specific user.
