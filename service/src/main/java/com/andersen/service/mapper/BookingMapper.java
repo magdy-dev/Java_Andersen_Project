@@ -1,10 +1,11 @@
-package com.andersen.domain.mapper;
+package com.andersen.service.mapper;
 
-import com.andersen.domain.dto.booking.BookingDto;
-import com.andersen.domain.dto.userrole.UserDto;
+
 import com.andersen.domain.entity.booking.Booking;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.service.dto.booking.BookingDto;
+import com.andersen.service.dto.userrole.UserDto;
 
 /**
  * Mapper class for converting between Booking entities and Booking Data Transfer Objects (DTOs).

@@ -1,9 +1,10 @@
 package com.andersen.service.auth;
 
-import com.andersen.domain.dto.userrole.AuthResponseDto;
+
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 import com.andersen.domain.repository.user.UserRepository;
+import com.andersen.service.dto.userrole.AuthResponseDto;
 import com.andersen.service.security.JwtTokenProvider;
 import com.andersen.service.security.CustomPasswordEncoder;
 import com.andersen.domain.exception.DataAccessException;
@@ -56,7 +57,7 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     public AuthResponseDto login(String username, String password)
-            throws AuthenticationException, DataAccessException {
+            throws AuthenticationException {
         User user = userRepository.getByUsername(username);
 
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
@@ -101,7 +102,7 @@ public class AuthServiceImpl implements AuthService {
             throw new DataAccessException("Error saving the user to the database");
         }
 
-        return newUser; // Return the new User object, consider including token if needed
+        return newUser;
     }
 
     /**

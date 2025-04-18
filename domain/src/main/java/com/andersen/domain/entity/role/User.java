@@ -57,13 +57,13 @@ public class User {
      * @param fullName the full name of the user
      * @param role     the userrole assigned to the user
      */
-    public User(Long id, String username, String password, String email,
-                String fullName, UserRole role) {
+    public User(Long id, String username, String password, String email, String fullName, boolean isActive, UserRole role) {
         this.id = id;
         this.username = username;
         this.password = password;
         this.email = email;
         this.fullName = fullName;
+        this.isActive = isActive;
         this.role = role;
     }
 

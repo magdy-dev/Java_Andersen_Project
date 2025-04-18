@@ -57,16 +57,35 @@ public class BookingServiceImpl implements BookingService {
      */
     @Override
     public Booking createBooking(User customer, Long workspaceId, LocalDateTime startTime, LocalDateTime endTime) throws BookingServiceException {
-        // Check if the booking start time is in the past
-        if (startTime.isBefore(LocalDateTime.now())) {
-            throw new BookingServiceException("Cannot book for past dates", ErrorCode.BK_004);
+        if (workspaceId == null) {
+            throw new BookingServiceException("Workspace ID is required.", ErrorCode.BK_001);
         }
 
-        // Proceed with booking creation (not fully implemented here)
+        if (startTime == null || endTime == null) {
+            throw new BookingServiceException("Start time and end time are required.", ErrorCode.BK_002);
+        }
+
+        if (startTime.isAfter(endTime)) {
+            throw new BookingServiceException("Start time must be before end time.", ErrorCode.BK_003);
+        }
+
+        if (startTime.isBefore(LocalDateTime.now())) {
+            throw new BookingServiceException("Cannot book for past dates.", ErrorCode.BK_004);
+        }
+
+        // Optionally check if customer or workspace exists in DB (depends on your implementation)
+
         Booking booking = new Booking();
         booking.setCustomer(customer);
-        return booking;
+        booking.setWorkspace(workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new BookingServiceException("Workspace not found", ErrorCode.WS_001)));
+        booking.setStartTime(startTime);
+        booking.setEndTime(endTime);
+        booking.setStatus(BookingStatus.CONFIRMED);
+
+        return bookingRepository.save(booking);
     }
+
 
     /**
      * Retrieves a list of bookings made by a customer.

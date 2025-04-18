@@ -1,4 +1,4 @@
-package com.andersen.domain.dto.workspace;
+package com.andersen.service.dto.workspace;
 
 import com.andersen.domain.entity.workspace.WorkspaceType;
 import jakarta.validation.constraints.Min;

@@ -1,4 +1,4 @@
-package com.andersen.domain.dto.userrole;
+package com.andersen.service.dto.userrole;
 
 /**
  * Data Transfer Object (DTO) representing a login request.

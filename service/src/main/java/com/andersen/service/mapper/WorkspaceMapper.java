@@ -1,7 +1,8 @@
-package com.andersen.domain.mapper;
+package com.andersen.service.mapper;
 
-import com.andersen.domain.dto.workspace.WorkspaceDto;
+
 import com.andersen.domain.entity.workspace.Workspace;
+import com.andersen.service.dto.workspace.WorkspaceDto;
 
 /**
  * Mapper for converting between Workspace entities and Workspace DTOs.

@@ -1,10 +1,14 @@
 package com.andersen.service.auth;
 
-import com.andersen.domain.dto.userrole.AuthResponseDto;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.exception.DataAccessException;
+import com.andersen.service.dto.userrole.AuthResponseDto;
 import com.andersen.service.exception.AuthenticationException;
 import com.andersen.service.exception.RegistrationException;
+
+
+
+
 
 /**
  * Interface for authentication and user management services.
@@ -20,7 +24,7 @@ public interface AuthService {
      * @return the authenticated User object
      * @throws AuthenticationException if the username or password is invalid
      */
-    AuthResponseDto login(String username, String password) throws AuthenticationException, DataAccessException;
+   AuthResponseDto login(String username, String password) throws AuthenticationException, DataAccessException;
 
     /**
      * Registers a new customer with the provided details.

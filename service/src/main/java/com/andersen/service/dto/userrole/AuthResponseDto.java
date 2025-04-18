@@ -1,4 +1,4 @@
-package com.andersen.domain.dto.userrole;
+package com.andersen.service.dto.userrole;
 
 /**
  * Data Transfer Object (DTO) for authentication responses.
@@ -88,4 +88,7 @@ public class AuthResponseDto {
     public void setToken(String token) {
         this.token = token;
     }
+
+
+
 }

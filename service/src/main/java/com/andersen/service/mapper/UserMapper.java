@@ -1,7 +1,8 @@
-package com.andersen.domain.mapper;
+package com.andersen.service.mapper;
 
-import com.andersen.domain.dto.userrole.UserDto;
+
 import com.andersen.domain.entity.role.User;
+import com.andersen.service.dto.userrole.UserDto;
 
 /**
  * Mapper for converting between User entities and User DTOs.

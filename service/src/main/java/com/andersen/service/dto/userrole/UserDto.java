@@ -1,4 +1,4 @@
-package com.andersen.domain.dto.userrole;
+package com.andersen.service.dto.userrole;
 
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
@@ -73,6 +73,8 @@ public class UserDto {
     public UserDto(Long id) {
         this.id = id;
     }
+
+
 
     /**
      * Converts a User entity into a UserDto.
