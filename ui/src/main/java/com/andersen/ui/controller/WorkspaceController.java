@@ -1,7 +1,7 @@
 package com.andersen.ui.controller;
 
-import com.andersen.service.dto.workspace.WorkspaceDto;
-import com.andersen.service.mapper.WorkspaceMapper;
+import com.andersen.ui.dto.workspace.WorkspaceDto;
+import com.andersen.ui.mapper.WorkspaceMapper;
 import com.andersen.domain.entity.workspace.Workspace;
 import com.andersen.service.exception.DataAccessException;
 import com.andersen.service.exception.WorkspaceServiceException;

@@ -1,6 +1,6 @@
-package com.andersen.service.dto.booking;
+package com.andersen.ui.dto.booking;
 
-import com.andersen.service.dto.userrole.UserDto;
+import com.andersen.ui.dto.userrole.UserDto;
 import com.andersen.domain.entity.booking.BookingStatus;
 import jakarta.validation.constraints.NotNull;
 

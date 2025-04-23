@@ -18,13 +18,14 @@
     <dependencies>
         <!-- Lombok -->
 
-        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.38</version>
-            <scope>provided</scope>
+            <version>1.18.30</version> <!-- Add this line -->
+            <scope>provided</scope> <!-- Or optional:true -->
         </dependency>
+
 
         <!-- Spring Boot Starter Data JPA -->
         <dependency>

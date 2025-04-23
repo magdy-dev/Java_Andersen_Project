@@ -45,47 +45,51 @@ public class BookingServiceImpl implements BookingService {
     }
 
     /**
-     * Creates a new booking for a workspace.
+     * Creates a new booking for a specified workspace and time period.
      *
-     * @param customer    the user making the booking
-     * @param workspaceId the ID of the workspace being booked
-     * @param startTime   the start time for the booking
-     * @param endTime     the end time for the booking
-     * @return the created Booking object
-     * @throws BookingServiceException if booking parameters are invalid or if the workspace is not found
-     * @throws DataAccessException     if there is an error accessing the data
+     * @param customer    The user who is making the booking.
+     * @param workspaceId The ID of the workspace to be booked.
+     * @param startTime   The start time of the booking.
+     * @param endTime     The end time of the booking.
+     * @return The created {@link Booking} object.
+     * @throws BookingServiceException If any of the following conditions are not met:
      */
     @Override
     public Booking createBooking(User customer, Long workspaceId, LocalDateTime startTime, LocalDateTime endTime) throws BookingServiceException {
+
         if (workspaceId == null) {
             throw new BookingServiceException("Workspace ID is required.", ErrorCode.BK_001);
         }
-
         if (startTime == null || endTime == null) {
             throw new BookingServiceException("Start time and end time are required.", ErrorCode.BK_002);
         }
-
         if (startTime.isAfter(endTime)) {
             throw new BookingServiceException("Start time must be before end time.", ErrorCode.BK_003);
         }
-
         if (startTime.isBefore(LocalDateTime.now())) {
             throw new BookingServiceException("Cannot book for past dates.", ErrorCode.BK_004);
         }
 
-        // Optionally check if customer or workspace exists in DB (depends on your implementation)
+        Workspace workspace = workspaceRepository.findById(workspaceId)
+                .orElseThrow(() -> new BookingServiceException("Workspace not found.", ErrorCode.WS_001));
+
+        List<Booking> overlapping = bookingRepository.findOverlappingBookings(
+                workspaceId, startTime, endTime
+        );
+        if (!overlapping.isEmpty()) {
+            throw new BookingServiceException("Workspace is not available for the selected time.", ErrorCode.BK_004);
+        }
 
         Booking booking = new Booking();
         booking.setCustomer(customer);
-        booking.setWorkspace(workspaceRepository.findById(workspaceId)
-                .orElseThrow(() -> new BookingServiceException("Workspace not found", ErrorCode.WS_001)));
+        booking.setWorkspace(workspace);
         booking.setStartTime(startTime);
         booking.setEndTime(endTime);
         booking.setStatus(BookingStatus.CONFIRMED);
 
         return bookingRepository.save(booking);
-    }
 
+    }
 
     /**
      * Retrieves a list of bookings made by a customer.
@@ -112,11 +116,10 @@ public class BookingServiceImpl implements BookingService {
      * @return true if the booking was successfully cancelled, false otherwise
      * @throws BookingServiceException if the booking ID or user ID is null,
      *                                 or if the user is not authorized to cancel the booking
-     * @throws DataAccessException     if there is an error accessing the data
      */
     @Override
     public boolean cancelBooking(Long bookingId, Long userId)
-            throws BookingServiceException, DataAccessException {
+            throws BookingServiceException {
         if (bookingId == null || userId == null) {
             throw new BookingServiceException("Invalid parameters", ErrorCode.BK_004);
         }
@@ -146,41 +149,30 @@ public class BookingServiceImpl implements BookingService {
      * @param endTime   the end time for the requested bookings
      * @return a list of available Workspace objects within the specified time range
      * @throws BookingServiceException if the time range is invalid
-     * @throws DataAccessException     if there is an error accessing the data
      */
     @Override
     public List<Workspace> getAvailableWorkspaces(LocalDateTime startTime, LocalDateTime endTime)
-            throws BookingServiceException, DataAccessException {
+            throws BookingServiceException {
+        // Validate inputs before touching the database
         validateTimeRange(startTime, endTime);
-        return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
+
+        try {
+            // Delegate to repository; the JPQL will exclude overlapping bookings
+            return workspaceRepository.getAvailableWorkspaces(startTime, endTime);
+        } catch (org.springframework.dao.DataAccessException e) {
+
+            throw new BookingServiceException("Failed to fetch available workspaces.", ErrorCode.BK_004);
+        }
     }
 
     /**
      * Retrieves all bookings from the repository.
      *
      * @return a list of all Booking objects
-     * @throws DataAccessException if there is an error accessing the data
      */
     @Override
-    public List<Booking> getAllBookings() throws DataAccessException {
+    public List<Booking> getAllBookings() {
         return bookingRepository.findAll();
-    }
-
-    /**
-     * Validates the parameters for booking creation.
-     *
-     * @param customer    the customer making the booking
-     * @param workspaceId the ID of the workspace
-     * @param startTime   the start time of the booking
-     * @param endTime     the end time of the booking
-     * @throws BookingServiceException if any of the required parameters are invalid
-     */
-    private void validateBookingParameters(User customer, Long workspaceId, LocalDateTime startTime, LocalDateTime endTime)
-            throws BookingServiceException {
-        if (customer == null || workspaceId == null) {
-            throw new BookingServiceException("Customer and workspace must be specified", ErrorCode.BK_003);
-        }
-        validateTimeRange(startTime, endTime);
     }
 
     /**

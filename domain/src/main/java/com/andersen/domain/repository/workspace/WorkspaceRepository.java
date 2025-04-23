@@ -53,7 +53,15 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
      * @param endTime   the end time of the requested range
      * @return a list of available Workspace objects
      */
-    @Query("SELECT DISTINCT w FROM Workspace w ")
+    // Filter available workspaces by excluding those with overlapping bookings.
+    // Overlap: (startTime < :endTime AND endTime > :startTime)
+    @Query("""
+                SELECT DISTINCT w FROM Workspace w
+                WHERE w.id NOT IN (
+                    SELECT b.workspace.id FROM Booking b
+                    WHERE (b.startTime < :endTime AND b.endTime > :startTime)
+                )
+            """)
     List<Workspace> getAvailableWorkspaces(@Param("startTime") LocalDateTime startTime,
                                            @Param("endTime") LocalDateTime endTime);
 }

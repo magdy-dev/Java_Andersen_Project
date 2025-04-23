@@ -1,17 +1,19 @@
-package com.andersen.service.mapper;
+package com.andersen.ui.mapper;
 
 
 import com.andersen.domain.entity.booking.Booking;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.workspace.Workspace;
-import com.andersen.service.dto.booking.BookingDto;
-import com.andersen.service.dto.userrole.UserDto;
+import com.andersen.ui.dto.booking.BookingDto;
+import com.andersen.ui.dto.userrole.UserDto;
+import lombok.Data;
 
 /**
  * Mapper class for converting between Booking entities and Booking Data Transfer Objects (DTOs).
  * This class provides methods to translate Booking data to and from User and Workspace representations
  * to facilitate data transfer across different layers of the application.
  */
+@Data
 public class BookingMapper {
 
     /**

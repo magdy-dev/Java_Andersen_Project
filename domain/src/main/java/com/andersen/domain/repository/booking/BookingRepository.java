@@ -3,8 +3,10 @@ package com.andersen.domain.repository.booking;
 
 import com.andersen.domain.entity.booking.Booking;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -22,4 +24,11 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @return a list of Booking objects associated with the given customer ID
      */
     List<Booking> getByCustomerId(Long customerId);
+    @Query("""
+        SELECT b FROM Booking b
+        WHERE b.workspace.id = :workspaceId
+          AND b.status = 'CONFIRMED'
+          AND (b.startTime < :endTime AND b.endTime > :startTime)
+    """)
+    List<Booking> findOverlappingBookings(Long workspaceId, LocalDateTime startTime, LocalDateTime endTime);
 }

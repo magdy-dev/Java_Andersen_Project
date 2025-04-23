@@ -1,5 +1,6 @@
 package com.andersen.service.exception;
 
+import com.andersen.domain.exception.DataAccessException;
 import com.andersen.service.exception.errorcode.ErrorCode;
 
 /**

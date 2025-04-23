@@ -1,8 +1,8 @@
-package com.andersen.service.mapper;
+package com.andersen.ui.mapper;
 
 
 import com.andersen.domain.entity.role.User;
-import com.andersen.service.dto.userrole.UserDto;
+import com.andersen.ui.dto.userrole.UserDto;
 
 /**
  * Mapper for converting between User entities and User DTOs.
@@ -16,11 +16,13 @@ import com.andersen.service.dto.userrole.UserDto;
  */
 public class UserMapper {
 
+
+
     /**
-     * Converts a {@link User} entity to a {@link UserDto}.
+     * Converts a User entity into a UserDto.
      *
      * @param user the User entity to convert
-     * @return the converted UserDto, or null if the provided User is null
+     * @return a UserDto representation of the User entity, or null if the user is null
      */
     public static UserDto toDto(User user) {
         if (user == null) return null;
@@ -53,4 +55,6 @@ public class UserMapper {
         user.setRole(dto.getRole());
         return user;
     }
+
+
 }

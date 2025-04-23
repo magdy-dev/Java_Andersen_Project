@@ -1,6 +1,6 @@
 package com.andersen.domain.exception;
 
-import com.andersen.domain.exception.errorCode.ErrorCodeRepo;
+import com.andersen.domain.exception.errorCode.ErrorCode;
 
 /**
  * Custom exception class to handle errors related to data access operations.
@@ -9,7 +9,7 @@ import com.andersen.domain.exception.errorCode.ErrorCodeRepo;
  */
 public class DataAccessException extends Exception {
 
-    private ErrorCodeRepo errorCode = null;
+    private ErrorCode errorCode = null;
 
     /**
      * Constructs a new DataAccessException with a specified message and error code.
@@ -21,12 +21,13 @@ public class DataAccessException extends Exception {
         this.errorCode = errorCode; // Store the error code
     }
 
+
     /**
      * Retrieves the error code associated with this exception.
      *
      * @return the error code
      */
-    public ErrorCodeRepo getErrorCode() {
+    public ErrorCode getErrorCode() {
         return errorCode;
     }
 }

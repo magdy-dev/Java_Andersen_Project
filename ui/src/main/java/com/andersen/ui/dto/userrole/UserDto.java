@@ -1,4 +1,4 @@
-package com.andersen.service.dto.userrole;
+package com.andersen.ui.dto.userrole;
 
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;

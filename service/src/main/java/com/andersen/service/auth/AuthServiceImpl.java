@@ -4,7 +4,6 @@ package com.andersen.service.auth;
 import com.andersen.domain.entity.role.User;
 import com.andersen.domain.entity.role.UserRole;
 import com.andersen.domain.repository.user.UserRepository;
-import com.andersen.service.dto.userrole.AuthResponseDto;
 import com.andersen.service.security.JwtTokenProvider;
 import com.andersen.service.security.CustomPasswordEncoder;
 import com.andersen.domain.exception.DataAccessException;
@@ -53,20 +52,16 @@ public class AuthServiceImpl implements AuthService {
      * @param password the password of the user trying to log in
      * @return an AuthResponseDto containing the authentication token and user role
      * @throws AuthenticationException if the username or password is invalid
-     * @throws DataAccessException     if there is an error accessing user data
      */
     @Override
-    public AuthResponseDto login(String username, String password)
-            throws AuthenticationException {
+    public User login(String username, String password) throws AuthenticationException {
         User user = userRepository.getByUsername(username);
-
         if (user != null && passwordEncoder.matches(password, user.getPassword())) {
-            String token = jwtTokenProvider.createToken(user.getUsername(), user.getRole());
-            return new AuthResponseDto(user.getId(), user.getUsername(), token);
-        } else {
-            throw new AuthenticationException("Invalid username or password");
+            return user;
         }
+        throw new AuthenticationException("Invalid username or password");
     }
+
 
     /**
      * Registers a new customer with the provided details.
@@ -104,7 +99,6 @@ public class AuthServiceImpl implements AuthService {
 
         return newUser;
     }
-
     /**
      * Retrieves a user by their unique identifier.
      *

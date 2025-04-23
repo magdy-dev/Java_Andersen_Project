@@ -4,7 +4,7 @@ package com.andersen.domain.exception.errorCode;
  * Standardized error codes for the booking system
  * Format: [Domain]_[ErrorType]_[SpecificCode]
  */
-public enum ErrorCodeRepo {
+public enum ErrorCode {
     // Booking domain errors (BK_XXX)
     BK_001("BK_001", "Booking creation failed"),
     BK_002("BK_002", "Booking not found"),
@@ -35,7 +35,7 @@ public enum ErrorCodeRepo {
     private final String code;
     private final String description;
 
-    ErrorCodeRepo(String code, String description) {
+    ErrorCode(String code, String description) {
         this.code = code;
         this.description = description;
     }
@@ -58,10 +58,10 @@ public enum ErrorCodeRepo {
      * @param code The error code to search for
      * @return Matching ErrorCode or null if not found
      */
-    public static ErrorCodeRepo fromCode(String code) {
-        for (ErrorCodeRepo errorCodeRepo : values()) {
-            if (errorCodeRepo.code.equals(code)) {
-                return errorCodeRepo;
+    public static ErrorCode fromCode(String code) {
+        for (ErrorCode errorCode : values()) {
+            if (errorCode.code.equals(code)) {
+                return errorCode;
             }
         }
         return null;
