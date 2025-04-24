@@ -37,16 +37,20 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
      * @param startTime   The start time of the period to check for overlaps.
      * @param endTime     The end time of the period to check for overlaps.
      * @return A list of {@link Booking} objects that are confirmed and overlap with the specified time range.
+     * Returns an empty list if no overlapping bookings are found.
      */
     @Query("""
-            SELECT b
-              FROM Booking b
-             WHERE b.workspace.id = :workspaceId
-               AND b.status = 'CONFIRMED'
+                    SELECT b
+                      FROM Booking b
+                     WHERE b.workspace.id = :workspaceId
+                       AND b.status = 'CONFIRMED'
+                       AND (b.startTime <= :endTime
+                            AND b.endTime >= :startTime)
             """)
     List<Booking> findOverlappingBookings(
             @Param("workspaceId") Long workspaceId,
             @Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime
     );
+
 }
