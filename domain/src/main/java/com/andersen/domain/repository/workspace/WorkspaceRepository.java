@@ -59,7 +59,7 @@ public interface WorkspaceRepository extends JpaRepository<Workspace, Long> {
                 SELECT DISTINCT w FROM Workspace w
                 WHERE w.id NOT IN (
                     SELECT b.workspace.id FROM Booking b
-                    WHERE (b.startTime < :endTime AND b.endTime > :startTime)
+                    WHERE (b.startTime >= :endTime OR b.endTime <= :startTime)
                 )
             """)
     List<Workspace> getAvailableWorkspaces(@Param("startTime") LocalDateTime startTime,
